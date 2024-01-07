@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('perpanjangan', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->id('id_perpanjangan');
+            $table->string('nik',50);
+            $table->text('ktp_seniman');
+            $table->text('pass_foto');
+            $table->text('surat_keterangan');
+            $table->date('tgl_pembuatan');
+            $table->string('kode_verifikasi',45)->nullable();
+            $table->enum('status',['diajukan','proses','diterima','ditolak']);
+            $table->text('catatan')->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('perpanjangan');

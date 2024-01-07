@@ -6,20 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('histori_nis', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->id('id_histori');
+            $table->string('nis',45);
+            $table->string('tahun',5);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('histori_nis');
