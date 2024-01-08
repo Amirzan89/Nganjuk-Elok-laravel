@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('alamat_seniman',50);
             $table->string('no_telpon',15);
             $table->string('nama_organisasi',50)->nullable();
-            $table->integer('jumlah_anggota',5)->nullable();
+            $table->unsignedInteger('jumlah_anggota')->nullable();
             $table->text('ktp_seniman');
             $table->text('pass_foto');
             $table->text('surat_keterangan');

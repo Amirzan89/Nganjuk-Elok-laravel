@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('nama_tempat',50);
             $table->string('deskripsi_sewa_tempat',100);
             $table->string('nama_kegiatan_sewa',50);
-            $table->integer('jumlah_peserta',10)->nullable();
+            $table->unsignedBigInteger('jumlah_peserta')->nullable();
             $table->string('instansi',50)->nullable();
             $table->text('surat_ket_sewa');
             $table->dateTime('tgl_awal_peminjaman');

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('kode_otp',6);
             $table->string('link');
             $table->enum('deskripsi',['password','email']);
-            $table->integer('send',2);
+            $table->unsignedInteger('send');
             $table->timestamps();
         });
     }
