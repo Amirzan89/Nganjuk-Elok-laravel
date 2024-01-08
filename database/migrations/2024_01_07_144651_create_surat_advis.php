@@ -20,6 +20,8 @@ return new class extends Migration
             $table->enum('status',['diajukan','proses','diterima','ditolak']);
             $table->text('catatan')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('id_seniman');
+            $table->foreign('id_seniman')->references('id_seniman')->on('seniman')->onDelete('cascade');
         });
     }
 

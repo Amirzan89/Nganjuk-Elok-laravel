@@ -13,8 +13,10 @@ return new class extends Migration
             $table->string('email',45);
             $table->longText('token');
             $table->enum('device',['website','mobile']);
-            $table->boolean('number',1);
+            $table->boolean('number');
             $table->timestamps();
+            $table->unsignedBigInteger('id_user');
+            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
         });
     }
 
