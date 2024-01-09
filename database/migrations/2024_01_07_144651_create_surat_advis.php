@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('surat_advis', function (Blueprint $table) {
             $table->id('id_advis');
-            $table->string('nomor_induk',20);
+            $table->string('nomor_induk',30);
             $table->string('nama_advis',30);
             $table->string('alamat_advis',100);
             $table->string('deskripsi_advis',100);
