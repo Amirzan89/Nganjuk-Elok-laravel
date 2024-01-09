@@ -22,7 +22,7 @@ return new class extends Migration
             $table->dateTime('tgl_akhir_peminjaman');
             $table->string('kode_pinjam',45)->nullable();
             $table->enum('status',['diajukan','proses','diterima','ditolak']);
-            $table->text('catatan');
+            $table->text('catatan')->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('id_user');
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
