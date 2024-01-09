@@ -14,6 +14,10 @@ return new class extends Migration
             $table->enum('status',['diajukan','proses','diterima','ditolak']);
             $table->text('catatan')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('id_detail');
+            $table->foreign('id_detail')->references('id_detail')->on('detail_events')->onDelete('cascade');
+            $table->unsignedBigInteger('id_user');
+            $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
         });
     }
 

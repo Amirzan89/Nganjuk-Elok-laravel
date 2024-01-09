@@ -17,8 +17,6 @@ return new class extends Migration
             $table->date('tanggal_akhir');
             $table->string('link_pendaftaran',2000);
             $table->text('poster_event');
-            $table->unsignedBigInteger('id_event');
-            $table->foreign('id_event')->references('id_event')->on('events')->onDelete('cascade');
         });
     }
 
