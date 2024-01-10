@@ -1,40 +1,5 @@
 <?php
-require_once(__DIR__ . '/../web/koneksi.php');
-require_once(__DIR__ . '/../web/authenticate.php');
-require_once(__DIR__ . '/../env.php');
-require_once(__DIR__ . '/../Date.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST, [
-  'uri' => $_SERVER['REQUEST_URI'],
-  'method' => $_SERVER['REQUEST_METHOD']
-], $conn);
-if ($userAuth['status'] == 'error') {
-  header('Location: /login.php');
-} else {
-  $userAuth = $userAuth['data'];
-  if (!in_array($userAuth['role'], ['super admin', 'admin seniman', 'admin pentas'])) {
-    echo "<script>alert('Anda bukan admin seniman !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-  if (isset($_GET['id_pentas']) && !empty($_GET['id_pentas'])) {
-    $id  = $_GET['id_pentas'];
-    $sql = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, alamat_advis, deskripsi_advis, kode_verifikasi, DATE(tgl_advis) AS tanggal, tempat_advis, status, catatan FROM surat_advis WHERE id_advis = '$id' LIMIT 1");
-    if (mysqli_num_rows($sql) > 0) {
-      $pentas = changeMonth(mysqli_fetch_all($sql, MYSQLI_ASSOC))[0];
-      // $pentas = mysqli_fetch_assoc($sql);
-  } else {
-      header("Location: /pentas.php");
-      exit();
-  }
-  } else {
-    header('Location: /pentas.php');
-  }
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,18 +13,18 @@ if ($userAuth['status'] == 'error') {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+  <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/style.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/style.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'css/popup.css') }}" rel="stylesheet">
 
 </head>
 
@@ -296,13 +261,13 @@ if ($userAuth['status'] == 'error') {
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <div id="greenPopup" style="display:none"></div>
   <div id="redPopup" style="display:none"></div>
-  <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
+  <script src="{{ asset($tPath.'js/popup.js') }}"></script>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
   <script>
     var modalProses = document.getElementById('modalProses');
     var modalSetuju = document.getElementById('modalSetuju');
