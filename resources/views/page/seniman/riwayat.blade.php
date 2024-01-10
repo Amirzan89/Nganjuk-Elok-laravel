@@ -1,27 +1,5 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
-require_once(__DIR__.'/../Date.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin seniman'])){
-    echo "<script>alert('Anda bukan admin seniman !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,21 +12,25 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/assets/img/favicon.png" rel="icon">
-  <link href="<?php echo $tPath; ?>/public/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="{{ asset($tPath.'assets/img/favicon.png') }}" rel="icon">
+  <link href="{{ asset($tPath.'assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <!-- <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet"> -->
+
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/nomor-induk.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/nomor-induk.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'css/popup.css') }}" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -68,18 +50,18 @@ if($userAuth['status'] == 'error'){
     }
 
   </style>
+
 </head>
 
 <body>
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-	  var csrfToken = "<?php echo $csrf ?>";
+		var csrfToken = "<?php echo $csrf ?>";
     var email = "<?php echo $userAuth['email'] ?>";
     var idUser = "<?php echo $userAuth['id_user'] ?>";
     var number = "<?php echo $userAuth['number'] ?>";
     var role = "<?php echo $userAuth['role'] ?>";
-	</script>
-
+    </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
     <?php include(__DIR__.'/../header.php');
@@ -90,8 +72,8 @@ if($userAuth['status'] == 'error'){
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
       <?php 
-        $nav = 'seniman';
-        include(__DIR__.'/../sidebar.php');
+      $nav = 'seniman';
+      include(__DIR__.'/../sidebar.php');
       ?>
     </ul>
   </aside><!-- End Sidebar-->
@@ -99,12 +81,12 @@ if($userAuth['status'] == 'error'){
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Verifikasi Pengajuan</h1>
+      <h1>Riwayat Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
           <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
-          <li class="breadcrumb-item active">Verifikasi Pengajuan</li>
+          <li class="breadcrumb-item active">Riwayat Pengajuan</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -123,7 +105,7 @@ if($userAuth['status'] == 'error'){
                         <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
                           <option value="semua">semua</option>
                           <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
                           <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
@@ -151,10 +133,10 @@ if($userAuth['status'] == 'error'){
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                   </tr>
-                  </thead>
-                  <tbody>
+                </thead>
+                <tbody>
                   <?php
-                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status FROM seniman WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_seniman DESC");
+                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
                       $no = 1;
                       $senimanData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
                       foreach ($senimanData as $seniman) {
@@ -164,18 +146,14 @@ if($userAuth['status'] == 'error'){
                       <td><?php echo $seniman['nama_seniman']?></td>
                       <td><?php echo $seniman['tanggal']?></td>
                       <td>
-                        <?php if($seniman['status'] == 'diajukan'){ ?>
-                          <span class="badge bg-proses">Diajukan</span>
-                        <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <span class="badge bg-terima">Diproses</span>
-                        <?php } ?>
+                        <?php if($seniman['status'] == 'diterima'){ ?>
+                          <span class="badge bg-terima">Diterima</span>
+                          <?php }else if($seniman['status'] == 'ditolak'){ ?>
+                            <span class="badge bg-tolak">Ditolak </span>
+                            <?php } ?>
                       </td>
                       <td>
-                      <?php if($seniman['status'] == 'diajukan'){ ?>
-                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
-                        <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
-                        <?php } ?>
+                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
                       </td>
                     </tr>
                   <?php $no++;
@@ -195,36 +173,34 @@ if($userAuth['status'] == 'error'){
       </div>
     </section>
 
-
-
   </main><!-- End #main -->
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-  <?php include(__DIR__.'/../footer.php');
+    <?php include(__DIR__.'/../footer.php');
     ?>
   </footer>
-  
+  <!-- </footer> -->
+
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <script src="{{ asset($tPath.'js/popup.js') }}"></script>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
   <script>
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
     var tahun;
+
     function updateTable(dataT = ''){
       var table = $('#tableSeniman').DataTable();
       table.clear().draw();
       var num = 1;
       if (dataT !== '') {
-        let count = 0;
         dataT.forEach(function (item) {
-          count++;
           table.row.add([
             num,
             item['nama_seniman'],
@@ -239,22 +215,20 @@ if($userAuth['status'] == 'error'){
       $('#tableSeniman_filter').remove();
       $('#tableSeniman_paginate').remove();
       $('#tableSeniman_info').remove();
-      //change info
+      //change info 
       ////////////////
 
       function getStatusBadge(status) {
-        if (status == 'diajukan') {
-          return '<span class="badge bg-proses">Diajukan</span>';
-        } else if (status == 'proses') {
-          return '<span class="badge bg-terima">Diproses</span>';
+        if (status == 'ditolak') {
+          return '<span class="badge bg-tolak">Ditolak</span>';
+        } else if (status == 'diterima') {
+          return '<span class="badge bg-terima">Diterima</span>';
         }
         return '';
       }
-      function getActionButton(status, idSeniman) {
-        if (status == 'diajukan') {
-          return `<button class="btn btn-lihat" onclick="proses('${idSeniman}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
-        } else if (status == 'proses') {
-          return `<a href="/seniman/detail_seniman.php?id_seniman=${idSeniman}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+      function getActionButton(status, idAdvis) {
+        if (status == 'ditolak' || status == 'diterima') {
+          return `<a href="/seniman/detail_seniman.php?id_seniman=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -265,16 +239,16 @@ if($userAuth['status'] == 'error'){
         var requestBody = {
           email: email,
           tanggal:'semua',
-          desc:'pengajuan',
-          table:'seniman'
+          desc:'riwayat',
+          table:"seniman"
         };
       }else if(con == null){
         var tanggal = bulanInput.value +'-'+tahunInput.value;
         var requestBody = {
           email: email,
           tanggal:tanggal,
-          desc:'pengajuan',
-          table:'seniman'
+          desc:'riwayat',
+          table:"seniman"
         };
       }
       //open the request
@@ -291,6 +265,7 @@ if($userAuth['status'] == 'error'){
           } else {
             var response = xhr.responseText;
             updateTable();
+            return;
           }
         }
       }
@@ -324,42 +299,12 @@ if($userAuth['status'] == 'error'){
         setTimeout(() => {
           getData();
         }, 250);
-      }, 50);
-    }
-    function proses(Id) {
-      var xhr = new XMLHttpRequest();
-      var requestBody = {
-        _method: 'PUT',
-        id_user: idUser,
-        id_seniman: Id,
-        keterangan: 'proses',
-        desc:'seniman'
-      };
-      //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman.php")
-      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      //send the form data
-      xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            window.location.href = "/seniman/detail_seniman.php?id_seniman="+Id;
-          } else {
-            console.log(xhr.responseText);
-            try {
-                eval(xhr.responseText);
-            } catch (error) {
-                console.error('Error evaluating JavaScript:', error);
-            }
-          }
-        }
-      }
+      }, 5);
     }
   </script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
 
 </body>
 

@@ -1,72 +1,5 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin seniman'])){
-    echo "<script>alert('Anda bukan admin seniman !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-  $pathFile = __DIR__."/../kategori_seniman.json";
-  $fileExist = file_exists($pathFile);
-  if (!$fileExist) {
-    $query = "SELECT nama_kategori, singkatan FROM kategori_seniman";
-    $stmt = $conn->prepare($query);
-    if(!$stmt->execute()){
-      $stmt->close();
-      throw new Exception('Data kategori seniman tidak ditemukan');
-    }
-    $result = $stmt->get_result();
-    $kategoriData = [];
-    while ($row = $result->fetch_assoc()) {
-      $kategoriData[] = $row;
-    }
-    $stmt->close();
-    if ($kategoriData === null) {
-      throw new Exception('Data kategori seniman tidak ditemukan');
-    }
-    $kategoriDB = json_encode($kategoriData, JSON_PRETTY_PRINT);
-  }else{
-    $jsonFile = file_get_contents($pathFile);
-    $kategoriDB = json_decode($jsonFile, true);
-    if($kategoriDB === null){
-      $query = "SELECT nama_kategori, singkatan FROM kategori_seniman";
-      $stmt = $conn->prepare($query);
-      if(!$stmt->execute()){
-        $stmt->close();
-        throw new Exception('Data kategori seniman tidak ditemukan');
-      }
-      $result = $stmt->get_result();
-      $kategoriData = [];
-      while ($row = $result->fetch_assoc()) {
-        $kategoriData[] = $row;
-      }
-      $stmt->close();
-      if ($kategoriData === null) {
-        throw new Exception('Data kategori seniman tidak ditemukan');
-      }
-      $kategoriDB = json_encode($kategoriData, JSON_PRETTY_PRINT);
-    }else{
-      $kategoriDB = array_map(function($kategori) {
-        unset($kategori['id_kategori_seniman']);
-        return $kategori;
-    }, $kategoriDB);
-    }
-  }
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,7 +12,7 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+  <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -87,13 +20,13 @@ if($userAuth['status'] == 'error'){
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/nomor-induk.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/nomor-induk.css') }}" rel="stylesheet">
 
 </head>
 
@@ -292,12 +225,12 @@ if($userAuth['status'] == 'error'){
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
 
 </body>
 
