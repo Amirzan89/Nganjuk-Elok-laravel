@@ -1,3 +1,6 @@
+<?php
+$tPath = app()->environment('local') ? '' : '/public/';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,16 +139,16 @@
             class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.js') }}"></script>
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/waypoints/noframework.waypoints.js') }}"></script>
-    <script src="<?php echo $tPath; ?>/public/assets/vendor/php-email-form/validate.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/waypoints/noframework.waypoints.js') }}"></script>
+    <script src="{{ asset($tPath.'assets/vendor/php-email-form/validate.js') }}"></script>
 
     <!-- Template Main JS File -->
-    <script src="<?php echo $tPath; ?>/public/assets/js/LandingPage.js"></script>
+    <script src="{{ asset($tPath.'assets/js/LandingPage.js"></script>
 
 </body>
 

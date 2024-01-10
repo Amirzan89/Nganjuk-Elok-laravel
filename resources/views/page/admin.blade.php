@@ -1,32 +1,5 @@
 <?php
-require_once(__DIR__ . '/web/koneksi.php');
-require_once(__DIR__ . '/web/authenticate.php');
-require_once(__DIR__ . '/env.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST, [
-  'uri' => $_SERVER['REQUEST_URI'],
-  'method' => $_SERVER['REQUEST_METHOD']
-], $conn);
-if ($userAuth['status'] == 'error') {
-  header('Location: /login.php');
-} else {
-  $userAuth = $userAuth['data'];
-  if ($userAuth['role'] != 'super admin') {
-    echo "<script>alert('Anda bukan super admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-  $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role != 'masyarakat' AND role != 'super admin'");
-  if ($query) {
-    $users = mysqli_fetch_all($query, MYSQLI_ASSOC);
-  } else {
-    $users = array();
-  }
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,19 +13,19 @@ if ($userAuth['status'] == 'error') {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+  <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
 
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/style.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/style.css') }}" rel="stylesheet">
 
 </head>
 
@@ -292,7 +265,7 @@ if ($userAuth['status'] == 'error') {
   </main>
   <!-- End #main -->
 
-  <!-- ======= Footer ======= -->
+  <!-- ======= Footer ======= -->/
   <footer id="footer" class="footer">
     <div class="copyright">
       &copy; Copyright <strong><span>Huffle Puff</span></strong>. All Rights Reserved
@@ -334,13 +307,13 @@ if ($userAuth['status'] == 'error') {
     }
   </script>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/admin/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/admin/main.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var currentPageURL = window.location.href;

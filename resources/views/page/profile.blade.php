@@ -1,28 +1,5 @@
 <?php
-require_once(__DIR__.'/web/koneksi.php');
-require_once(__DIR__.'/web/authenticate.php');
-require_once(__DIR__.'/env.php');
-require_once(__DIR__.'/Date.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST, [
-  'uri' => $_SERVER['REQUEST_URI'],
-  'method' => $_SERVER['REQUEST_METHOD'
-  ]
-], $conn);
-if ($userAuth['status'] == 'error') {
-  header('Location: /login.php');
-} else {
-  $userAuth = $userAuth['data'];
-  if($userAuth['role'] == 'masyarakat'){
-    echo "<script>alert('Anda bukan admin !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,7 +14,7 @@ if ($userAuth['status'] == 'error') {
 
   <!-- Favicons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+  <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -45,12 +22,12 @@ if ($userAuth['status'] == 'error') {
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/style.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/style.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'css/popup.css') }}" rel="stylesheet">
   <style>
     div.drag#divImg{
       border:4px solid black;
@@ -419,10 +396,10 @@ if ($userAuth['status'] == 'error') {
   <div id="greenPopup" style="display:none"></div>
   <div id="redPopup" style="display:none"></div>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/apexcharts/apexcharts.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?php  echo $tPath ?>/public/js/popup.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="<?php  echo $tPath ?>/public/js/popup.js') }}"></script>
   <script>
     const maxSizeInBytes = 4 * 1024 * 1024; //max file 4MB
     var divImg = document.getElementById('divImg');
@@ -564,8 +541,7 @@ if ($userAuth['status'] == 'error') {
         });
       });
     </script>
-  <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/admin/main.js"></script>
+  // <!-- Template Main JS File -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var currentPageURL = window.location.href;
@@ -577,8 +553,8 @@ if ($userAuth['status'] == 'error') {
         }
       });
     });
-
-  </script>
+    </script>
+    <script src="{{ asset($tPath.'assets/js/admin/main.js') }}"></script>
 </body>
 
 </html>

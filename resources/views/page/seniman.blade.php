@@ -1,27 +1,3 @@
-<?php
-require_once(__DIR__ . '/web/koneksi.php');
-require_once(__DIR__ . '/web/authenticate.php');
-require_once(__DIR__ . '/env.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST, [
-  'uri' => $_SERVER['REQUEST_URI'],
-  'method' => $_SERVER['REQUEST_METHOD']
-], $conn);
-if ($userAuth['status'] == 'error') {
-  header('Location: /login.php');
-} else {
-  $userAuth = $userAuth['data'];
-  if (!in_array($userAuth['role'], ['super admin', 'admin seniman'])) {
-    echo "<script>alert('Anda bukan admin seniman !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 

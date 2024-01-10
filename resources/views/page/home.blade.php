@@ -1,3 +1,6 @@
+<?php
+$tPath = app()->environment('local') ? '' : '/public/';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -66,11 +69,11 @@
             masyarakat,
             sehingga masyarakat dapat dengan lebih mudah menikmati layanan kami.</h2>
           <div class="d-flex justify-content-center justify-content-lg-start">
-            <a href="{{ asset($tPath.'Nganjuk Elok.apk" class="btn-get-started scrollto">Unduh Aplikasi</a>
+            <a href="{{ asset($tPath.'Nganjuk Elok.apk') }}" class="btn-get-started scrollto">Unduh Aplikasi</a>
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-in" data-aos-delay="200">
-          <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/hero.png" class="img-fluid animated" alt="">
+          <img src="{{ asset($tPath.'assets/img/LandingPage/hero.png') }}" class="img-fluid animated" alt="">
         </div>
       </div>
     </div>
@@ -86,7 +89,7 @@
 
       <div class="row">
         <div class="col-lg-6 d-flex align-items-center" data-aos="fade-right" data-aos-delay="100">
-          <img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/hero2.png" class="img-fluid" alt="">
+          <img src="{{ asset($tPath.'assets/img/LandingPage/hero2.png') }}" class="img-fluid" alt="">
         </div>
         <div class="col-lg-6 pt-4 pt-lg-0 content" data-aos="fade-left" data-aos-delay="100">
           <br>
@@ -156,12 +159,12 @@
         </div>
 
         <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
-          <?php
+          {{-- <?php
           $query = mysqli_query($con, "SELECT id_tempat, nama_tempat, alamat_tempat, foto_tempat FROM list_tempat");
           while ($tempat = mysqli_fetch_array($query)) {
           ?>
             <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-              <!-- <div class="portfolio-img"><img src="<?php echo $tPath; ?>/public/img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div> -->
+              <!-- <div class="portfolio-img"><img src="{{ asset($tPath.'img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div> -->
               <div class="portfolio-img"><img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
               <div class="portfolio-info">
                 <h4><?php echo $tempat['nama_tempat']?></h4>
@@ -172,7 +175,7 @@
                 <a href="/home2.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
               </div>
             </div>
-          <?php } ?>
+          <?php } ?> --}}
         </div>
       </div>
     </section>
@@ -189,7 +192,7 @@
         <div class="row">
           <div class="col-lg-6">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="100">
-              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan1.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset($tPath.'assets/img/LandingPage/layanan1.png') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Upload Event</h4>
                 <p>Masyrakar dapat mengupload event atau kegiatan yang akan dilaksanakan.</p>
@@ -203,7 +206,7 @@
 
           <div class="col-lg-6 mt-4 mt-lg-0">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="200">
-              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan2.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset($tPath.'assets/img/LandingPage/layanan2.png') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Peminjaman Gedung/Tempat</h4>
                 <p>Masyarakat dapat mengajukan peminjaman gedung dan tempat wisata yang dikelola oleh DISPARPORABUD.
@@ -218,7 +221,7 @@
 
           <div class="col-lg-6 mt-4">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="300">
-              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan3.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset($tPath.'assets/img/LandingPage/layanan3.png') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Nomer Induk Seniman</h4>
                 <p>Masyarakat dapat mendaftarkan nomer induk seniman dan memperpanjang masa berlaku kartu.</p>
@@ -232,7 +235,7 @@
 
           <div class="col-lg-6 mt-4">
             <div class="member d-flex align-items-start" data-aos="zoom-in" data-aos-delay="400">
-              <div class="pic"><img src="<?php echo $tPath; ?>/public/assets/img/LandingPage/layanan4.png" class="img-fluid" alt=""></div>
+              <div class="pic"><img src="{{ asset($tPath.'assets/img/LandingPage/layanan4.png') }}" class="img-fluid" alt=""></div>
               <div class="member-info">
                 <h4>Surat Advis / Izin Pentas</h4>
                 <p>Masyarakat dapat mengajukan surat advis / surat perizinan pentas kesenian.</p>
@@ -313,16 +316,16 @@
   <div id="preloader"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/aos/aos.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/waypoints/noframework.waypoints.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/php-email-form/validate.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/aos/aos.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/waypoints/noframework.waypoints.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/php-email-form/validate.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/LandingPage.js"></script>
+  <script src="{{ asset($tPath.'assets/js/LandingPage.js') }}"></script>
 </body>
 
 </html>

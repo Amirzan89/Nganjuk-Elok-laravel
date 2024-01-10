@@ -1,3 +1,6 @@
+<?php
+$tPath = app()->environment('local') ? '' : '/public/';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +9,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disporabudpar - Nganjuk</title>
-    <link rel="stylesheet" href="<?php echo $tPath; ?>/public/css/utama/login.css?">
+    <link rel="stylesheet" href="{{ asset($tPath.'css/utama/login.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+    <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 </head>
 <body>
     <!-- <img class="wave" src="https://raw.githubusercontent.com/sefyudem/Responsive-Login-Form/master/img/wave.png"> -->
