@@ -65,26 +65,20 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
                 <div class="row content">
                     <div class="row row-cols-1 row-cols-md-3 g-3">
-                        <?php 
-                            $query = mysqli_query($con, "SELECT events.id_detail, nama_event, deskripsi, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y')AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' ORDER BY ABS(TIMESTAMPDIFF(SECOND, NOW(), tanggal_awal)) ASC");
-                            while ($events = mysqli_fetch_array($query)) {
-                        ?>
                         <div class="col">
                             <div class="card">
-                                <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
+                                {{-- <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" /> --}}
                                 <div class="card-body">
-                                    <h5 class="card-title"><?php echo $events['nama_event']?></h5>
+                                    <h5 class="card-title"></h5>
                                     <p class="card-text">
-                                        Tanggal Pelaksanaan : <?php echo $events['tanggal_awal'] ?> 
+                                        Tanggal Pelaksanaan : 
                                         <br><br>
-                                        Tempat : <?php echo $events['tempat_event']?>
+                                        Tempat : 
                                         <br><br>
-                                        <?php echo $events['deskripsi']?>
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <?php } ?>
                     </div>
                 </div>
         </section>

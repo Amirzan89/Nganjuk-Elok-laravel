@@ -399,7 +399,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <script src="{{ asset($tPath.'assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
   <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
-  <script src="<?php  echo $tPath ?>/public/js/popup.js') }}"></script>
+  <script src="{{ asset($tPath.'/js/popup.js') }}"></script>
   <script>
     const maxSizeInBytes = 4 * 1024 * 1024; //max file 4MB
     var divImg = document.getElementById('divImg');

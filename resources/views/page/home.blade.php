@@ -122,24 +122,19 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="row content">
           <div class="row row-cols-1 row-cols-md-3 g-3">
-          <?php 
-            $query = mysqli_query($con, "SELECT events.id_detail, nama_event, deskripsi, tempat_event, DATE_FORMAT(tanggal_awal, '%d %M %Y')AS tanggal_awal, DATE_FORMAT(tanggal_akhir, '%d %M %Y') AS tanggal_akhir, poster_event FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' ORDER BY ABS(TIMESTAMPDIFF(SECOND, NOW(), tanggal_awal)) ASC LIMIT 3");
-            while ($events = mysqli_fetch_array($query)) {
-          ?>
             <div class="col">
               <div class="card">
               <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
-                  <h5 class="card-title"><?php echo $events['nama_event']?></h5>
+                  {{-- <h5 class="card-title"><?php echo $events['nama_event']?></h5> --}}
                   <p class="card-text">
-                    Tanggal Pelaksanaan : <?php echo $events['tanggal_awal']?>
+                    {{-- Tanggal Pelaksanaan : <?php echo $events['tanggal_awal']?> --}}
                     <br>
-                    Tempat : <?php echo $events['tempat_event'] ?>
+                    {{-- Tempat : <?php echo $events['tempat_event'] ?> --}}
                   </p>
                 </div>
               </div>
             </div>
-          <?php } ?>
           </div>
           <a href="/home1.php" class="btn-learn-more">Lainnya</a>
         </div>
@@ -159,23 +154,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
 
         <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
-          {{-- <?php
-          $query = mysqli_query($con, "SELECT id_tempat, nama_tempat, alamat_tempat, foto_tempat FROM list_tempat");
-          while ($tempat = mysqli_fetch_array($query)) {
-          ?>
-            <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-              <!-- <div class="portfolio-img"><img src="{{ asset($tPath.'img/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div> -->
-              <div class="portfolio-img"><img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>" class="img-fluid" alt=""></div>
-              <div class="portfolio-info">
-                <h4><?php echo $tempat['nama_tempat']?></h4>
-                <!-- <p>Gedung</p> -->
-                <!-- <a href="{{ asset($tPath.'img/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery" -->
-                <a href="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>" data-gallery="portfolioGallery"
-                  class="portfolio-lightbox preview-link" title="Balai Budaya"><i class="bx bx-plus"></i></a>
-                <a href="/home2.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
-              </div>
-            </div>
-          <?php } ?> --}}
         </div>
       </div>
     </section>
