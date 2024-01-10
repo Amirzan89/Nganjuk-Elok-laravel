@@ -21,7 +21,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <img style="width: 400px;" src="/public/img/icon/utama/login.svg">
         </div>
         <div class="login-content">
-            <form action="web/login.php" method="post" class="form-login" id="loginForm">
+            <form action="{{route('users.login')}}" method="post" class="form-login" id="loginForm">
                 <h2>Selamat Datang!</h2>
                 <div class="input-div one">
                     <div class="i">

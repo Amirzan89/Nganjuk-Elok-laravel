@@ -124,7 +124,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <div class="row row-cols-1 row-cols-md-3 g-3">
             <div class="col">
               <div class="card">
-              <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" />
+              {{-- <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" /> --}}
                 <div class="card-body">
                   {{-- <h5 class="card-title"><?php echo $events['nama_event']?></h5> --}}
                   <p class="card-text">
