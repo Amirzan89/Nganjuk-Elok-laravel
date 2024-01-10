@@ -1,26 +1,5 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-  'uri'=>$_SERVER['REQUEST_URI'],
-  'method'=>$_SERVER['REQUEST_METHOD']
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-  if(!in_array($userAuth['role'],['super admin','admin tempat'])){
-    echo "<script>alert('Anda bukan admin tempat !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +12,7 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+  <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -41,13 +20,13 @@ if($userAuth['status'] == 'error'){
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/tempat.css') }}" rel="stylesheet">
 
 </head>
 
@@ -94,8 +73,8 @@ if($userAuth['status'] == 'error'){
                         <div class="card-body">
                           <h4 class="card-title">Data Tempat</h4>
                           <a href="/tempat/tambah_tempat.php">
-                            <button type="button" class="btn btn-success">
-                                <i class="bi bi-person-plus-fill"></i> Tambah Tempat
+                            <button type="button" class="btn btn-primary">
+                                <i class="bi bi-file-earmark-plus" style='font-size: 20px; font-weight: bold;'></i>   Tambah Tempat
                             </button>
                           </a>
                             <table class="table datatable">
@@ -111,20 +90,27 @@ if($userAuth['status'] == 'error'){
                                   <?php
                                     $query = mysqli_query($conn, "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat FROM list_tempat ");
                                     $no = 1;
-                                    while ($users = mysqli_fetch_array($query)) {
+                                    while ($tempat = mysqli_fetch_array($query)) {
                                   ?>
                                       <tr>
                                         <td><?php echo $no?></td>
-                                        <td><?php echo $users['nama_tempat'] ?></td>
-                                        <td><?php echo $users['alamat_tempat'] ?></td>
+                                        <td><?php echo $tempat['nama_tempat'] ?></td>
+                                        <td><?php echo $tempat['alamat_tempat'] ?></td>
                                         <td>
-                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $users['id_tempat'] ?>" class="btn btn-info"><i class="bi bi-pencil-square">Lihat</i></a>
+                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                                          <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
+                                          <button type="button" class="btn btn-tolak" onclick="openDelete(<?php echo $tempat['id_tempat']?>)"> <i class="bi bi-trash-fill"></i>   Hapus</button>
                                         </td>
                                       </tr>
                                     <?php $no++;
                                   } ?>
                                 </tbody>
                             </table>
+                            <div class="row mb-3 justify-content-end">
+                                <div class="col-sm-10 text-end">
+                                    <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -133,23 +119,54 @@ if($userAuth['status'] == 'error'){
         </section>
 
     </main><!-- End #main -->
-
+    <!-- start modal delete -->
+  <div class="modal fade" id="modalDelete" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Konfirmasi hapus data tempat</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Apakah anda yakin ingin menghapus data tempat?  
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <form action="/web/tempat/tempat.php" id="deleteForm" method="POST">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_tempat" id="inpTempat">
+            <button type="submit" class="btn btn-tolak" name="hapusAdmin">Hapus</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end modal delete -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <?php include(__DIR__.'/../footer.php');
     ?>
   </footer>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script>
+    var modal = document.getElementById('modalDelete');
+    var deleteForm = document.getElementById('deleteForm');
+    var inpTempat = document.getElementById('inpTempat');
+    function openDelete(dataU){
+      inpTempat.value = dataU;
+      var myModal = new bootstrap.Modal(modal);
+      myModal.show();
+    }
+  </script>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
 
 </body>
 

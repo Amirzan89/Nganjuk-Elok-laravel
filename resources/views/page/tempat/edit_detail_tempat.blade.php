@@ -1,39 +1,5 @@
 <?php
-require_once(__DIR__.'/../web/koneksi.php');
-require_once(__DIR__.'/../web/authenticate.php');
-require_once(__DIR__.'/../env.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST,[
-    'uri'=>$_SERVER['REQUEST_URI'],
-    'method'=>$_SERVER['REQUEST_METHOD'
-    ]
-],$conn);
-if($userAuth['status'] == 'error'){
-	header('Location: /login.php');
-}else{
-	$userAuth = $userAuth['data'];
-    if(!in_array($userAuth['role'],['super admin','admin tempat'])){
-        echo "<script>alert('Anda bukan admin tempat !')</script>";
-        echo "<script>window.location.href = '/dashboard.php';</script>";
-        exit();
-    }
-    $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-    $csrf = $GLOBALS['csrf'];
-    if (isset($_GET['id_tempat']) && !empty($_GET['id_tempat'])) {
-        $id  = $_GET['id_tempat'];
-        $sql  = mysqli_query($conn, "SELECT * FROM list_tempat WHERE `id_tempat` = '" . $id . "'");
-        if (mysqli_num_rows($sql) > 0) {
-            $tempat = mysqli_fetch_assoc($sql);
-        } else {
-            header("Location: /tempat.php");
-            exit();
-        }
-    }else{
-        header('Location: /tempat/data_tempat.php');
-    }
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,7 +12,7 @@ if($userAuth['status'] == 'error'){
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/img/icon/utama/logo.png" rel="icon">
+  <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
@@ -54,14 +20,14 @@ if($userAuth['status'] == 'error'){
     href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
     rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
 
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/tempat.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'css/popup.css') }}" rel="stylesheet">
   <style>
         div.drag#divImg {
             border: 4px solid black;
@@ -198,8 +164,7 @@ if($userAuth['status'] == 'error'){
                                     <div class="col-md-12" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
                                         <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
                                         <img src="<?php echo $tPath ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt="">
-                                        <!-- <img src="<?php echo $tPath ?>/public/img/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt=""> -->
-                                        <!-- <input class="form-control" name="foto" type="file" id="formFile"> -->
+                                    {{-- <!-- <input class="form-control" name="foto" type="file" id="formFile"> --> --}}
                                     </div>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
@@ -229,13 +194,13 @@ if($userAuth['status'] == 'error'){
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script> 
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script> 
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
-  <script src="<?php echo $tPath ?>/public/js/popup.js"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
+  <script src="{{ asset($tPath.'js/popup.js') }}"></script>
     <script>
         const maxSizeInBytes = 4 * 1024 * 1024; //max file 4MB
         var divText = document.getElementById('divText');

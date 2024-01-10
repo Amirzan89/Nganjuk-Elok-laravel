@@ -1,27 +1,5 @@
 <?php
-require_once(__DIR__ . '/../web/koneksi.php');
-require_once(__DIR__ . '/../web/authenticate.php');
-require_once(__DIR__ . '/../env.php');
-require_once(__DIR__ . '/../Date.php');
-loadEnv();
-$database = koneksi::getInstance();
-$conn = $database->getConnection();
-$userAuth = authenticate($_POST, [
-  'uri' => $_SERVER['REQUEST_URI'],
-  'method' => $_SERVER['REQUEST_METHOD']
-], $conn);
-if ($userAuth['status'] == 'error') {
-  header('Location: /login.php');
-} else {
-  $userAuth = $userAuth['data'];
-  if (!in_array($userAuth['role'], ['super admin', 'admin tempat'])) {
-    echo "<script>alert('Anda bukan admin tempat !')</script>";
-    echo "<script>window.location.href = '/dashboard.php';</script>";
-    exit();
-  }
-  $tPath = ($_SERVER['APP_ENV'] == 'local') ? '' : $_SERVER['APP_FOLDER'];
-  $csrf = $GLOBALS['csrf'];
-}
+$tPath = app()->environment('local') ? '' : '/public/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,18 +13,18 @@ if ($userAuth['status'] == 'error') {
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/favicon.png" rel="icon">
-  <link href="<?php echo $tPath; ?>/public/assets/img/landing-page/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="{{ asset($tPath.'assets/img/landing-page/favicon.png') }}" rel="icon">
+  <link href="{{ asset($tPath.'assets/img/landing-page/apple-touch-icon.png') }}" rel="apple-touch-icon">
   <!-- Google Fonts -->
   <!-- <link href="https://fonts.gstatic.com" rel="preconnect"> -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
   <!-- Vendor CSS Files -->
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
   <!-- Template Main CSS File -->
-  <link href="<?php echo $tPath; ?>/public/assets/css/tempat.css" rel="stylesheet">
-  <link href="<?php echo $tPath; ?>/public/css/popup.css" rel="stylesheet">
+  <link href="{{ asset($tPath.'assets/css/tempat.css') }}" rel="stylesheet">
+  <link href="{{ asset($tPath.'css/popup.css') }}" rel="stylesheet">
   <style>
     .ui-datepicker-calendar {
       display: none;
@@ -201,13 +179,13 @@ if ($userAuth['status'] == 'error') {
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-  <script src="<?php echo $tPath; ?>/public/js/popup.js"></script>
+  <script src="{{ asset($tPath.'js/popup.js') }}"></script>
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/jquery/jquery.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
+  <script src="{{ asset($tPath.'assets/vendor/jquery/jquery.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/datatables/js/jquery.dataTables.min.js') }}"></script>
   <script>
     var tahunInput = document.getElementById('inpTahun');
     var bulanInput = document.getElementById('inpBulan');
@@ -325,7 +303,7 @@ if ($userAuth['status'] == 'error') {
   </script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
 
 </body>
 
