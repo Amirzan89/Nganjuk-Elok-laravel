@@ -18,10 +18,11 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <!-- <img class="wave" src="https://raw.githubusercontent.com/sefyudem/Responsive-Login-Form/master/img/wave.png"> -->
     <div class="container">
         <div class="img">
-            <img style="width: 400px;" src="/public/img/icon/utama/login.svg">
+            <img style="width: 400px;" src="{{ asset($tPath.'/img/icon/utama/login.svg') }}">
         </div>
         <div class="login-content">
             <form action="{{route('users.login')}}" method="post" class="form-login" id="loginForm">
+                @csrf
                 <h2>Selamat Datang!</h2>
                 <div class="input-div one">
                     <div class="i">

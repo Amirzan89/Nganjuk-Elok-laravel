@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Exception;
-class UserController extends Controller
+class AdminController extends Controller
 {
     public function getChangePass(Request $request, User $user, $any = null){
         $changePassPage = new ChangePasswordController();

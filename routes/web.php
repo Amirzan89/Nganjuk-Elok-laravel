@@ -1,10 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use app\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LoginController;
 Route::group(['middleware'=>'auth'],function(){
-    // Route::get('/', function () {
-    //     return view('welcome');
-    // });
     Route::get('/login', function () {
         return view('page.login');
     })->name('login');
@@ -61,7 +58,8 @@ Route::group(['middleware'=>'auth'],function(){
         //
     });
     Route::group(['prefix'=>'/users'],function(){
-        Route::post('/login','Auth\LoginController@Login')->name('users.login');
+        Route::post('/login',[LoginController::class,'Login']);
+        // Route::post('/login','Auth\LoginController@Login');
     });
     Route::get('/auth/redirect', 'Auth\LoginController@redirectToProvider');
     Route::get('/auth/google', 'Auth\LoginController@handleProviderCallback');
