@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Page;
+namespace App\Http\Controllers\Mobile;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class SenimanController extends Controller
+class TempatController extends Controller
 {
     //
 }

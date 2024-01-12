@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Page;
+namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class EventController extends Controller
+class TempatController extends Controller
 {
     //
 }

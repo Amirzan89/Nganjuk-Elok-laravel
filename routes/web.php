@@ -1,6 +1,12 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Web\TempatController;
+
+use App\Http\Controllers\Services\AdminController;
+use App\Http\Controllers\Services\EventController;
+use App\Http\Controllers\Services\PentasController;
+use App\Http\Controllers\Services\SenimanController;
+use App\Http\Controllers\Services\SewaController;
+use App\Http\Controllers\Services\TempatController;
 
 use App\Http\Controllers\Mobile\EventController AS MobileEventController;
 use App\Http\Controllers\Mobile\PentasController AS MobilePentasController;
@@ -10,6 +16,7 @@ use App\Http\Controllers\Mobile\SenimanController AS MobileSenimanController;
 use App\Http\Controllers\Page\EventController AS ShowEventController;
 use App\Http\Controllers\Page\PentasController AS ShowPentasController;
 use App\Http\Controllers\Page\SenimanController AS ShowSenimanController;
+use App\Http\Controllers\Page\SewaController AS ShowSewaController;
 use App\Http\Controllers\Page\TempatController AS ShowTempatController;
 
 use App\Http\Controllers\Auth\LoginController;
@@ -64,14 +71,16 @@ Route::group(['middleware'=>'auth'],function(){
         //
     });
     Route::group(['prefix'=>'/sewa'],function(){
-        Route::get('/formulir',[ShowTempatController::class,'showFormulir']);
-        Route::get('/detail',[ShowTempatController::class,'showDetailSewa']);
+        Route::get('/formulir',[ShowSewaController::class,'showFormulir']);
+        Route::get('/detail',[ShowSewaController::class,'showDetailSewa']);
+        Route::get('/pengajuan', [ShowSewaController::class,'showPengajuan']);
+        Route::get('/riwayat', [ShowSewaController::class,'showRiwayat']);
+        Route::post('/pengajuan', [ShowSewaController::class,'showPengajuan']);
+        Route::post('/riwayat', [ShowSewaController::class,'showRiwayat']);
     });
     Route::group(['prefix'=>'/tempat'],function(){
         Route::get('/', [ShowTempatController::class,'showTempat']);
         Route::get('/data', [ShowTempatController::class,'showDataTempat']);
-        Route::get('/pengajuan', [ShowTempatController::class,'showPengajuan']);
-        Route::get('/riwayat', [ShowTempatController::class,'showRiwayat']);
         Route::get('/detail', [ShowTempatController::class,'showDetailTempat']);
         Route::get('/lihat', [ShowTempatController::class,'showDetailTempat']);
         Route::get('/tambah', [ShowTempatController::class,'showTambahTempat']);

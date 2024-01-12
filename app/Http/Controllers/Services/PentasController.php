@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Web;
+namespace App\Http\Controllers\Services;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class TempatController extends Controller
+class PentasController extends Controller
 {
     //
 }
