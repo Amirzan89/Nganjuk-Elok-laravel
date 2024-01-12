@@ -1,6 +1,6 @@
 <?php
 namespace App\Http\Middleware;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\JWTController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ use Closure;
 class Authenticate
 {
     public function handle(Request $request, Closure $next){
-        $userController = app()->make(UserController::class);
+        $userController = app()->make(AdminController::class);
         $jwtController = app()->make(JWTController::class);
         $pathh = $request->path();
         $previousUrl = url()->previous();
@@ -109,21 +109,28 @@ class Authenticate
                                                     $response->cookie('token3',$token3,$cookie->getExpiresTime());
                                                 }
                                             }
+                                            Cookie::forget('token2');
                                             $response->cookie('token2', $updated['data'], time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED')));
                                             return $response;
                                         }
                                     }else{
                                         return response()->json(['status'=>'error','message'=>$decoded['message']],500);
                                     }
-                                //if success decode
+                                    //if success decode
                                 }else{
-                                    $decoded['data'][0][0]['number'] = $number;
                                     if($request->path() === 'users/google' && $request->isMethod("get")){
                                         $data = [$decoded['data'][0][0]];
                                         $request->request->add($data);
                                         return response()->json($request->all());
                                     }
-                                    return $next($request);
+                                    //when working using this
+                                    $request->merge(['user_auth' => $decoded['data']]);
+                                    $response = $next($request);
+                                    return $response; 
+
+                                    //when error using this
+                                    // $request->merge(['user_auth'=>$decoded]);
+                                    // return $next($request); 
                                 }
                             }
                         //if token is not exist in database
@@ -141,7 +148,7 @@ class Authenticate
             }
         //if cookie gone
         }else{
-            $page = ['/page/dashboard','/page/device','/users/pengaturan','/page/laporan','/page/edukasi'];
+            $page = ['/dashboard'];
             if(in_array('/'.$request->path(),$page)){
                 if($request->hasCookie("token1")){
                     $token1 = $request->cookie('token1');

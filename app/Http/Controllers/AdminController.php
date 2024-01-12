@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Services;
+namespace App\Http\Controllers;
 use App\Http\Controllers\Auth\JwtController;
 use App\http\controllers\Mail\MailController;
 use App\Http\Controllers\Website\ChangePasswordController;

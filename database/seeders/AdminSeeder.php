@@ -21,7 +21,7 @@ class AdminSeeder extends Seeder
                 'role'=>'admin event',
                 'email'=>'adminEvent@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
             [
@@ -33,7 +33,7 @@ class AdminSeeder extends Seeder
                 'role'=>'admin event',
                 'email'=>'adminEvent1@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
             [
@@ -45,7 +45,7 @@ class AdminSeeder extends Seeder
                 'role'=>'admin tempat',
                 'email'=>'adminTempat@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
             [
@@ -57,7 +57,7 @@ class AdminSeeder extends Seeder
                 'role'=>'admin tempat',
                 'email'=>'adminTempat1@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
             [
@@ -69,7 +69,7 @@ class AdminSeeder extends Seeder
                 'role'=>'admin seniman',
                 'email'=>'adminSeniman@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
             [
@@ -81,7 +81,7 @@ class AdminSeeder extends Seeder
                 'role'=>'admin seniman',
                 'email'=>'adminSeniman1@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
         ]);

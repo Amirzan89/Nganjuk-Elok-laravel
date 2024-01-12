@@ -18,15 +18,13 @@ use App\Http\Controllers\Page\PentasController AS ShowPentasController;
 use App\Http\Controllers\Page\SenimanController AS ShowSenimanController;
 use App\Http\Controllers\Page\SewaController AS ShowSewaController;
 use App\Http\Controllers\Page\TempatController AS ShowTempatController;
-
+use App\Http\Controllers\Page\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 Route::group(['middleware'=>'auth'],function(){
     Route::get('/login', function () {
         return view('page.login');
     })->name('login');
-    Route::get('/dashboard', function () {
-        return view('page.dashboard');
-    });
+    Route::get('/dashboard',[DashboardController::class,'show']);
     Route::get('/event', function () {
         return view('page.event');
     });
@@ -75,8 +73,8 @@ Route::group(['middleware'=>'auth'],function(){
         Route::get('/detail',[ShowSewaController::class,'showDetailSewa']);
         Route::get('/pengajuan', [ShowSewaController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowSewaController::class,'showRiwayat']);
-        Route::post('/pengajuan', [ShowSewaController::class,'showPengajuan']);
-        Route::post('/riwayat', [ShowSewaController::class,'showRiwayat']);
+        Route::put('/pengajuan', [ShowSewaController::class,'showPengajuan']);
+        Route::put('/riwayat', [ShowSewaController::class,'showRiwayat']);
     });
     Route::group(['prefix'=>'/tempat'],function(){
         Route::get('/', [ShowTempatController::class,'showTempat']);
@@ -86,7 +84,7 @@ Route::group(['middleware'=>'auth'],function(){
         Route::get('/tambah', [ShowTempatController::class,'showTambahTempat']);
         Route::get('/edit', [ShowTempatController::class,'showEditTempat']);
         Route::post('/tambah', [TempatController::class,'tambah']);
-        Route::post('/edit',[TempatController::class,'edit']);
+        Route::put('/edit',[TempatController::class,'edit']);
     });
     Route::group(['prefix'=>'/users'],function(){
         Route::post('/login',[LoginController::class,'Login']);

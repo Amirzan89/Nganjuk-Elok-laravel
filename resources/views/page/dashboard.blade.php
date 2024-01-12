@@ -31,26 +31,30 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
   <script>
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+      var tPath = '';
+  </script>
+  @else
+  <script>
+      var tPath = '/public/';
+  </script>
+  @endif
+  <script>
+    var csrfToken = "{{ csrf_token() }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'dashboard';
-      include(__DIR__.'/sidebar.php');
-      ?>
+      @php
+        $nav = 'dashboard';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -78,11 +82,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                         <i class="bi bi-people-fill"></i>
                       </div>
                       <div class="ps-3"> 
-                        <?php
-                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role != 'super admin' AND role != 'masyarakat'");
-                        $data = mysqli_fetch_assoc($sql);
-                        echo "<h4>" . $data['total'] . "</h4>";
-                        ?>
+                        <h4> {{ $totalAdmin }}</h4>
                       </div>
                     </div>
                   </div>
@@ -98,11 +98,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                         <i class="bi bi-people-fill"></i>
                       </div>
                       <div class="ps-3">
-                        <?php
-                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'masyarakat'");
-                        $data = mysqli_fetch_assoc($sql);
-                        echo "<h4>" . $data['total'] . "</h4>";
-                        ?>
+                        <h4> {{ $totalPengguna }}</h4>
                       </div>
                     </div>
                 </a>
@@ -117,28 +113,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <div class="card">
             <div class="card-body mt-2 mb-5">
               <h5 class="card-title mt-3 "><strong>Kalender Peminjaman Tempat</strong></h5>
-              <?php
-              $dataKalender = ''; 
-              $sql = "SELECT id_sewa, nama_peminjam, nama_tempat, nama_kegiatan_sewa, DATE(tgl_awal_peminjaman) AS start_date, DATE(tgl_akhir_peminjaman) AS end_date FROM sewa_tempat WHERE status = 'diterima'"; 
-              $result = $conn->query($sql);
-              if ($result->num_rows >= 1) {
-                  $data = array();
-                  while ($row = mysqli_fetch_assoc($result)) {
-                    $sewa = array(
-                      'id' => $row['id_sewa'],
-                      'title' => $row['nama_kegiatan_sewa'],
-                      'peminjam' => $row['nama_peminjam'],
-                      'nama_tempat' => $row['nama_tempat'],
-                      'start' => $row['start_date'],
-                      'end' => $row['end_date'],
-                  );
-                    $data[] = $sewa;
-                  }
-                  $dataKalender = $data;
-              }
-              // include(__DIR__.'/kalender.php'); 
-              include(__DIR__.'/dynamic-full-calendar.php'); 
-              ?>
+              @include('component.dynamic-full-calendar')
             </div>
           </div>
         </div>
@@ -159,11 +134,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="activity-content">
                     <a href="/event/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Kelola Event</strong></h6>
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diajukan'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo $data['total'] . " notifikasi";
-                      ?>
+                      {{ $totalEvent }} notifikasi
                     </a>
                   </div>
                 </div><!-- End activity item-->
@@ -176,11 +147,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="activity-content">
                     <a href="/tempat/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Peminjaman Tempat</strong></h6>
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM sewa_tempat WHERE status = 'diajukan'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo $data['total'] . " notifikasi";
-                      ?>
+                      {{ $totalSewa }} notifikasi
                     </a>
                   </div>
                 </div><!-- End activity item-->
@@ -193,11 +160,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="activity-content">
                     <a href="/seniman/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Regitrasi Nomor Induk Seniman</strong></h6>
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo $data['total'] . " notifikasi";
-                      ?>
+                      {{ $totalSeniman }} notifikasi
                     </a>
                   </div>
                 </div><!-- End activity item-->
@@ -210,11 +173,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="activity-content">
                     <a href="/seniman/perpanjangan.php" class="fw-bold text-dark">
                       <h6><strong>Perpanjang Nomor Induk Seniman</strong></h6>
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM perpanjangan WHERE status = 'diajukan'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo $data['total'] . " notifikasi";
-                      ?>
+                      {{ $totalPerpanjangan }} notifikasi
                     </a>
                   </div>
                 </div><!-- End activity item-->
@@ -227,11 +186,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="activity-content">
                     <a href="/pentas/pengajuan.php" class="fw-bold text-dark">
                       <h6><strong>Surat Advis</strong></h6>
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo $data['total'] . " notifikasi";
-                      ?>
+                      {{ $totalPentas }} notifikasi
                     </a>
                   </div>
     </div>
@@ -253,8 +208,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/footer.php');
-    ?>
+    @extends('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i

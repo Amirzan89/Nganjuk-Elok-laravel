@@ -21,7 +21,7 @@ class SuperAdminSeeder extends Seeder
                 'role'=>'super admin',
                 'email'=>'SuperAdmin@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ],
             [
@@ -33,7 +33,7 @@ class SuperAdminSeeder extends Seeder
                 'role'=>'super admin',
                 'email'=>'adminTester@gmail.com',
                 'password'=>Hash::make('Admin@1234567890'),
-                'foto'=>Str::random(5),
+                'foto'=>'',
                 'verifikasi'=>true
             ]
         ]);

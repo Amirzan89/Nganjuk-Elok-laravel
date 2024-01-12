@@ -145,7 +145,7 @@ class JwtController extends Controller
                     // return $this->checkTotalLoginWebsite(['email'=>$email]);
                     $number = $this->checkTotalLoginWebsite(['email'=>$email]);
                     $dataDb = User::select()->whereRaw("BINARY email = ?",[$email])->limit(1)->get();
-                    $data = json_decode(json_encode($dataDb));
+                    $data = json_decode($dataDb,true)[0];
                     if($number['data'] >= 3){
                         $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
                         $expRefresh = time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED'));
@@ -163,6 +163,7 @@ class JwtController extends Controller
                             $refreshToken->token = $Rtoken;
                             $refreshToken->device = 'website';
                             $refreshToken->number = 3;
+                            $refreshToken->id_user = $data['id_user'];
                             if($refreshToken->save()){
                                 return [
                                     'status'=>'success',
@@ -189,6 +190,7 @@ class JwtController extends Controller
                         $refreshToken->email = $email;
                         $refreshToken->token = $Rtoken;
                         $refreshToken->device = 'website';
+                        $refreshToken->id_user = $data['id_user'];
                         $number = $this->checkTotalLoginWebsite(['email'=>$email]);
                         if($number['status'] == 'error'){
                             $refreshToken->number = 1;
@@ -256,7 +258,7 @@ class JwtController extends Controller
                 }else if($opt == 'refresh'){
                     $decode = JWT::decode($token, new Key(env('JWT_SECRET_REFRESH_TOKEN'), 'HS512'));
                     $decoded = json_decode(json_encode($decode), true);
-                    if(strcmp($email,$decoded['data'][0]['email'] ?? null) === 0){
+                    if(strcmp($email,$decoded['data']['email'] ?? null) === 0){
                         return ['status'=>'success','data'=>json_decode(json_encode($decode), true)];
                     }else{
                         return ['status'=>'error','message'=>'invalid email'];

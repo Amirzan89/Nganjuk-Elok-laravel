@@ -15,13 +15,29 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <link href="{{ asset($tPath.'img/icon/utama/logo.png') }}" rel="icon">
 </head>
 <body>
+    @if(app()->environment('local'))
+    <script>
+        var tPath = '';
+    </script>
+    @else
+        <script>
+            var tPath = '/public/';
+        </script>
+    @endif
+    <script>
+        var csrfToken = "{{ csrf_token() }}";
+        @if(isset($logout))
+            var logoutt = "{{$logout}}";
+            showPopup(logoutt);
+        @endif
+    </script>
     <!-- <img class="wave" src="https://raw.githubusercontent.com/sefyudem/Responsive-Login-Form/master/img/wave.png"> -->
     <div class="container">
         <div class="img">
             <img style="width: 400px;" src="{{ asset($tPath.'/img/icon/utama/login.svg') }}">
         </div>
         <div class="login-content">
-            <form action="{{route('users.login')}}" method="post" class="form-login" id="loginForm">
+            <form class="form-login" id="loginForm">
                 @csrf
                 <h2>Selamat Datang!</h2>
                 <div class="input-div one">
@@ -53,7 +69,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
-    <script> 
+    <script src="{{ asset($tPath.'js/page/login.js?') }}"></script>
+    <script>
         const inputs = document.querySelectorAll(".input");
         function addcl(){
         	let parent = this.parentNode.parentNode;

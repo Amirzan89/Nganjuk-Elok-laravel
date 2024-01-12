@@ -31,7 +31,7 @@ loginForm.onsubmit = function(event){
         password:inpPassword.value
     };
     xhr.open('POST',"/users/login")
-    // xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
     xhr.onreadystatechange = function() {
