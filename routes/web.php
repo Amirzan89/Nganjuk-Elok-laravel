@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Services\AdminController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Services\EventController;
 use App\Http\Controllers\Services\PentasController;
 use App\Http\Controllers\Services\SenimanController;
@@ -88,6 +88,7 @@ Route::group(['middleware'=>'auth'],function(){
     });
     Route::group(['prefix'=>'/users'],function(){
         Route::post('/login',[LoginController::class,'Login']);
+        Route::post('/logout',[AdminController::class,'logout']);
     });
     Route::get('/auth/redirect', 'Auth\LoginController@redirectToProvider');
     Route::get('/auth/google', 'Auth\LoginController@handleProviderCallback');

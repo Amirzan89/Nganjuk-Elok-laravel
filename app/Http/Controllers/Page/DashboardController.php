@@ -36,21 +36,13 @@ class DashboardController extends Controller
             $dataKalender[] = $sewa;
         }
         unset($dataKalenderQuery);
-        // echo json_encode($dataKalender);
-        // exit();
         $totalEvent = Events::where('status','diajukan')->count();
         $totalSeniman = Seniman::where('status','diajukan')->count();
         $totalSewa = SewaTempat::where('status','diajukan')->count();
         $totalPentas = SuratAdvis::where('status','diajukan')->count();
         $totalPerpanjangan = Perpanjangan::where('status','diajukan')->count();
-        // echo json_encode($request);
-        // echo '<br>';
-        // echo '<br>';
-        // echo '<br>';
-        // echo json_encode($request->input('user_auth'));
-        // exit();
         $dataShow = [
-            'userAuth'=>$request->input('user_auth')['data'],
+            'userAuth'=>$request->input('user_auth'),
             'totalAdmin'=>$totalAdmin,
             'totalPengguna'=>$totalPengguna,
             'dataKalender'=>$dataKalender,

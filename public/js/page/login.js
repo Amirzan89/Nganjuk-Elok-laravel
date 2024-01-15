@@ -12,7 +12,6 @@ function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
 loginForm.onsubmit = function(event){
-    console.log("wayahe login");
     event.preventDefault();
     const email = inpEmail.value;
     const password = inpPassword.value;

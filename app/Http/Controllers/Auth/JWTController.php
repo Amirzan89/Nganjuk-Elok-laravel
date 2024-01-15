@@ -146,6 +146,7 @@ class JwtController extends Controller
                     $number = $this->checkTotalLoginWebsite(['email'=>$email]);
                     $dataDb = User::select()->whereRaw("BINARY email = ?",[$email])->limit(1)->get();
                     $data = json_decode($dataDb,true)[0];
+                    unset($data['password']);
                     if($number['data'] >= 3){
                         $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
                         $expRefresh = time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED'));

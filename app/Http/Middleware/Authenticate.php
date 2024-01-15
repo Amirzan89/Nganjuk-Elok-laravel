@@ -124,12 +124,20 @@ class Authenticate
                                         return response()->json($request->all());
                                     }
                                     //when working using this
-                                    $request->merge(['user_auth' => $decoded['data']]);
+                                    $userAuth = $decoded['data']['data'];
+                                    $userAuth['number'] = $decoded['data']['number'];
+                                    $userAuth['exp'] = $decoded['data']['exp'];
+                                    unset($decoded);
+                                    $request->merge(['user_auth' => $userAuth]);
                                     $response = $next($request);
                                     return $response; 
-
+                                    
                                     //when error using this
-                                    // $request->merge(['user_auth'=>$decoded]);
+                                    // $userAuth = $decoded['data']['data'];
+                                    // $userAuth['number'] = $decoded['data']['number'];
+                                    // $userAuth['exp'] = $decoded['data']['exp'];
+                                    // unset($decoded);
+                                    // $request->merge(['user_auth'=>$userAuth]);
                                     // return $next($request); 
                                 }
                             }

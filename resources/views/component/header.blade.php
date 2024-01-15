@@ -22,7 +22,7 @@
               @endif
             @endif
             <span class="d-none d-md-block dropdown-toggle ps-2">{{ $userAuth['nama_lengkap'] }}</span>
-          </a><!-- End Profile Iamge Icon -->
+          </a><!-- End Profile Image Icon -->
 
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
@@ -55,4 +55,4 @@
 
       </ul>
     </nav>
-    <script src="/public/js/utama/logout.js"></script>
+    <script src="{{ asset($tPath . '/js/page/logout.js') }}"></script>

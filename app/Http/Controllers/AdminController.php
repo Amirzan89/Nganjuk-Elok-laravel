@@ -395,10 +395,10 @@ class AdminController extends Controller
         }else{
             $deleted = $jwtController->deleteRefreshWebsite($email,$number);
             if($deleted['status'] == 'error'){
-                return redirect("/login")->withCookies([Cookie::forget('token1'),Cookie::forget('token2')]);
+                return redirect("/login")->withCookies([Cookie::forget('token1'),Cookie::forget('token2'), Cookie::forget('token3')]);
                 // return response()->json(['status'=>'error',$deleted['message']],$deleted['code']);
             }else{
-                return redirect("/login")->withCookies([Cookie::forget('token1'),Cookie::forget('token2')]);
+                return redirect("/login")->withCookies([Cookie::forget('token1'),Cookie::forget('token2'), Cookie::forget('token3')]);
             }
         }
     }
