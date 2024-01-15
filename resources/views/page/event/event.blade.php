@@ -37,7 +37,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
   </script>
   @endif
   <script>
-    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
+    var role = "{{ $userAuth['role'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -61,7 +63,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Kelola Event</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
           <li class="breadcrumb-item active">Kelola Event</li>
         </ol>
       </nav>
@@ -74,7 +76,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <div class="row">
             <div class="row">
               <div class="col-xxl-4 col-md-4">
-                <div class="card success-card revenue-card"><a href="/event/formulir.php">
+                <div class="card success-card revenue-card"><a href="/event/formulir">
                     <div class="card-body">
                       <h5 class="card-title">Formulir</h5>
                       <div class="d-flex align-items-center">
@@ -87,7 +89,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
               </div>
             </div>
             <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card"><a href="/event/pengajuan.php">
+              <div class="card success-card revenue-card"><a href="/event/pengajuan">
                   <div class="card-body">
                     <h5 class="card-title">Verifikasi Pengajuan</h5>
                     <div class="d-flex align-items-center">
@@ -95,11 +97,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                         <i class="bi bi-bell-fill"></i>
                       </div>
                       <div class="ps-3">
-                        <?php
-                        $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diajukan' OR status = 'proses'");
-                        $data = mysqli_fetch_assoc($sql);
-                        echo "<h4>" . $data['total'] . "</h4>";
-                        ?>
+                        <h4> {{ $totalPengajuan }}</h4>
                       </div>
                     </div>
                 </a>
@@ -107,7 +105,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
             </div>
           </div>
           <div class="col-xxl-4 col-md-4">
-            <div class="card success-card revenue-card"><a href="/event/riwayat.php">
+            <div class="card success-card revenue-card"><a href="/event/riwayat">
                 <div class="card-body">
                   <h5 class="card-title">Riwayat</h5>
                   <div class="d-flex align-items-center">
@@ -115,11 +113,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM events WHERE status = 'diterima' OR status = 'ditolak'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo "<h4>" . $data['total'] . "</h4>";
-                      ?>
+                      <h4> {{ $totalRiwayat }}</h4>
                     </div>
                   </div>
                 </div>
@@ -134,20 +128,19 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
-  <script src="<?php echo $tPath; ?>/public/assets/vendor/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/vendor/tinymce/tinymce.min.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="<?php echo $tPath; ?>/public/assets/js/main.js') }}"></script>
+  <script src="{{ asset($tPath.'assets/js/main.js') }}"></script>
 </body>
 
 </html>

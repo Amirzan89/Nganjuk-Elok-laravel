@@ -1,6 +1,6 @@
-<?php
-$tPath = app()->environment('local') ? '' : '/public/';
-?>
+@php 
+  $tPath = app()->environment('local') ? '' : '/public/'; 
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,27 +53,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+  <script>
+    var tPath = '';
+    </script>
+  @else
+  <script>
+    var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-	</script>
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
+    var role = "{{ $userAuth['role'] }}";
+  </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-      $nav = 'event';
-      include(__DIR__.'/../sidebar.php');
-      ?>
+      @php
+        $nav = 'event';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -83,8 +90,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Riwayat Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="/event">Kelola Event</a></li>
             <li class="breadcrumb-item active">Riwayat Pengajuan</li>
         </ol>
       </nav>
@@ -100,23 +107,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="{{ date('Y') }}" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
                         <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
                           <option value="semua">semua</option>
-                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
-                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
-                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
-                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
-                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
-                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
-                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
-                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
-                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
-                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
-                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
-                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
+                          <option value="1" {{  (date('m') == 1) ? 'selected' : '' }} >Januari</option>
+                          <option value="2" {{  (date('m') == 2) ? 'selected' : '' }} >Februari</option>
+                          <option value="3" {{  (date('m') == 3) ? 'selected' : '' }} >Maret</option>
+                          <option value="4" {{  (date('m') == 4) ? 'selected' : '' }} >April</option>
+                          <option value="5" {{  (date('m') == 5) ? 'selected' : '' }} >Mei</option>
+                          <option value="6" {{  (date('m') == 6) ? 'selected' : '' }} >Juni</option>
+                          <option value="7" {{  (date('m') == 7) ? 'selected' : '' }} >Juli</option>
+                          <option value="8" {{  (date('m') == 8) ? 'selected' : '' }} >Agustus</option>
+                          <option value="9" {{  (date('m') == 9) ? 'selected' : '' }} >September</option>
+                          <option value="10" {{  (date('m') == 10) ? 'selected' : '' }} >Oktober</option>
+                          <option value="11" {{  (date('m') == 11) ? 'selected' : '' }} >November</option>
+                          <option value="12" {{  (date('m') == 12) ? 'selected' : '' }} >Desember</option>
                         </select>
                       </div>
                     </div>
@@ -134,35 +141,30 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                    $query = mysqli_query($conn, "SELECT id_event, nama_pengirim, nama_event, DATE(created_at) AS tanggal, status, catatan FROM events INNER JOIN detail_events ON events.id_detail = detail_events.id_detail WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_event DESC");
-                    $no = 1;
-                    $eventsData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
-                    foreach ($eventsData as $event) {
-                  ?>
+                  @php $no = 1; @endphp
+                  @foreach ($eventsData as $event)
                     <tr>
-                      <td><?php echo $no?></td>
-                      <td><?php echo $event['nama_pengirim']?></td>
-                      <td><?php echo $event['nama_event']?></td>
-                      <td><?php echo $event['tanggal']?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $event['nama_pengirim'] }}</td>
+                      <td>{{ $event['nama_event'] }}</td>
+                      <td>{{ $event['tanggal'] }}</td>
                       <td>
-                        <?php if($event['status'] == 'diterima'){ ?>
+                        @if ($event['status'] == 'diterima')
                           <span class="badge bg-terima">Diterima</span>
-                        <?php }else if($event['status'] == 'ditolak'){ ?>
-                          <span class="badge bg-tolak">Ditolak </span>
-                        <?php } ?>
+                        @elseif ($event['status'] == 'ditolak')
+                          <span class="badge bg-tolak">Ditolak</span>
+                        @endif
                       </td>
                       <td>
-                        <a href="/event/detail_event.php?id_event=<?= $event['id_event'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
+                        <a href="/event/detail_event?id_event={{ $event['id_event'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>
                     </tr>
-                  <?php $no++;
-                  } ?>
+                  @endforeach
                 </tbody>
               </table>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../event.php" class="btn btn-secondary">Kembali</a>
+                  <a href="../event" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
             </div>
@@ -176,8 +178,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
   <!-- </footer> -->
 
@@ -228,7 +229,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       function getActionButton(status, idEvent) {
         if (status == 'ditolak' || status == 'diterima') {
-          return `<a href="/event/detail_event.php?id_event=${idEvent}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/event/detail_event?id_event=${idEvent}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -250,7 +251,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/event/event.php")
+      xhr.open('POST', domain + "/web/event/event")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

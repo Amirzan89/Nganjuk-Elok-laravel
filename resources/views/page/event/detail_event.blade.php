@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,28 +31,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+  <script>
+      var tPath = '';
+      </script>
+  @else
+  <script>
+      var tPath = '/public/';
+      </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    var idEvent = "<?php echo $id ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
+    var role = "{{ $userAuth['role'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__ . '/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'event';
-      include(__DIR__ . '/../sidebar.php');
-      ?>
+      @php
+        $nav = 'event';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -63,13 +69,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Detail Data Event</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
-          <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
-            <li class="breadcrumb-item"><a href="/event/pengajuan.php">Verifikasi Pengajuan</a></li>
-          <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
-            <li class="breadcrumb-item"><a href="/event/riwayat.php">Riwayat Pengajuan</a></li>
-          <?php } ?>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/event">Kelola Event</a></li>
+          @if ($eventsData['status'] == 'diajukan' || $eventsData['status'] == 'proses')
+            <li class="breadcrumb-item"><a href="/event/pengajuan">Verifikasi Pengajuan</a></li>
+          @elseif ($eventsData['status'] == 'diterima' || $eventsData['status'] == 'ditolak')
+            <li class="breadcrumb-item"><a href="/event/riwayat">Riwayat Pengajuan</a></li>
+          @endif
           <li class="breadcrumb-item active">Detail event</li>
         </ol>
       </nav>
@@ -79,48 +85,48 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <div class="row">
         <div class="col-lg-12">
           <div class="row mb-3 d-flex justify-content-center align-items-center">
-            <?php if ($events['status'] == 'diterima') { ?>
+            @if ($eventsData['status'] == 'diterima')
               <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
-            <?php } else if ($events['status'] == 'ditolak') { ?>
+            @elseif ($eventsData['status'] == 'ditolak')
               <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
               </li>
-            <?php } ?>
+            @endif
           </div>
           <div class="card">
             <div class="card-body">
-              <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
+              @if ($eventsData['status'] == 'diajukan' || $eventsData['status'] == 'proses')
                 <h5 class="card-title"> Pengajuan event</h5>
-              <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
+              @elseif ($eventsData['status'] == 'diterima' || $eventsData['status'] == 'ditolak')
                 <h5 class="card-title"> Riwayat event</h5>
-              <?php } ?>
+              @endif
               <form class="row g-3">
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Nama Pengirim</label>
-                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['nama_pengirim'] ?>">
+                  <input type="text" class="form-control" id="inputText" readonly value="{{  $eventsData['nama_pengirim'] }}">
                 </div>
                 <div class="col-md-12">
                   <label for="inputText" class="form-label">Nama Event</label>
-                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['nama_event'] ?>">
+                  <input type="text" class="form-control" id="inputText" readonly value="{{  $eventsData['nama_event'] }}">
                 </div>
                 <div class="col-md-4">
                   <label for="inputDate" class="form-label">Tanggal awal</label>
-                  <input type="text" class="form-control" id="inputDate" readonly value="<?php echo $events['tanggal_awal'] ?>">
+                  <input type="text" class="form-control" id="inputDate" readonly value="{{  $eventsData['tanggal_awal'] }}">
                 </div>
                 <div class="col-md-4">
                   <label for="inputDate" class="form-label">Tanggal akhir</label>
-                  <input type="text" class="form-control" id="inputDate" readonly value="<?php echo $events['tanggal_akhir'] ?>">
+                  <input type="text" class="form-control" id="inputDate" readonly value="{{  $eventsData['tanggal_akhir'] }}">
                 </div>
                 <div class="col-md-8">
                   <label for="inputText" class="form-label">Tempat</label>
-                  <input type="text" class="form-control" id="inputText" readonly value="<?php echo $events['tempat_event'] ?>">
+                  <input type="text" class="form-control" id="inputText" readonly value="{{  $eventsData['tempat_event'] }}">
                 </div>
                 <div class="col-12">
                   <label for="inputText" class="form-label">Deskripsi Event</label>
-                  <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $events['deskripsi'] ?></textarea>
+                  <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>{{  $eventsData['deskripsi'] }}</textarea>
                 </div>
                 <div class="col-12">
                   <label for="inputLink" class="form-label">Link Pendaftaran</label>
-                  <input type="link" class="form-control" id="inputLink" readonly value="<?php echo $events['link_pendaftaran'] ?>">
+                  <input type="link" class="form-control" id="inputLink" readonly value="{{  $eventsData['link_pendaftaran'] }}">
                 </div>
 
                 <div class="col-12">
@@ -131,29 +137,29 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
 
                 </div>
-                <?php if (isset($events['catatan']) && !is_null($events['catatan']) && !empty($events['catatan'])) { ?>
+                @if (isset($eventsData['catatan']) && !is_null($eventsData['catatan']) && !empty($eventsData['catatan']))
                   <div class="col-12">
                     <label for="inputText" class="form-label">Alasan Penolakan</label>
-                    <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $events['catatan'] ?></textarea>
+                    <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>{{  $eventsData['catatan'] }}</textarea>
                   </div>
-                <?php } ?>
+                @endif
                 <div class="row mb-3 justify-content-end">
                   <div class="col-sm-10 text-end"><br>
 
-                    <?php if ($events['status'] == 'diajukan' || $events['status'] == 'proses') { ?>
-                      <a href="/event/pengajuan.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
-                    <?php } else if ($events['status'] == 'diterima' || $events['status'] == 'ditolak') { ?>
-                      <a href="/event/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
-                    <?php } ?>
-                    <?php if ($events['status'] == 'diajukan') { ?>
-                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $events['id_event'] ?>)"> Proses
+                    @if ($eventsData['status'] == 'diajukan' || $eventsData['status'] == 'proses')
+                      <a href="/event/pengajuan" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
+                    @elseif ($eventsData['status'] == 'diterima' || $eventsData['status'] == 'ditolak')
+                      <a href="/event/riwayat" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
+                    @endif
+                    @if ($eventsData['status'] == 'diajukan')
+                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses({{ $eventsData['id_event'] }})"> Proses
                       </button>
-                    <?php } else if ($events['status'] == 'proses') { ?>
-                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $events['id_event'] ?>)">Terima
+                    @elseif ($eventsData['status'] == 'proses')
+                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju({{ $eventsData['id_event'] }})">Terima
                       </button>
-                      <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $events['id_event'] ?>)">Tolak
+                      <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak({{ $eventsData['id_event'] }})">Tolak
                       </button>
-                    <?php } ?>
+                    @endif
                   </div>
                 </div>
               </form>
@@ -179,11 +185,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/event/event.php" id="prosesForm" method="POST">
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+          <form onsubmit="proses(event, 'proses')">
             <input type="hidden" name="id_event" id="inpEventP">
-            <input type="hidden" name="keterangan" value="proses">
             <button type="submit" class="btn btn-tambah">Proses</button>
           </form>
         </div>
@@ -205,11 +208,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/event/event.php" id="prosesForm" method="POST">
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+          <form onsubmit="proses(event, 'diterima')">
             <input type="hidden" name="id_event" id="inpEventS">
-            <input type="hidden" name="keterangan" value="diterima">
             <button type="submit" class="btn btn-tambah">Terima</button>
           </form>
         </div>
@@ -226,17 +226,14 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <h5 class="modal-title">Tolak Pengajuan</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="/web/event/event.php" id="prosesForm" method="POST">
+        <form onsubmit="proses(event, 'ditolak')">
           <div class="modal-body" style="text-align: left;">
             <label for="catatan" class="form-label">Alasan penolakan</label>
             <textarea class="form-control" id="catatan" name="catatan" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
             <input type="hidden" name="id_event" id="inpEventT">
-            <input type="hidden" name="keterangan" value="ditolak">
             <button type="submit" class="btn btn-tolak">Tolak</button>
           </div>
         </form>
@@ -246,9 +243,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__ . '/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
+  <div id="preloader" style="display: none;"></div>
   <div id="greenPopup" style="display:none"></div>
   <div id="redPopup" style="display:none"></div>
   <script src="{{ asset($tPath.'js/popup.js') }}"></script>
@@ -259,7 +256,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
     var inpEventP = document.getElementById('inpEventP');
     var inpEventS = document.getElementById('inpEventS');
     var inpEventT = document.getElementById('inpEventT');
-
+    function showLoading(){
+      document.querySelector('div#preloader').style.display = 'block';
+    }
+    function closeLoading(){
+      document.querySelector('div#preloader').style.display = 'none';
+    }
     function openProses(dataU, ) {
       inpEventP.value = dataU;
       var myModal = new bootstrap.Modal(modalProses);
@@ -271,11 +273,15 @@ $tPath = app()->environment('local') ? '' : '/public/';
       var myModal = new bootstrap.Modal(modalSetuju);
       myModal.show();
     }
-
+    
     function openTolak(dataU) {
       inpEventT.value = dataU;
       var myModal = new bootstrap.Modal(modalTolak);
       myModal.show();
+    }
+    function closeModal(dataU) {
+      var myModal = new bootstrap.Modal(dataU);
+      myModal.hide();
     }
     //preview data
     function preview(desc) {
@@ -291,7 +297,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         deskripsi: desc
       };
       //open the request
-      xhr.open('POST', domain + "/preview.php")
+      xhr.open('POST', domain + "/preview")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
@@ -321,7 +327,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         deskripsi: desc
       };
       // open the request
-      xhr.open('POST', domain + "/download.php", true);
+      xhr.open('POST', domain + "/download", true);
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.responseType = 'blob';
@@ -354,6 +360,57 @@ $tPath = app()->environment('local') ? '' : '/public/';
           }
         }
       };
+    }
+    function proses(event, ket) {
+      event.preventDefault();
+      var modals = '';
+      var Id = event.target.querySelector('[name="id_event"]').value;
+      var catatan = '';
+      if(ket == 'proses'){
+        modals = modalProses;
+      }else if(ket == 'diterima'){
+        modals = modalSetuju;
+      }else if(ket == 'ditolak'){
+        catatan = event.target.querySelector('[name="catatan"]').value;
+        modals = modalTolak;
+      }
+      showLoading();
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        _method: 'PUT',
+        email: email,
+        id_event: Id,
+        keterangan: ket,
+        catatan:catatan
+      };
+      //open the request
+      xhr.open('PUT', domain + "/event/pengajuan")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //send the form data
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            closeLoading();
+            closeModal(modals);
+            var response = JSON.parse(xhr.responseText);
+            showGreenPopup(response);
+            setTimeout(() => {
+              if(ket == 'proses'){
+                window.location.href = "/event/pengajuan";
+              }else if(ket == 'diterima' || ket == 'ditolak'){
+                window.location.href = "/event/pengajuan";
+              }
+            }, 3000);
+          } else {
+            closeLoading();
+            closeModal(modals);
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
+          }
+        }
+      }
     }
   </script>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

@@ -41,7 +41,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
   </script>
   @endif
   <script>
-    var csrfToken = "{{ csrf_token() }}";
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
     var role = "{{ $userAuth['role'] }}";
@@ -77,7 +76,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         <div class="col-lg-12">
           <div class="row">
             <div class="col-lg-6 col-md-4">
-              <div class="card success-card revenue-card"><a href="/admin.php">
+              <div class="card success-card revenue-card"><a href="/admin">
                   <div class="card-body">
                     <h5 class="card-title">Daftar Admin</h5>
                     <div class="d-flex align-items-center">
@@ -93,7 +92,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
               </div>
             </div>
             <div class="col-lg-6 col-md-4">
-              <div class="card success-card revenue-card"><a href="/pengguna.php">
+              <div class="card success-card revenue-card"><a href="/pengguna">
                   <div class="card-body">
                     <h5 class="card-title">Daftar Pengguna</h5>
                     <div class="d-flex align-items-center">
@@ -135,7 +134,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/event/pengajuan.php" class="fw-bold text-dark">
+                    <a href="/event/pengajuan" class="fw-bold text-dark">
                       <h6><strong>Kelola Event</strong></h6>
                       {{ $totalEvent }} notifikasi
                     </a>
@@ -148,7 +147,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/tempat/pengajuan.php" class="fw-bold text-dark">
+                    <a href="/tempat/pengajuan" class="fw-bold text-dark">
                       <h6><strong>Peminjaman Tempat</strong></h6>
                       {{ $totalSewa }} notifikasi
                     </a>
@@ -161,7 +160,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/seniman/pengajuan.php" class="fw-bold text-dark">
+                    <a href="/seniman/pengajuan" class="fw-bold text-dark">
                       <h6><strong>Regitrasi Nomor Induk Seniman</strong></h6>
                       {{ $totalSeniman }} notifikasi
                     </a>
@@ -174,7 +173,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/seniman/perpanjangan.php" class="fw-bold text-dark">
+                    <a href="/seniman/perpanjangan" class="fw-bold text-dark">
                       <h6><strong>Perpanjang Nomor Induk Seniman</strong></h6>
                       {{ $totalPerpanjangan }} notifikasi
                     </a>
@@ -187,7 +186,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/pentas/pengajuan.php" class="fw-bold text-dark">
+                    <a href="/pentas/pengajuan" class="fw-bold text-dark">
                       <h6><strong>Surat Advis</strong></h6>
                       {{ $totalPentas }} notifikasi
                     </a>
@@ -211,7 +210,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    @extends('component.footer')
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Events;
@@ -10,7 +11,6 @@ use App\Models\Seniman;
 use App\Models\SewaTempat;
 use App\Models\SuratAdvis;
 use App\Models\Perpanjangan;
-use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     public function show(Request $request){
