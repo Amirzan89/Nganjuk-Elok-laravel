@@ -31,26 +31,32 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+		var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-      $nav = 'tempat';
-      include(__DIR__.'/../sidebar.php');
-      ?>
+      @php
+        $nav = 'tempat';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
     <main id="main" class="main">
@@ -145,8 +151,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <!-- end modal delete -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

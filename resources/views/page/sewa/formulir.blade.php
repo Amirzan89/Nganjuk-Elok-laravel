@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,26 +30,32 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+    @if(app()->environment('local'))
+        <script>
+            var tPath = '';
+        </script>
+    @else
+        <script>
+            var tPath = '/public/';
+        </script>
+    @endif
     <script>
-        var csrfToken = "<?php echo $csrf ?>";
-        var email = "<?php echo $userAuth['email'] ?>";
-        var idUser = "<?php echo $userAuth['id_user'] ?>";
-        var number = "<?php echo $userAuth['number'] ?>";
-        var role = "<?php echo $userAuth['role'] ?>";
+        var csrfToken = "{{ csrf_token() }}";
+        var email = "{{ $userAuth['email'] }}";
+        var number = "{{ $userAuth['number'] }}";
     </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-        <?php include(__DIR__ . '/../header.php');
-        ?>
+        @include('component.header')
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
-            <?php
-            $nav = 'tempat';
-            include(__DIR__ . '/../sidebar.php');
-            ?>
+            @php
+                $nav = 'tempat';
+            @endphp
+            @include('component.sidebar')
         </ul>
     </aside><!-- End Sidebar-->
 
@@ -58,8 +64,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <h1>Formulir Peminjaman</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="/sewa">Kelola Tempat</a></li>
                     <li class="breadcrumb-item active">Formulir Peminjaman</li>
                 </ol>
             </nav>
@@ -74,7 +80,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                             <h5 class="card-title">Formulir Peminjaman Tempat</h5>
 
                             <!-- Multi Columns Form -->
-                            <form class="row g-3" method="POST" action="proses-tambah-tempat.php">
+                            <form class="row g-3" method="POST" action="proses-tambah-tempat">
                                 <div class="col-md-12">
                                     <label for="nama_peminjam" class="form-label">Nama Lengkap</label>
                                     <input type="text" class="form-control" readonly value="">
@@ -157,7 +163,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                             </div>
                             <div class="row mb-3 justify-content-end">
                                 <div class="col-sm-10 text-end">
-                                    <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
+                                    <a href="/sewa" class="btn btn-secondary">Kembali</a>
                                 </div>
                             </div>
         </section>
@@ -166,8 +172,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
     </main><!-- End #main -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
-        <?php include(__DIR__ . '/../footer.php');
-        ?>
+        @include('component.footer')
     </footer>
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

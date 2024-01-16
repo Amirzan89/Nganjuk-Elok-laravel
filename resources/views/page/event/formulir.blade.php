@@ -43,7 +43,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <script>
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
-    var role = "{{ $userAuth['role'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -67,8 +66,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Formulir Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/event.php">Kelola Event</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/event">Kelola Event</a></li>
           <li class="breadcrumb-item active">Formulir Pengajuan</li>
         </ol>
       </nav>
@@ -134,7 +133,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
               </div>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../event.php" class="btn btn-secondary">Kembali</a>
+                  <a href="../event" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
               <!-- End General Form Elements -->

@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -46,27 +46,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__ . '/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'tempat';
-      include(__DIR__ . '/../sidebar.php');
-      ?>
+      @php
+        $nav = 'tempat';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -76,8 +82,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Riwayat Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/sewa">Kelola Tempat</a></li>
           <li class="breadcrumb-item active">Riwayat peminjaman</li>
         </ol>
       </nav>
@@ -94,23 +100,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <div class="col-lg-12">
                   <div class="row">
                     <div class="col-lg-3">
-                      <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                      <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="{{ date('Y') }}" oninput="tampilkanTahun()">
                     </div>
                     <div class="col-lg-5">
                       <select id="inpBulan" onchange="tampilkanBulan()" class="inp">
                         <option value="semua">semua</option>
-                        <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?>>Januari</option>
-                        <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?>>Februari</option>
-                        <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?>>Maret</option>
-                        <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?>>April</option>
-                        <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?>>Mei</option>
-                        <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?>>Juni</option>
-                        <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?>>Juli</option>
-                        <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?>>Agustus</option>
-                        <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?>>September</option>
-                        <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?>>Oktober</option>
-                        <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?>>November</option>
-                        <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?>>Desember</option>
+                        <option value="1" {{ (date('m') == 1) ? 'selected' : ''}}>Januari</option>
+                        <option value="2" {{ (date('m') == 2) ? 'selected' : ''}}>Februari</option>
+                        <option value="3" {{ (date('m') == 3) ? 'selected' : ''}}>Maret</option>
+                        <option value="4" {{ (date('m') == 4) ? 'selected' : ''}}>April</option>
+                        <option value="5" {{ (date('m') == 5) ? 'selected' : ''}}>Mei</option>
+                        <option value="6" {{ (date('m') == 6) ? 'selected' : ''}}>Juni</option>
+                        <option value="7" {{ (date('m') == 7) ? 'selected' : ''}}>Juli</option>
+                        <option value="8" {{ (date('m') == 8) ? 'selected' : ''}}>Agustus</option>
+                        <option value="9" {{ (date('m') == 9) ? 'selected' : ''}}>September</option>
+                        <option value="10" {{ (date('m') == 10) ? 'selected' : ''}}>Oktober</option>
+                        <option value="11" {{ (date('m') == 11) ? 'selected' : ''}}>November</option>
+                        <option value="12" {{ (date('m') == 12) ? 'selected' : ''}}>Desember</option>
                       </select>
                     </div>
                   </div>
@@ -129,37 +135,30 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                  $query = mysqli_query($conn, "SELECT id_sewa, nama_peminjam, nama_tempat, tgl_awal_peminjaman, DATE_FORMAT(created_at, '%d %M %Y') AS tanggal, status, catatan, kode_pinjam FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_sewa DESC");
-                  $no = 1;
-                  $sewaData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
-                  foreach ($sewaData as $sewa) {
-                  ?>
+                  @php $no = 1; @endphp
+                  @foreach ($sewaData as $sewa)
                     <tr>
-                      <td><?php echo $no; ?></td>
-                      <td><?php echo $sewa['nama_peminjam']; ?></td>
-                      <td><?php echo $sewa['nama_tempat']; ?></td>
-                      <td><?php echo $sewa['tanggal']; ?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $sewa['nama_peminjam'] }}</td>
+                      <td>{{ $sewa['nama_tempat'] }}</td>
+                      <td>{{ $sewa['tanggal'] }}</td>
                       <td>
-                        <?php if ($sewa['status'] == 'diterima') { ?>
+                        @if ($sewa['status'] == 'diterima')
                           <span class="badge bg-terima">Diterima</span>
-                          <?php } else if ($sewa['status'] == 'ditolak') { ?>
-                            <span class="badge bg-tolak">Ditolak </span>
-                            <?php } ?>
+                        @elseif ($sewa['status'] == 'ditolak')
+                          <span class="badge bg-tolak">Ditolak</span>
+                        @endif
                       </td>
-                      <td><?php echo $sewa['kode_pinjam']; ?></td>
                       <td>
-                        <a href="/tempat/detail_sewa.php?id_sewa=<?= $sewa['id_sewa'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        <a href="/sewa/detail/{{ $sewa['id_sewa'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>
                     </tr>
-                  <?php
-                    $no++;
-                  } ?>
+                  @endforeach
                 </tbody>
               </table>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
+                  <a href="/sewa" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
             </div>
@@ -174,8 +173,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__ . '/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -226,7 +224,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       function getActionButton(status, idSewa) {
         if (status == 'ditolak' || status == 'diterima') {
-          return `<a href="/tempat/detail_sewa.php?id_sewa=${idSewa}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/sewa/detail/${idSewa}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -249,7 +247,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/tempat/tempat.php")
+      xhr.open('POST', domain + "/web/tempat/tempat")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

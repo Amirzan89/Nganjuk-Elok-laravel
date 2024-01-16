@@ -18,7 +18,7 @@
 
 @if($userAuth['role'] == 'super admin' || $userAuth['role'] == 'admin tempat')
 <li class="nav-item {{ $nav == 'tempat' ? 'active' : ''}}">
-  <a class="nav-link " href="/tempat">
+  <a class="nav-link " href="/sewa">
     <i class="bi bi-building"></i>
     <span>Kelola Tempat</span>
   </a>

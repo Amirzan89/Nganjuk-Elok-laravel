@@ -11,6 +11,7 @@ use DateTime;
 class EventController extends Controller
 {
     private function changeMonth($inpDate){
+        $inpDate = json_decode($inpDate, true);
         $monthTranslations = [
             '01' => 'Januari',
             '02' => 'Februari',
@@ -25,21 +26,35 @@ class EventController extends Controller
             '11' => 'November',
             '12' => 'Desember',
         ];
-        if (!is_array($inpDate)) {
-            $inpDate = [$inpDate];
-        }
-        foreach ($inpDate as &$row) {
-            foreach (['tanggal', 'tanggal_awal', 'tanggal_akhir'] as $dateField) {
-                if (isset($row[$dateField]) && $row[$dateField] !== null) {
-                    $date = new DateTime($row[$dateField]);
+        // Check if it's an associative array (single data)
+        if (array_keys($inpDate) !== range(0, count($inpDate) - 1)) {
+            foreach (['tanggal_awal', 'tanggal_akhir'] as $dateField) {
+                if (isset($inpDate[$dateField]) && $inpDate[$dateField] !== null) {
+                    $date = new DateTime($inpDate[$dateField]);
                     $monthNumber = $date->format('m');
                     $indonesianMonth = $monthTranslations[$monthNumber];
                     $formattedDate = $date->format('d') . ' ' . $indonesianMonth . ' ' . $date->format('Y');
-                    $row[$dateField] = $formattedDate;
+                    $inpDate[$dateField] = $formattedDate;
                 }
             }
+        } else {
+            $processedData = [];
+            foreach ($inpDate as $inpDateRow) {
+                $processedRow = $inpDateRow;
+                foreach (['tanggal', 'tanggal_awal', 'tanggal_akhir'] as $dateField) {
+                    if (isset($processedRow[$dateField]) && $processedRow[$dateField] !== null) {
+                        $date = new DateTime($processedRow[$dateField]);
+                        $monthNumber = $date->format('m');
+                        $indonesianMonth = $monthTranslations[$monthNumber];
+                        $formattedDate = $date->format('d') . ' ' . $indonesianMonth . ' ' . $date->format('Y');
+                        $processedRow[$dateField] = $formattedDate;
+                    }
+                }
+                $processedData[] = $processedRow;
+            }
+            $inpDate = $processedData;
         }
-        return (count($inpDate) === 1) ? $inpDate[0] : $inpDate;
+        return $inpDate;
     }
     public function showEvent(Request $request){
         $totalPengajuan = Events::where('status', 'diajukan')->orWhere('status', 'proses')->count();
@@ -66,8 +81,6 @@ class EventController extends Controller
             'userAuth'=>$request->input('user_auth'),
             'eventsData'=>$eventsData,
         ];
-        // echo json_encode($dataShow);
-        // exit();
         return view('page.event.pengajuan',$dataShow);
     }
     public function showRiwayat(Request $request){
@@ -99,6 +112,6 @@ class EventController extends Controller
             'userAuth'=>$request->input('user_auth'),
             'eventsData'=>$eventsData,
         ];
-        return view('page.event.detail_event',$dataShow);
+        return view('page.event.detail',$dataShow);
     }
 }

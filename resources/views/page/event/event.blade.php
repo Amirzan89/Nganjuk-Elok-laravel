@@ -39,7 +39,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <script>
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
-    var role = "{{ $userAuth['role'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">

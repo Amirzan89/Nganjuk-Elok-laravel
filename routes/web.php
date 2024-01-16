@@ -33,13 +33,11 @@ Route::group(['middleware'=>'auth'],function(){
         return view('page.seniman');
     });
     Route::group(['prefix'=>'/event'],function(){
-        Route::get('/detail/{id}',[ShowEventController::class,'showDetail']);
-        // Route::get('/detail/{id}', 'UserController@update');
-        Route::get('/detail',[ShowEventController::class,'showDetail']);
         Route::get('/',[ShowEventController::class,'showEvent']);
         Route::get('/formulir',[ShowEventController::class,'showFormulir']);
         Route::get('/pengajuan', [ShowEventController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowEventController::class,'showRiwayat']);
+        Route::get('/detail/{id}',[ShowEventController::class,'showDetail']);
         Route::put('/pengajuan', [EventController::class,'prosesEvent']);
         Route::put('/riwayat', [EventController::class,'prosesEvent']);
     });
@@ -50,17 +48,13 @@ Route::group(['middleware'=>'auth'],function(){
         //
     });
     Route::group(['prefix'=>'/sewa'],function(){
-        Route::get('/',[ShowEventController::class,'showSewa']);
+        Route::get('/',[ShowSewaController::class,'showSewa']);
         Route::get('/formulir',[ShowSewaController::class,'showFormulir']);
         Route::get('/pengajuan', [ShowSewaController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowSewaController::class,'showRiwayat']);
-        // Route::get('/detail{id}',[ShowSewaController::class,'showDetailSewa']);
-        Route::get('/detail{id}',function($id){
-            echo 'id sewaa '.$id;
-            exit();
-        });
-        Route::put('/pengajuan', [ShowSewaController::class,'showPengajuan']);
-        Route::put('/riwayat', [ShowSewaController::class,'showRiwayat']);
+        Route::get('/detail/{id}',[ShowSewaController::class,'showDetail']);
+        Route::put('/pengajuan', [SewaController::class,'prosesSewa']);
+        Route::put('/riwayat', [SewaController::class,'prosesSewa']);
     });
     Route::group(['prefix'=>'/tempat'],function(){
         Route::get('/', [ShowTempatController::class,'showTempat']);

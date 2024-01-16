@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,27 +27,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/header.php');
-    ?>
+    @include('component.header')
   </header>
   <!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'tempat';
-      include(__DIR__.'/sidebar.php');
-      ?>
+      @php
+        $nav = 'tempat';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside>
   <!-- End Sidebar-->
@@ -57,7 +63,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Kelola Tempat</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
           <li class="breadcrumb-item active">Kelola Tempat</li>
         </ol>
       </nav>
@@ -69,7 +75,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         <div class="col-lg-12">
           <div class="row">
             <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card"><a href="/tempat/formulir-sewa.php">
+              <div class="card success-card revenue-card"><a href="/sewa/formulir">
                   <div class="card-body">
                     <h5 class="card-title">Formulir</h5>
                     <div class="d-flex align-items-center">
@@ -82,7 +88,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
             </div>
           </div>
           <div class="col-xxl-4 col-md-4">
-            <div class="card success-card revenue-card"><a href="/tempat/pengajuan.php">
+            <div class="card success-card revenue-card"><a href="/sewa/pengajuan">
                 <div class="card-body">
                   <h5 class="card-title">Verifikasi Peminjaman</h5>
                   <div class="d-flex align-items-center">
@@ -90,11 +96,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM sewa_tempat WHERE status = 'diajukan' OR status = 'proses'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo "<h4>" . $data['total'] . "</h4>";
-                      ?>
+                      <h4> {{ $totalPengajuan }}</h4>
                     </div>
                   </div>
               </a>
@@ -102,7 +104,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           </div>
         </div>
         <div class="col-xxl-4 col-md-4">
-          <div class="card success-card revenue-card"><a href="/tempat/riwayat.php">
+          <div class="card success-card revenue-card"><a href="/sewa/riwayat">
               <div class="card-body">
                 <h5 class="card-title">Riwayat</h5>
                 <div class="d-flex align-items-center">
@@ -110,11 +112,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     <i class="bi bi-clock-fill"></i>
                   </div>
                   <div class="ps-3">
-                    <?php
-                    $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM sewa_tempat WHERE status = 'diterima' OR status = 'ditolak'");
-                    $data = mysqli_fetch_assoc($sql);
-                    echo "<h4>" . $data['total'] . "</h4>";
-                    ?>
+                    <h4> {{ $totalRiwayat }}</h4>
                   </div>
                 </div>
               </div>
@@ -122,7 +120,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           </div>
         </div>
         <div class="col-xxl-4 col-md-4">
-          <div class="card success-card revenue-card"><a href="/tempat/data_tempat.php">
+          <div class="card success-card revenue-card"><a href="/sewa/data_sewa">
               <div class="card-body">
                 <h5 class="card-title">Data Tempat</h5>
                 <div class="d-flex align-items-center">
@@ -130,11 +128,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     <i class="bi bi-folder-fill"></i>
                   </div>
                   <div class="ps-3">
-                    <?php
-                    $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM list_tempat");
-                    $data = mysqli_fetch_assoc($sql);
-                    echo "<h4>" . $data['total'] . "</h4>";
-                    ?>
+                    <h4> {{ $totalTempat }}</h4>
                   </div>
                 </div>
             </a>
@@ -147,8 +141,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i

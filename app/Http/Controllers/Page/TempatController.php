@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Models\ListTempat;
 class TempatController extends Controller
 {
     public function showTempat(Request $request){
@@ -12,12 +12,6 @@ class TempatController extends Controller
             ''
         ];
         return view('page.tempat.tempat',$dataShow);
-    }
-    public function showFormulir(Request $request){
-        $dataShow = [
-            ''
-        ];
-        return view('page.tempat.formulir-sewa',$dataShow);
     }
     public function showDataTempat(Request $request){
         $dataShow = [

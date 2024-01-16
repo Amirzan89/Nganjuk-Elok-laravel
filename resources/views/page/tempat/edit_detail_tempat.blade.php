@@ -77,29 +77,32 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+    @if(app()->environment('local'))
+        <script>
+            var tPath = '';
+        </script>
+    @else
+        <script>
+            var tPath = '/public/';
+        </script>
+    @endif
     <script>
-        var tPath = "<?php echo $tPath ?>";
-        var csrfToken = "<?php echo $csrf ?>";
-        var email = "<?php echo $userAuth['email'] ?>";
-        var idUser = "<?php echo $userAuth['id_user'] ?>";
-        var idTempat = <?php echo $id ?>;
-        var number = "<?php echo $userAuth['number'] ?>";
-        var role = "<?php echo $userAuth['role'] ?>";
-        var tempats = <?php echo json_encode($tempat) ?>;
+        var csrfToken = "{{ csrf_token() }}";
+        var email = "{{ $userAuth['email'] }}";
+        var number = "{{ $userAuth['number'] }}";
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-    <?php 
-        $nav = 'tempat';
-        include(__DIR__.'/../sidebar.php');
-    ?>
+        @php
+            $nav = 'tempat';
+        @endphp
+        @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -186,8 +189,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
   <div id="greenPopup" style="display:none"></div>
   <div id="redPopup" style="display:none"></div>

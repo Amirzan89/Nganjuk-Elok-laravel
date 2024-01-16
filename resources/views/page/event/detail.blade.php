@@ -45,7 +45,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
     var csrfToken = "{{ csrf_token() }}";
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
-    var role = "{{ $userAuth['role'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -89,7 +88,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
               <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
             @elseif ($eventsData['status'] == 'ditolak')
               <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
-              </li>
             @endif
           </div>
           <div class="card">
@@ -383,11 +381,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
         keterangan: ket,
         catatan:catatan
       };
-      //open the request
       xhr.open('PUT', domain + "/event/pengajuan")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      //send the form data
       xhr.send(JSON.stringify(requestBody));
       xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {

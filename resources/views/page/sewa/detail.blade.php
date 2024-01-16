@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,28 +31,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+    @if(app()->environment('local'))
+        <script>
+            var tPath = '';
+        </script>
+    @else
+        <script>
+            var tPath = '/public/';
+        </script>
+    @endif
     <script>
         const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-        var csrfToken = "<?php echo $csrf ?>";
-        var email = "<?php echo $userAuth['email'] ?>";
-        var idUser = "<?php echo $userAuth['id_user'] ?>";
-        var number = "<?php echo $userAuth['number'] ?>";
-        var role = "<?php echo $userAuth['role'] ?>";
-        var idSewa = "<?php echo $id ?>";
+        var csrfToken = "{{ csrf_token() }}";
+        var email = "{{ $userAuth['email'] }}";
+        var number = "{{ $userAuth['number'] }}";
     </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-        <?php include(__DIR__ . '/../header.php');
-        ?>
+        @include('component.header')
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
-            <?php
-            $nav = 'tempat';
-            include(__DIR__ . '/../sidebar.php');
-            ?>
+            @php
+                $nav = 'tempat';
+            @endphp
+            @include('component.sidebar')
         </ul>
     </aside><!-- End Sidebar-->
 
@@ -61,13 +66,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <h1>Detail Peminjaman</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <?php if ($sewa['status'] == 'diajukan' || $sewa['status'] == 'proses') { ?>
-                        <li class="breadcrumb-item"><a href="/tempat/pengajuan.php">Verifikasi Peminjaman</a></li>
-                    <?php } else if ($sewa['status'] == 'diterima' || $sewa['status'] == 'ditolak') { ?>
-                        <li class="breadcrumb-item"><a href="/tempat/riwayat.php">Riwayat Peminjaman</a></li>
-                    <?php } ?>
+                    <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="/sewa">Kelola Tempat</a></li>
+                    @if ($sewaData['status'] == 'diajukan' || $sewaData['status'] == 'proses')
+                        <li class="breadcrumb-item"><a href="/sewa/pengajuan">Verifikasi Peminjaman</a></li>
+                    @elseif ($sewaData['status'] == 'diterima' || $sewaData['status'] == 'ditolak')
+                        <li class="breadcrumb-item"><a href="/sewa/riwayat">Riwayat Peminjaman</a></li>
+                    @endif
                     <li class="breadcrumb-item active">Detail Data Peminjaman</li>
                 </ol>
             </nav>
@@ -76,12 +81,11 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <div class="row">
                 <div class="col-lg-12">
                     <div class="row mb-3 d-flex justify-content-center align-items-center">
-                        <?php if ($sewa['status'] == 'diterima') { ?>
+                        @if ($sewaData['status'] == 'diterima')
                             <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
-                        <?php } else if ($sewa['status'] == 'ditolak') { ?>
+                        @elseif ($sewaData['status'] == 'ditolak')
                             <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
-                            </li>
-                        <?php } ?>
+                        @endif
                     </div>
                     <div class="card">
                         <div class="card-body">
@@ -90,118 +94,118 @@ $tPath = app()->environment('local') ? '' : '/public/';
                             </div>
                             <!-- General Form Elements -->
                             <form>
-                                <form>
-                                    <div class="col-md-12">
-                                        <label for="nama_peminjam" class="form-label">Nama Lengkap</label>
+                                <div class="col-md-12">
+                                    <label for="nama_peminjam" class="form-label">Nama Lengkap</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" readonly value="{{ $sewaData['nama_peminjam'] }}">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="col-md-12">
+                                    <label for="nik_sewa" class="form-label">Nomor Induk Kependudukan</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" readonly value="{{ base64_decode($sewaData['nik_sewa']) }}">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="col-md-12">
+                                    <label for="instansi" class="form-label">Instansi</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" readonly value="{{ $sewaData['instansi'] }}">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="col-md-12">
+                                    <label for="nama_kegiatan_sewa" class="form-label">Nama Kegiatan</label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" readonly value="{{ $sewaData['nama_kegiatan_sewa'] }}">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <label for="tempat" class="form-label">Nama Tempat</label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['nama_peminjam'] ?>">
+                                            <input type="text" class="form-control" readonly value="{{ $sewaData['nama_tempat'] }}">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="col-md-3">
+                                        <label for="jumlah_peserta" class="form-label">Jumlah Peserta</label>
+                                        <div class="col-sm-12">
+                                            <input type="number" class="form-control" readonly value="{{ $sewaData['jumlah_peserta'] }}">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="col-md-6">
+                                        <label for="tgl_awal_peminjaman" class="form-label">Tanggal Awal</label>
+                                        <input type="text" class="form-control" readonly value="{{ $sewaData['tanggal_awal'] }}">
+                                    </div>
+                                    <br>
+                                    <div class="col-md-6">
+                                        <label for="tgl_akhir_peminjaman" class="form-label">Tanggal Akhir</label>
+                                        <input type="text" class="form-control" readonly value="{{ $sewaData['tanggal_akhir'] }}">
+                                    </div>
+                                    <br>
+                                    <div class="col-md-6">
+                                        <label for="tgl_awal_peminjaman" class="form-label">Waktu Awal</label>
+                                        <input type="time-local" class="form-control" readonly value="{{ $sewaData['waktu_awal'] }}">
+                                    </div>
+                                    <br>
+                                    <div class="col-md-6">
+                                        <label for="tgl_akhir_peminjaman" class="form-label">Waktu Akhir</label>
+                                        <input type="time-loc   al" class="form-control" readonly value="{{ $sewaData['waktu_akhir'] }}">
+                                    </div>  
+                                    <br>
+                                    <div class="col-md-12">
+                                        <label for="surat_keterangan" class="form-label">Surat Keterangan</label>
+                                        <div class="col-sm-10">
+                                            <button class="btn btn-info" type="button" onclick="preview('surat')"> Lihat surat keterangan </button>
+                                            <button class="btn btn-info" type="button" onclick="download('surat')"> Download surat keterangan </button>
                                         </div>
                                     </div>
                                     <br>
                                     <div class="col-md-12">
-                                        <label for="nik_sewa" class="form-label">Nomor Induk Kependudukan</label>
+                                        <label for="deskripsi_sewa_tempat" class="form-label">Deskripsi Kegiatan</label>
                                         <div class="col-sm-12">
-                                            <input type="text" class="form-control" readonly value="<?php echo base64_decode($sewa['nik_sewa']) ?>">
+                                            <textarea class="form-control" style="height: 100px" readonly>{{ $sewaData['deskripsi_sewa_tempat'] }}</textarea>
                                         </div>
                                     </div>
                                     <br>
+                                    @if (isset($sewaData['catatan']) && !is_null($sewaData['catatan']) && !empty($sewaData['catatan']))
+                                        <div class="col-12">
+                                            <label for="inputText" class="form-label">Alasan Penolakan</label>
+                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>{{ $sewaData['catatan'] }}</textarea>
+                                        </div>
+                                        <br>
+                                    @endif
+                                    @if (isset($sewaData['kode_pinjam']) && !is_null($sewaData['kode_pinjam']) && !empty($sewaData['kode_pinjam']))
                                     <div class="col-md-12">
-                                        <label for="instansi" class="form-label">Instansi</label>
-                                        <div class="col-sm-12">
-                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['instansi'] ?>">
+                                        <label for="nik" class="form-label">Kode Surat</label>
+                                        <input type="text" class="form-control" id="nik" readonly value="{{ $sewaData['kode_pinjam'] }}">
+                                    </div>
+                                    @endif
+                                    <br><br><br><br>
+                                    <div class="row mb-3 justify-content-end">
+                                        <div class="col-sm-10 text-end">
+                                            @if ($sewaData['status'] == 'diajukan' || $sewaData['status'] == 'proses')
+                                                <a href="/sewa/pengajuan" class="btn btn-secondary" style="margin-right: 5px;">kembali</a>
+                                            @elseif ($sewaData['status'] == 'diterima' || $sewaData['status'] == 'ditolak')
+                                                <a href="/sewa/riwayat" class="btn btn-secondary" style="margin-right: 5px;">kembali</a>
+                                            @endif
+                                            @if ($sewaData['status'] == 'diajukan')
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses({{ $sewaData['id_sewa'] }})">Proses
+                                                </button>
+                                            @elseif ($sewaData['status'] == 'proses')
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju({{ $sewaData['id_sewa'] }})">Terima
+                                                </button>
+                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak({{ $sewaData['id_sewa'] }})">Tolak
+                                                </button>
+                                            @endif
                                         </div>
                                     </div>
-                                    <br>
-                                    <div class="col-md-12">
-                                        <label for="nama_kegiatan_sewa" class="form-label">Nama Kegiatan</label>
-                                        <div class="col-sm-12">
-                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['nama_kegiatan_sewa'] ?>">
-                                        </div>
-                                    </div>
-                                    <br>
-                                    <div class="row">
-                                        <div class="col-md-9">
-                                            <label for="tempat" class="form-label">Nama Tempat</label>
-                                            <div class="col-sm-12">
-                                                <input type="text" class="form-control" readonly value="<?php echo $sewa['nama_tempat'] ?>">
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <div class="col-md-3">
-                                            <label for="jumlah_peserta" class="form-label">Jumlah Peserta</label>
-                                            <div class="col-sm-12">
-                                                <input type="number" class="form-control" readonly value="<?php echo $sewa['jumlah_peserta'] ?>">
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <div class="col-md-6">
-                                            <label for="tgl_awal_peminjaman" class="form-label">Tanggal Awal</label>
-                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['tanggal_awal'] ?>">
-                                        </div>
-                                        <br>
-                                        <div class="col-md-6">
-                                            <label for="tgl_akhir_peminjaman" class="form-label">Tanggal Akhir</label>
-                                            <input type="text" class="form-control" readonly value="<?php echo $sewa['tanggal_akhir'] ?>">
-                                        </div>
-                                        <br>
-                                        <div class="col-md-6">
-                                            <label for="tgl_awal_peminjaman" class="form-label">Waktu Awal</label>
-                                            <input type="time-local" class="form-control" readonly value="<?php echo $sewa['waktu_awal'] ?>">
-                                        </div>
-                                        <br>
-                                        <div class="col-md-6">
-                                            <label for="tgl_akhir_peminjaman" class="form-label">Waktu Akhir</label>
-                                            <input type="time-loc   al" class="form-control" readonly value="<?php echo $sewa['waktu_akhir'] ?>">
-                                        </div>  
-                                        <br>
-                                        <div class="col-md-12">
-                                            <label for="surat_keterangan" class="form-label">Surat Keterangan</label>
-                                            <div class="col-sm-10">
-                                                <button class="btn btn-info" type="button" onclick="preview('surat')"> Lihat surat keterangan </button>
-                                                <button class="btn btn-info" type="button" onclick="download('surat')"> Download surat keterangan </button>
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <div class="col-md-12">
-                                            <label for="deskripsi_sewa_tempat" class="form-label">Deskripsi Kegiatan</label>
-                                            <div class="col-sm-12">
-                                                <textarea class="form-control" style="height: 100px" readonly><?php echo $sewa['deskripsi_sewa_tempat'] ?></textarea>
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <?php if (isset($sewa['catatan']) && !is_null($sewa['catatan']) && !empty($sewa['catatan'])) { ?>
-                                            <div class="col-12">
-                                                <label for="inputText" class="form-label">Alasan Penolakan</label>
-                                                <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $sewa['catatan'] ?></textarea>
-                                            </div>
-                                            <br>
-                                        <?php } ?>
-                                        <?php if (isset($sewa['kode_pinjam']) && !is_null($sewa['kode_pinjam']) && !empty($sewa['kode_pinjam'])) { ?>
-                                        <div class="col-md-12">
-                                            <label for="nik" class="form-label">Kode Surat</label>
-                                            <input type="text" class="form-control" id="nik" readonly value="<?php echo $sewa['kode_pinjam'] ?>">
-                                        </div>
-                                        <?php } ?>
-                                        <br><br><br><br>
-                                        <div class="row mb-3 justify-content-end">
-                                            <div class="col-sm-10 text-end">
-                                                <?php if ($sewa['status'] == 'diajukan' || $sewa['status'] == 'proses') { ?>
-                                                    <a href="/tempat/pengajuan.php" class="btn btn-secondary" style="margin-right: 5px;">kembali</a>
-                                                <?php } else if ($sewa['status'] == 'diterima' || $sewa['status'] == 'ditolak') { ?>
-                                                    <a href="/tempat/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;">kembali</a>
-                                                <?php } ?>
-                                                <?php if ($sewa['status'] == 'diajukan') { ?>
-                                                    <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $sewa['id_sewa'] ?>)">Proses
-                                                    </button>
-                                                <?php } else if ($sewa['status'] == 'proses') { ?>
-                                                    <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $sewa['id_sewa'] ?>)">Terima
-                                                    </button>
-                                                    <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $sewa['id_sewa'] ?>)">Tolak
-                                                    </button>
-                                                <?php } ?>
-                                            </div>
-                                        </div>
-                                </form>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -222,11 +226,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/tempat/tempat.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                    <form onsubmit="proses(event, 'proses')">
                         <input type="hidden" name="id_sewa" id="inpSewaP">
-                        <input type="hidden" name="keterangan" value="proses">
                         <button type="submit" class="btn btn-tambah">Proses</button>
                     </form>
                 </div>
@@ -248,11 +249,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/tempat/tempat.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                    <form onsubmit="proses(event, 'diterima')">
                         <input type="hidden" name="id_sewa" id="inpSewaS">
-                        <input type="hidden" name="keterangan" value="diterima">
                         <button type="submit" class="btn btn-tambah">Terima</button>
                     </form>
                 </div>
@@ -269,17 +267,14 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     <h5 class="modal-title">Tolak Pengajuan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/web/tempat/tempat.php" id="prosesForm" method="POST">
+                <form onsubmit="proses(event, 'ditolak')">
                     <div class="modal-body" style="text-align: left;">
                         <label for="catatan" class="form-label">Alasan penolakan</label>
                         <textarea class="form-control" id="catatan" name="catatan" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                         <input type="hidden" name="id_sewa" id="inpSewaT">
-                        <input type="hidden" name="keterangan" value="ditolak">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
                     </div>
                 </form>
@@ -289,9 +284,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <!-- end modal tolak -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
-        <?php include(__DIR__ . '/../footer.php');
-        ?>
+        @include('component.footer')
     </footer>
+    <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
     <script src="{{ asset($tPath.'js/popup.js') }}"></script>
@@ -302,7 +297,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
         var inpSewaP = document.getElementById('inpSewaP');
         var inpSewaS = document.getElementById('inpSewaS');
         var inpSewaT = document.getElementById('inpSewaT');
-
+        function showLoading(){
+            document.querySelector('div#preloader').style.display = 'block';
+        }
+        function closeLoading(){
+            document.querySelector('div#preloader').style.display = 'none';
+        }
         function openProses(dataU, ) {
             inpSewaP.value = dataU;
             var myModal = new bootstrap.Modal(modalProses);
@@ -320,6 +320,10 @@ $tPath = app()->environment('local') ? '' : '/public/';
             var myModal = new bootstrap.Modal(modalTolak);
             myModal.show();
         }
+        function closeModal(dataU) {
+            var myModal = new bootstrap.Modal(dataU);
+            myModal.hide();
+        }
         //preview data
         function preview(desc) {
             if (desc != 'ktp' && desc != 'foto' && desc != 'surat') {
@@ -334,7 +338,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/preview.php");
+            xhr.open('POST', domain + "/preview");
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             //send the form data
@@ -364,7 +368,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/download.php")
+            xhr.open('POST', domain + "/download")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.responseType = 'blob';
@@ -399,6 +403,55 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 }
             };
         }
+        function proses(event, ket) {
+            event.preventDefault();
+            var modals = '';
+            var Id = event.target.querySelector('[name="id_sewa"]').value;
+            var catatan = '';
+            if(ket == 'proses'){
+                modals = modalProses;
+            }else if(ket == 'diterima'){
+                modals = modalSetuju;
+            }else if(ket == 'ditolak'){
+                catatan = event.target.querySelector('[name="catatan"]').value;
+                modals = modalTolak;
+            }
+            showLoading();
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                _method: 'PUT',
+                email: email,
+                id_sewa: Id,
+                keterangan: ket,
+                catatan:catatan
+            };
+            xhr.open('PUT', domain + "/sewa/pengajuan")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        closeLoading();
+                        closeModal(modals);
+                        var response = JSON.parse(xhr.responseText);
+                        showGreenPopup(response);
+                        setTimeout(() => {
+                        if(ket == 'proses'){
+                            window.location.href = "/sewa/pengajuan";
+                        }else if(ket == 'diterima' || ket == 'ditolak'){
+                            window.location.href = "/sewa/pengajuan";
+                        }
+                        }, 3000);
+                    } else {
+                        closeLoading();
+                        closeModal(modals);
+                        var response = JSON.parse(xhr.responseText);
+                        showRedPopup(response);
+                    }
+                }
+            }
+            }
     </script>
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
