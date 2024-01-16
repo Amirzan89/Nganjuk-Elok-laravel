@@ -156,7 +156,7 @@
                         @endif
                       </td>
                       <td>
-                        <a href="/event/detail_event?id_event={{ $event['id_event'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        <a href="/event/detail/{{ $event['id_event'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>
                     </tr>
                   @endforeach
@@ -229,7 +229,7 @@
       }
       function getActionButton(status, idEvent) {
         if (status == 'ditolak' || status == 'diterima') {
-          return `<a href="/event/detail_event?id_event=${idEvent}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/event/detail/${idEvent}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
