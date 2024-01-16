@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Services;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Events;
-use App\Models\DetailEvents;
 use Exception;
 class EventController extends Controller
 {

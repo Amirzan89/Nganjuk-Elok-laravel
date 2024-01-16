@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,8 +64,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <h1>Data Tempat</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="/tempat">Kelola Tempat</a></li>
                     <li class="breadcrumb-item active">Data Tempat</li>
                 </ol>
             </nav>
@@ -78,7 +78,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     <div class="card">
                         <div class="card-body">
                           <h4 class="card-title">Data Tempat</h4>
-                          <a href="/tempat/tambah_tempat.php">
+                          <a href="/tempat/tambah">
                             <button type="button" class="btn btn-primary">
                                 <i class="bi bi-file-earmark-plus" style='font-size: 20px; font-weight: bold;'></i>   Tambah Tempat
                             </button>
@@ -93,29 +93,25 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                     </tr>
                                 </thead>
                                 <tbody>
-                                  <?php
-                                    $query = mysqli_query($conn, "SELECT id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat FROM list_tempat ");
-                                    $no = 1;
-                                    while ($tempat = mysqli_fetch_array($query)) {
-                                  ?>
-                                      <tr>
-                                        <td><?php echo $no?></td>
-                                        <td><?php echo $tempat['nama_tempat'] ?></td>
-                                        <td><?php echo $tempat['alamat_tempat'] ?></td>
-                                        <td>
-                                          <a href="/tempat/detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
-                                          <a href="/tempat/edit_detail_tempat.php?id_tempat=<?= $tempat['id_tempat'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
-                                          <button type="button" class="btn btn-tolak" onclick="openDelete(<?php echo $tempat['id_tempat']?>)"> <i class="bi bi-trash-fill"></i>   Hapus</button>
-                                        </td>
-                                      </tr>
-                                    <?php $no++;
-                                  } ?>
+                                  @php $no = 1; @endphp
+                                  @foreach ($tempatData as $tempat)
+                                    <tr>
+                                      <td>{{ $no++ }}</td>
+                                      <td>{{ $tempat['nama_tempat'] }}</td>
+                                      <td>{{ $tempat['alamat_tempat'] }}</td>
+                                      <td>
+                                        <a href="/tempat/detail/{{ $tempat['id_tempat'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                                        <a href="/tempat/edit/{{ $tempat['id_tempat'] }}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
+                                        <button type="button" class="btn btn-tolak" onclick="openDelete({{ $tempat['id_tempat'] }} )"> <i class="bi bi-trash-fill"></i>   Hapus</button>
+                                      </td>
+                                    </tr>
+                                  @endforeach
                                 </tbody>
                             </table>
                             <div class="row mb-3 justify-content-end">
-                                <div class="col-sm-10 text-end">
-                                    <a href="../tempat.php" class="btn btn-secondary">Kembali</a>
-                                </div>
+                              <div class="col-sm-10 text-end">
+                                <a href="/sewa" class="btn btn-secondary">Kembali</a>
+                              </div>
                             </div>
                         </div>
                     </div>
@@ -138,9 +134,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/tempat/tempat.php" id="deleteForm" method="POST">
-            <input type="hidden" name="_method" value="DELETE">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+          <form action="/web/tempat/tempat" id="deleteForm" method="POST">
             <input type="hidden" name="id_tempat" id="inpTempat">
             <button type="submit" class="btn btn-tolak" name="hapusAdmin">Hapus</button>
           </form>
@@ -163,6 +157,55 @@ $tPath = app()->environment('local') ? '' : '/public/';
       inpTempat.value = dataU;
       var myModal = new bootstrap.Modal(modal);
       myModal.show();
+    }
+    function proses(event, ket) {
+      event.preventDefault();
+      var modals = '';
+      var Id = event.target.querySelector('[name="id_event"]').value;
+      var catatan = '';
+      if(ket == 'proses'){
+        modals = modalProses;
+      }else if(ket == 'diterima'){
+        modals = modalSetuju;
+      }else if(ket == 'ditolak'){
+        catatan = event.target.querySelector('[name="catatan"]').value;
+        modals = modalTolak;
+      }
+      showLoading();
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        _method: 'PUT',
+        email: email,
+        id_event: Id,
+        keterangan: ket,
+        catatan:catatan
+      };
+      xhr.open('PUT', domain + "/event/pengajuan")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            closeLoading();
+            closeModal(modals);
+            var response = JSON.parse(xhr.responseText);
+            showGreenPopup(response);
+            setTimeout(() => {
+              if(ket == 'proses'){
+                window.location.href = "/event/pengajuan";
+              }else if(ket == 'diterima' || ket == 'ditolak'){
+                window.location.href = "/event/pengajuan";
+              }
+            }, 3000);
+          } else {
+            closeLoading();
+            closeModal(modals);
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
+          }
+        }
+      }
     }
   </script>
   <!-- Vendor JS Files -->

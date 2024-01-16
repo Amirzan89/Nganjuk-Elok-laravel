@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,15 +38,15 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <!-- ======= Header ======= -->
   <header id="header" class="fixed-top ">
     <div class="container d-flex align-items-center">
-    <h1 class="logo me-auto"><a href="/home.php">DISPORABUDPAR</a></h1>
+    <h1 class="logo me-auto"><a href="">DISPORABUDPAR</a></h1>
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="/home.php#hero">Beranda</a></li>
-          <li><a class="nav-link scrollto" href="/home.php#event">Event</a></li>
-          <li><a class="nav-link scrollto" href="/home.php#about">Informasi</a></li>
-          <li><a class="nav-link scrollto" href="/home.php#layanan">Layanan</a></li>
-          <li><a class="nav-link   scrollto" href="/home.php#profil">Profil</a></li>
-          <li><a class="getstarted scrollto" href="/login.php">Masuk</a></li>
+          <li><a class="nav-link scrollto active" href="#hero">Beranda</a></li>
+          <li><a class="nav-link scrollto" href="#event">Event</a></li>
+          <li><a class="nav-link scrollto" href="#about">Informasi</a></li>
+          <li><a class="nav-link scrollto" href="#layanan">Layanan</a></li>
+          <li><a class="nav-link   scrollto" href="#profil">Profil</a></li>
+          <li><a class="getstarted scrollto" href="/login">Masuk</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
@@ -67,10 +67,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <div class="col-lg-8">
             <div class="portfolio-details-slider swiper">
               <div class="swiper-wrapper align-items-center">
-
                 <div class="swiper-slide">
-                  {{-- <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat']?>') }}" alt=""> --}}
-                  {{-- <!-- <img src="{{ asset($tPath.'img/tempat<?php echo $tempat['foto_tempat']?>" alt=""> --> --}}
+                  <img src="{{ asset($tPath.'/img/tempat' . $tempatData['foto_tempat']) }}" id="inpImg" class="d-block" alt="">
                 </div>
               </div>
               <div class="swiper-pagination"></div>
@@ -79,14 +77,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
           <div class="col-lg-4">
             <div class="portfolio-info">
-              <!-- <h3>Air Terjun Sedudo</h3> -->
-              <h3><?php echo $tempat['nama_tempat'];?></h3>
+              <h3>{{ $tempatData['nama_tempat'] }}</h3>
               <p><strong>Alamat</strong></p><br>
-              <p><?php echo $tempat['alamat_tempat'];?></p>
-              <!-- <p>Jl. Sedudo, Hutan, Sawahan, Kec. Sawahan, Kabupaten Nganjuk, Jawa Timur 64475</p> -->
+              <p>{{ $tempatData['alamat_tempat'] }}</p>
             </div>
             <div class="portfolio-description">
-              <p><?php echo $tempat['deskripsi_tempat'];?></p>
+              <p>{{ $tempatData['deskripsi_tempat'] }}</p>
             </div>
           </div>
 

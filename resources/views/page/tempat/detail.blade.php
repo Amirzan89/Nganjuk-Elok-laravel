@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -65,9 +65,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <h1>Detail Data Tempat</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat/data_tempat.php">Data tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="/sewa">Kelola Tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/tempat/data">Data tempat</a></li>
                     <li class="breadcrumb-item active">Detail Data Tempat</li>
                 </ol>
             </nav>
@@ -85,31 +85,31 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['nama_tempat'] ?>" readonly>
+                                        <input type="text" class="form-control" value="{{ $tempatData['nama_tempat'] }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" value="<?php echo $tempat['alamat_tempat'] ?>" readonly>
+                                        <input type="text" class="form-control" value="{{ $tempatData['alamat_tempat'] }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Pengelola</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="phone" value="<?php echo $tempat['pengelola']?>" readonly>
+                                        <input type="text" class="form-control" name="phone" value="{{ $tempatData['pengelola'] }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-md-12 col-form-label">No. Telpon Pengelola</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="phone" value="<?php echo $tempat['contact_person']?>" readonly>
+                                        <input type="text" class="form-control" name="phone" value="{{ $tempatData['contact_person'] }}" readonly>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
                                     <div class="col-md-12">
-                                        <textarea class="form-control" style="height: 100px" readonly><?php echo $tempat['deskripsi_tempat'] ?></textarea>
+                                        <textarea class="form-control" style="height: 100px" readonly="">{{ $tempatData['deskripsi_tempat'] }}</textarea>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
@@ -121,7 +121,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                 </div><br>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                        <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
+                                        <a href="/tempat/data" class="btn btn-secondary">Kembali</a>
                                     </div>
                                 </div>
                             </form>
@@ -151,7 +151,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/preview.php")
+            xhr.open('POST', domain + "/preview")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             //send the form data
@@ -182,7 +182,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/download.php")
+            xhr.open('POST', domain + "/download")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.responseType = 'blob';

@@ -147,7 +147,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </div>
                   <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
                   <div class="activity-content">
-                    <a href="/tempat/pengajuan" class="fw-bold text-dark">
+                    <a href="/sewa/pengajuan" class="fw-bold text-dark">
                       <h6><strong>Peminjaman Tempat</strong></h6>
                       {{ $totalSewa }} notifikasi
                     </a>

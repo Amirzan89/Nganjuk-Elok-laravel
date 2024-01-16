@@ -8,57 +8,51 @@ use App\Models\ListTempat;
 class TempatController extends Controller
 {
     public function showTempat(Request $request){
+        $tempatData = $this->changeMonth(ListTempat::select('id_tempat, nama_tempat, alamat_tempat, deskripsi_tempat')->get());
         $dataShow = [
-            ''
+            'userAuth'=>$request->input('user_auth'),
+            'tempatData'=>$tempatData,
         ];
         return view('page.tempat.tempat',$dataShow);
     }
-    public function showDataTempat(Request $request){
+    public function showData(Request $request){
+        $tempatData = ListTempat::select('id_tempat', 'nama_tempat', 'alamat_tempat', 'deskripsi_tempat')->get();
         $dataShow = [
-            ''
+            'userAuth'=>$request->input('user_auth'),
+            'tempatData'=>$tempatData,
         ];
-        return view('page.tempat.data_tempat',$dataShow);
+        return view('page.tempat.data',$dataShow);
     }
-    public function showPengajuan(Request $request){
+    //for home page
+    public function showDetailHome(Request $request, $tempatId){
+        $tempatData = ListTempat::select('nama_tempat', 'alamat_tempat', 'deskripsi_tempat','foto_tempat')->where('id_tempat', $tempatId)->limit(1)->get()[0];
         $dataShow = [
-            ''
-        ];
-        return view('page.tempat.pengajuan',$dataShow);
-    }
-    public function showRiwayat(Request $request){
-        $dataShow = [
-            ''
-        ];
-        return view('page.tempat.riwayat',$dataShow);
-    }
-    public function showDetailSewa(Request $request){
-        $dataShow = [
-            ''
-        ];
-        return view('page.tempat.detail_sewa',$dataShow);
-    }
-    public function showDetailTempat(Request $request){
-        $dataShow = [
-            ''
+            'userAuth'=>$request->input('user_auth'),
+            'tempatData'=>$tempatData,
         ];
         return view('page.home2',$dataShow);
     }
-    public function showDetailTempatAdmin(Request $request){
+    //only for admin and super admin
+    public function showDetail(Request $request, $tempatId){
+        $tempatData = ListTempat::select()->where('id_tempat', $tempatId)->limit(1)->get()[0];
         $dataShow = [
-            ''
+            'userAuth'=>$request->input('user_auth'),
+            'tempatData'=>$tempatData,
         ];
-        return view('page.tempat.detail_tempat',$dataShow);
+        return view('page.tempat.detail',$dataShow);
     }
     public function showTambahTempat(Request $request){
         $dataShow = [
-            ''
+            'userAuth'=>$request->input('user_auth'),
         ];
-        return view('page.tempat.tambah_tempat',$dataShow);
+        return view('page.tempat.tambah',$dataShow);
     }
-    public function showEditTempat(Request $request){
+    public function showEditTempat(Request $request, $tempatId){
+        $tempatData = ListTempat::select()->where('id_tempat', $tempatId)->limit(1)->get()[0];
         $dataShow = [
-            ''
+            'userAuth'=>$request->input('user_auth'),
+            'tempatData'=>$tempatData,
         ];
-        return view('page.tempat.edit_detail_tempat',$dataShow);
+        return view('page.tempat.edit',$dataShow);
     }
 }

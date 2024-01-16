@@ -120,7 +120,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           </div>
         </div>
         <div class="col-xxl-4 col-md-4">
-          <div class="card success-card revenue-card"><a href="/sewa/data_sewa">
+          <div class="card success-card revenue-card"><a href="/tempat/data">
               <div class="card-body">
                 <h5 class="card-title">Data Tempat</h5>
                 <div class="d-flex align-items-center">

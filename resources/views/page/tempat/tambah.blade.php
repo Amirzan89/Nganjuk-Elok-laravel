@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,9 +105,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
         <h1>Tambah Tempat</h1>
         <nav>
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-            <li class="breadcrumb-item"><a href="/tempat/data_tempat.php">Data tempat</a></li>
+            <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+            <li class="breadcrumb-item"><a href="/sewa">Kelola Tempat</a></li>
+            <li class="breadcrumb-item"><a href="/tempat/data">Data tempat</a></li>
             <li class="breadcrumb-item active">Tambah Data Tempat</li>
           </ol>
         </nav>
@@ -119,8 +119,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
               <!-- Default Card -->
               <div class="card">
                 <div class="card-body"> <br>
-                  <form action="/web/tempat/tempat.php" method="POST" class="row" enctype="multipart/form-data">
-                  <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user']; ?>">
+                  <form action="/web/tempat/tempat" method="POST" class="row" enctype="multipart/form-data">
                     <div class="col-md-6">
                       <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
                         <div class="carousel-inner" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
@@ -168,7 +167,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <br>
                       <div class="row mb-3 justify-content-end">
                         <div class="col-sm-10 text-end">
-                          <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
+                          <a href="/tempat/data" class="btn btn-secondary">Kembali</a>
                           <button type="button" class="btn btn-tambah" onclick="upload()">Tambah</button>
                         </div>
                       </div>
@@ -214,7 +213,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       uploadStat = true;
       const formData = new FormData();
-      formData.append('id_user',idUser);
+      formData.append('email',email);
       formData.append('nama_tempat', document.querySelector('input[name="nama_tempat"]').value);
       formData.append('alamat', document.querySelector('input[name="alamat"]').value);
       formData.append('nama_pengelola', document.querySelector('input[name="nama_pengelola"]').value);
@@ -222,12 +221,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
       formData.append('deskripsi', document.querySelector('textarea[name="deskripsi"]').value);
       formData.append('foto', fileImg, fileImg.name);
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/web/tempat/tempat.php', true);
+      xhr.open('POST', '/tempat/tambah', true);
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.onload = function () {
         if (xhr.status === 200) {
           showGreenPopup(JSON.parse(xhr.responseText));
           setTimeout(() => {
-                window.location.href = '/tempat/data_tempat.php';
+              window.location.href = '/tempat/data';
             }, 1000);
           return;
         } else {

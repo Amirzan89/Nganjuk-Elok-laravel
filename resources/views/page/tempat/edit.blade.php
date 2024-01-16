@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,9 +111,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <h1>Edit Data Tempat</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat.php">Kelola Tempat</a></li>
-                    <li class="breadcrumb-item"><a href="/tempat/data_tempat.php?id_tempat=<?php $id;?>">Data tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="/sewa">Kelola Tempat</a></li>
+                    <li class="breadcrumb-item"><a href="/tempat/data">Data tempat</a></li>
                     <li class="breadcrumb-item active">Edit Data Tempat</li>
                 </ol>
             </nav>
@@ -128,51 +128,48 @@ $tPath = app()->environment('local') ? '' : '/public/';
                             <div class="card-body d-flex justify-content-center align-items-center">
                                 <h5 class="card-title text-center">Edit Data Tempat</h5>
                             </div>
-                            <form method="POST" action="/web/tempat/tempat.php" enctype="multipart/form-data">
+                            <form method="POST" action="/web/tempat/tempat" enctype="multipart/form-data">
                                 <input type="hidden" name="_method" value="PUT">
-                                <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user']; ?>">
-                                <input type="hidden" name="id_tempat" value="<?php echo $id; ?>">
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Tempat</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="nama_tempat" value="<?php echo $tempat['nama_tempat']?>">
+                                        <input type="text" class="form-control" name="nama_tempat" value="{{ $tempatData['nama_tempat'] }}">
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Alamat Tempat</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="alamat" value="<?php echo $tempat['alamat_tempat']?>">
+                                        <input type="text" class="form-control" name="alamat" value="{{ $tempatData['alamat_tempat'] }}">
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nama Pengelola</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="nama_pengelola" value="<?php echo $tempat['pengelola']?>">
+                                        <input type="text" class="form-control" name="nama_pengelola" value="{{ $tempatData['pengelola'] }}">
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-md-12 col-form-label">No. Telpon Pengelola</label>
                                     <div class="col-md-12">
-                                        <input type="text" class="form-control" name="phone" value="<?php echo $tempat['contact_person']?>">
+                                        <input type="text" class="form-control" name="phone" value="{{ $tempatData['contact_person'] }}">
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Deskripsi Kegiatan</label>
                                     <div class="col-md-12">
-                                        <textarea class="form-control" name="deskripsi" style="height: 100px"><?php echo $tempat['deskripsi_tempat']?></textarea>
+                                        <textarea class="form-control" name="deskripsi" style="height: 100px">{{ $tempatData['deskripsi_tempat'] }}</textarea>
                                     </div>
                                 </div>
                                 <div class="col mb-3">
                                     <label for="inputNumber" class="col-sm-2 col-form-label">Gambar tempat</label>
                                     <div class="col-md-12" id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
                                         <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
-                                        <img src="<?php echo $tPath ?>/DatabaseMobile/uploads/tempat<?php echo $tempat['foto_tempat'] ?>" id="inpImg" class="d-block" alt="">
-                                    {{-- <!-- <input class="form-control" name="foto" type="file" id="formFile"> --> --}}
+                                        <img src="{{ asset($tPath.'/img/tempat' . $tempatData['foto_tempat']) }}" id="inpImg" class="d-block" alt="">
                                     </div>
                                 </div>
                                 <div class="row mb-3 justify-content-end">
                                     <div class="col-sm-10 text-end">
-                                    <a href="/tempat/data_tempat.php" class="btn btn-secondary">Kembali</a>
+                                    <a href="/tempat/data" class="btn btn-secondary">Kembali</a>
                                     <button type="button" class="btn btn-tambah" onclick="upload()">Edit</button>
                                 </div>
                             </div>
@@ -233,7 +230,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
             uploadStat = true;
             const formData = new FormData();
             formData.append('_method','PUT');
-            formData.append('id_user',idUser);
+            formData.append('email',idUser);
             formData.append('id_tempat',idTempat);
             formData.append('nama_tempat', document.querySelector('input[name="nama_tempat"]').value);
             formData.append('alamat', document.querySelector('input[name="alamat"]').value);
@@ -244,12 +241,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 formData.append('foto', fileImg, fileImg.name);
             }
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/web/tempat/tempat.php', true);
+            xhr.open('PUT', '/tempat/edit', true);
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     showGreenPopup(JSON.parse(xhr.responseText));
                     setTimeout(() => {
-                        window.location.href = '/tempat/data_tempat.php';
+                        window.location.href = '/tempat/data';
                     }, 1000);
                     return;
                 } else {

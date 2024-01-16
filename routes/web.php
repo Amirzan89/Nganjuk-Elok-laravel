@@ -58,13 +58,13 @@ Route::group(['middleware'=>'auth'],function(){
     });
     Route::group(['prefix'=>'/tempat'],function(){
         Route::get('/', [ShowTempatController::class,'showTempat']);
-        Route::get('/data', [ShowTempatController::class,'showDataTempat']);
-        Route::get('/detail', [ShowTempatController::class,'showDetailTempat']);
-        Route::get('/lihat', [ShowTempatController::class,'showDetailTempat']);
+        Route::get('/{id}', [ShowTempatController::class,'showDetailHome']);
+        Route::get('/data', [ShowTempatController::class,'showData']);
+        Route::get('/detail/{id}', [ShowTempatController::class,'showDetail']);
         Route::get('/tambah', [ShowTempatController::class,'showTambahTempat']);
-        Route::get('/edit', [ShowTempatController::class,'showEditTempat']);
-        Route::post('/tambah', [TempatController::class,'tambah']);
-        Route::put('/edit',[TempatController::class,'edit']);
+        Route::get('/edit/{id}', [ShowTempatController::class,'showEditTempat']);
+        Route::post('/tambah', [TempatController::class,'tambahTempat']);
+        Route::put('/edit',[TempatController::class,'editTempat']);
     });
     Route::group(['prefix'=>'/users'],function(){
         Route::post('/login',[LoginController::class,'Login']);
