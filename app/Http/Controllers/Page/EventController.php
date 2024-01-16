@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Events;
-use App\Models\DetailEvents;
 use DateTime;
 class EventController extends Controller
 {

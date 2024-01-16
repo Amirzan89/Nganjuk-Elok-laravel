@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,26 +31,32 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
-	  var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>"; 
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}"; 
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-      $nav = 'seniman';
-      include(__DIR__.'/../sidebar.php');
-      ?>
+      @php
+        $nav = 'seniman';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -59,9 +65,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Tambah Seniman Baru</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
-          <li class="breadcrumb-item"><a href="/seniman/data_seniman.php">Data Seniman</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/seniman">Kelola Seniman</a></li>
+          <li class="breadcrumb-item"><a href="/seniman/data_seniman">Data Seniman</a></li>
           <li class="breadcrumb-item active">Tambah Seniman Baru</li>
         </ol>
       </nav>
@@ -73,7 +79,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <div class="card-body">
               <h5 class="card-title"></h5>
 
-              <form class="row g-3" action="/web/seniman/seniman.php" method="POST" enctype="multipart/form-data">
+              <form class="row g-3" action="/web/seniman/seniman" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                 <input type="hidden" name="keterangan" value="tambah">
                 <div class="col-md-12">
@@ -182,7 +188,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end"><br>
-                  <a href="/seniman/data_seniman.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
+                  <a href="/seniman/data_seniman" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
                   <button type="submit" class="btn btn-tambah" onclick="openTambah(<?php echo $seniman['id_seniman']?>)">Tambah</button>
                 </div>
               </div>
@@ -203,7 +209,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           Apakah anda yakin ingin menambahkan data seniman?
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
+          <form action="/web/seniman/seniman" id="deleteForm" method="POST">
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
             <input type="hidden" name="id_tempat" id="inpTempat">
@@ -217,8 +223,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i

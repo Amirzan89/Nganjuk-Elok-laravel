@@ -1,3 +1,6 @@
+@php
+$tPath = app()->environment('local') ? '' : '/public/';
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,29 +23,34 @@
   <!-- Template Main CSS File -->
   <link href="{{ asset($tPath.'assets/css/nomor-induk.css') }}" rel="stylesheet" />
 </head>
-
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__ . '/header.php');
-    ?>
+    @include('component.header')
   </header>
   <!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'seniman';
-      include(__DIR__ . '/sidebar.php');
-      ?>
+      @php
+        $nav = 'seniman';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside>
   <!-- End Sidebar-->
@@ -52,7 +60,7 @@
       <h1>Kelola Seniman</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
           <li class="breadcrumb-item active">Kelola Seniman</li>
         </ol>
       </nav>
@@ -64,7 +72,7 @@
         <div class="col-lg-12">
           <div class="row">
             <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card"><a href="/seniman/formulir.php">
+              <div class="card success-card revenue-card"><a href="/seniman/formulir">
                   <div class="card-body">
                     <h5 class="card-title">Formulir</h5>
                     <div class="d-flex align-items-center">
@@ -77,7 +85,7 @@
             </div>
           </div>
           <div class="col-xxl-4 col-md-4">
-            <div class="card success-card revenue-card"><a href="/seniman/pengajuan.php">
+            <div class="card success-card revenue-card"><a href="/seniman/pengajuan">
                 <div class="card-body">
                   <h5 class="card-title">Verifikasi registrasi</h5>
                   <div class="d-flex align-items-center">
@@ -85,12 +93,7 @@
                       <i class="bi bi-bell-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <?php
-                      $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diajukan' 
-                      OR status = 'proses'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo "<h4>" . $data['total'] . "</h4>";
-                      ?>
+                      <h4> {{ $totalPengajuan }}</h4>
                     </div>
                   </div>
               </a>
@@ -98,7 +101,7 @@
           </div>
         </div>
         <div class="col-xxl-4 col-md-4">
-          <div class="card success-card revenue-card"><a href="/seniman/perpanjangan.php">
+          <div class="card success-card revenue-card"><a href="/perpanjangan">
               <div class="card-body">
                 <h5 class="card-title">Verifikasi perpanjangan</h5>
                 <div class="d-flex align-items-center">
@@ -106,12 +109,7 @@
                     <i class="bi bi-clock-fill"></i>
                   </div>
                   <div class="ps-3">
-                    <?php
-                    $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM perpanjangan WHERE status = 'diajukan' 
-                    OR status = 'proses'");
-                    $data = mysqli_fetch_assoc($sql);
-                    echo "<h4>" . $data['total'] . "</h4>";
-                    ?>
+                    <h4> {{ $totalPerpanjangan }}</h4>
                   </div>
                 </div>
               </div>
@@ -121,7 +119,7 @@
       </div>
       <div class="row">
         <div class="col-xxl-4 col-md-4">
-          <div class="card success-card revenue-card"><a href="/seniman/riwayat.php">
+          <div class="card success-card revenue-card"><a href="/seniman/riwayat">
               <div class="card-body">
                 <h5 class="card-title">Riwayat</h5>
                 <div class="d-flex align-items-center">
@@ -129,12 +127,7 @@
                     <i class="bi bi-clock-fill"></i>
                   </div>
                   <div class="ps-3">
-                    <?php
-                    $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diterima'
-                    OR status = 'ditolak'");
-                    $data = mysqli_fetch_assoc($sql);
-                    echo "<h4>" . $data['total'] . "</h4>";
-                    ?>
+                    <h4> {{ $totalRiwayat }}</h4>
                   </div>
                 </div>
               </div>
@@ -142,7 +135,7 @@
           </div>
         </div>
         <div class="col-xxl-4 col-md-4">
-          <div class="card success-card revenue-card"><a href="/seniman/data_seniman.php">
+          <div class="card success-card revenue-card"><a href="/seniman/data">
               <div class="card-body">
                 <h5 class="card-title">Data Seniman</h5>
                 <div class="d-flex align-items-center">
@@ -150,11 +143,7 @@
                     <i class="bi bi-folder-fill"></i>
                   </div>
                   <div class="ps-3">
-                    <?php
-                    $sql = mysqli_query($conn, "SELECT COUNT(*) AS total FROM seniman WHERE status = 'diterima'");
-                    $data = mysqli_fetch_assoc($sql);
-                    echo "<h4>" . $data['total'] . "</h4>";
-                    ?>
+                    <h4> {{ $totalSeniman }}</h4>
                   </div>
                 </div>
             </a>
@@ -167,8 +156,7 @@
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__ . '/footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

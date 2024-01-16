@@ -310,7 +310,6 @@
     function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {
-        _method: 'PUT',
         email: email,
         id_event: Id,
         keterangan: 'proses'

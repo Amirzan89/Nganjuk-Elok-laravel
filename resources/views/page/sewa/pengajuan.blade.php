@@ -305,7 +305,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
     function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {
-        _method: 'PUT',
         email: email,
         id_sewa: Id,
         keterangan: 'proses'

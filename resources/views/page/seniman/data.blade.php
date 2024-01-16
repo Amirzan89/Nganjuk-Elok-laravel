@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -60,27 +60,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    </script>
+		var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
+  </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'seniman';
-      include(__DIR__.'/../sidebar.php');
-      ?>
+      @php
+        $nav = 'seniman';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -90,8 +96,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Data Seniman</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/seniman">Kelola Seniman</a></li>
           <li class="breadcrumb-item active">Data Seniman</li>
         </ol>
       </nav>
@@ -107,15 +113,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
               <div class="col-md-3">
                   <select id="inpKategori" onchange="tampilkanKategori()" class="inp">
                           <option value="semua">semua</option>
-                          <?php
-                            foreach($kategoriSeniman as $n){
-                              echo "<option value='".$n['id_kategori_seniman']."'>".$n['nama_kategori']."</option>";
-                            }
-                          ?>
+                          @foreach($kategoriSeniman as $kategori)
+                            <option value="{{ $kategori['id_kategori_seniman'] }}">{{ $kategori['nama_kategori'] }}</option>
+                          @endforeach
                         </select>
                   </div>
                 
-              <a href="tambah.php" class="btn btn-primary">
+              <a href="tambah" class="btn btn-primary">
                 <i class="bi bi-person-plus-fill"></i> Tambah Seniman
               </a>
               
@@ -123,23 +127,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="{{ date('Y') }}" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="{{ date('M')  }}">
                           <option value="semua">semua</option>
-                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
-                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
-                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
-                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
-                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
-                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
-                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
-                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
-                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
-                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
-                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
-                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
+                          <option value="1" {{ (date('m') == 1) ? 'selected' : '' }} >Januari</option>
+                          <option value="2" {{ (date('m') == 2) ? 'selected' : '' }} >Februari</option>
+                          <option value="3" {{ (date('m') == 3) ? 'selected' : '' }} >Maret</option>
+                          <option value="4" {{ (date('m') == 4) ? 'selected' : '' }} >April</option>
+                          <option value="5" {{ (date('m') == 5) ? 'selected' : '' }} >Mei</option>
+                          <option value="6" {{ (date('m') == 6) ? 'selected' : '' }} >Juni</option>
+                          <option value="7" {{ (date('m') == 7) ? 'selected' : '' }} >Juli</option>
+                          <option value="8" {{ (date('m') == 8) ? 'selected' : '' }} >Agustus</option>
+                          <option value="9" {{ (date('m') == 9) ? 'selected' : '' }} >September</option>
+                          <option value="10" {{ (date('m') == 10) ? 'selected' : '' }} >Oktober</option>
+                          <option value="11" {{ (date('m') == 11) ? 'selected' : '' }} >November</option>
+                          <option value="12" {{ (date('m') == 12) ? 'selected' : '' }} >Desember</option>
                         </select>
                       </div>
                     </div>
@@ -157,32 +161,27 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                    $query = mysqli_query($conn, "SELECT id_seniman, nomor_induk, nama_kategori, nama_seniman, no_telpon, DATE(created_at) AS tanggal, status, catatan FROM seniman INNER JOIN kategori_seniman ON seniman.id_kategori_seniman = kategori_seniman.id_kategori_seniman WHERE status = 'diterima' ORDER BY id_seniman DESC");
-                    $no = 1;
-                    $senimanData = mysqli_fetch_all($query, MYSQLI_ASSOC);
-                    foreach ($senimanData as $seniman) {
-                  ?>
+                  @php $no = 1; @endphp
+                  @foreach ($senimanData as $seniman)
                     <tr>
-                      <td><?php echo $no ?></td>
-                      <td><?php echo $seniman['nomor_induk'] ?></td>
-                      <td><?php echo $seniman['nama_kategori'] ?></td>
-                      <td><?php echo $seniman['nama_seniman'] ?></td>
-                      <td><?php echo $seniman['no_telpon'] ?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $seniman['nomor_induk'] }}</td>
+                      <td>{{ $seniman['nama_kategori'] }}</td>
+                      <td>{{ $seniman['nama_seniman'] }}</td>
+                      <td>{{ $seniman['no_telpon'] }}</td>
                       <td>
-                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
-                        <a href="/seniman/edit_detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
-                        <button type="button" class="btn btn-tolak" onclick="openDelete(<?php echo $seniman['id_seniman']?>)"> <i class="bi bi-trash-fill"></i>   Hapus</button>
+                        <a href="/seniman/detail/{{ $seniman['id_seniman'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
+                        <a href="/seniman/edit/{{ $seniman['id_seniman'] }}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i>   Edit</a>
+                        <button type="button" class="btn btn-tolak" onclick="openDelete({{ $seniman['id_seniman']}})"> <i class="bi bi-trash-fill"></i>   Hapus</button>
                       </td>
                     </tr>
-                  <?php $no++;
-                  } ?>
+                  @endforeach
                 </tbody>
               </table>
               <br>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                  <a href="../seniman" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
             </div>
@@ -205,10 +204,10 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/seniman/seniman.php" id="deleteForm" method="POST">
+          <form action="/web/seniman/seniman" id="deleteForm" method="POST">
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="desc" value="hapus">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+            <input type="hidden" name="id_user" value="{{ $userAuth['id_user'] }}">
             <input type="hidden" name="id_seniman" id="inpSenimanDelete">
             <button type="submit" class="btn btn-tolak">Hapus</button>
           </form>
@@ -220,8 +219,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -266,8 +264,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
       function getActionButton(status, idSeniman) {
           return `
-          <a href="/seniman/detail_seniman.php?id_seniman=${idSeniman}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
-          <a href="/seniman/edit_detail_seniman.php?id_seniman=${idSeniman}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Lihat</a>
+          <a href="/seniman/detail/${idSeniman}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+          <a href="/seniman/edit/${idSeniman}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Lihat</a>
           <button class="btn btn-tolak" onclick="openDelete('${idSeniman}')"><i class="bi bi-trash-fill"></i> Lihat</button>`;
       }
     }
@@ -303,7 +301,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           icon.innerText = 'Lihat';
           link.appendChild(icon);
           link.classList.add('btn','btn-lihat');
-          link.setAttribute('href',`/seniman/detail_seniman.php?id_seniman=${item['id_seniman']}`);
+          link.setAttribute('href',`/seniman/detail/${item['id_seniman']}`);
           td.appendChild(link);
           //btn 2
           var btn = document.createElement('button');
@@ -348,7 +346,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.open('POST', domain + "/web/seniman/seniman")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

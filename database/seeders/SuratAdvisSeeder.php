@@ -37,7 +37,7 @@ class SuratAdvisSeeder extends Seeder
                 $total = $total == 0 ? 1 : $total++;
                 $total = str_pad($total, 3, '0', STR_PAD_LEFT);
                 $seniman = [
-                    'nik'=>mt_rand(1000000000000000,9999999999999999),
+                    'nik'=>base64_encode(mt_rand(1000000000000000,9999999999999999)),
                     'nomor_induk'=>$kategoriData[$index]->singkatan_kategori.'/'.str_pad($total, 3, '0', STR_PAD_LEFT).'/411.302/'.date('Y'),
                     'nama_seniman'=>Str::random(30),
                     'jenis_kelamin'=>['laki-laki', 'perempuan'][rand(0, 1)],

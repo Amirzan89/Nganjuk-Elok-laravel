@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,28 +31,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+    @if(app()->environment('local'))
+        <script>
+            var tPath = '';
+        </script>
+    @else
+        <script>
+            var tPath = '/public/';
+        </script>
+    @endif
     <script>
         const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-        var csrfToken = "<?php echo $csrf ?>";
-        var email = "<?php echo $userAuth['email'] ?>";
-        var idUser = "<?php echo $userAuth['id_user'] ?>";
-        var number = "<?php echo $userAuth['number'] ?>";
-        var role = "<?php echo $userAuth['role'] ?>";
-        var idSeniman = "<?php echo $id ?>";
+        var csrfToken = "{{ csrf_token() }}";
+        var email = "{{ $userAuth['email'] }}";
+        var number = "{{ $userAuth['number'] }}";
     </script>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-        <?php include(__DIR__ . '/../header.php');
-        ?>
+        @include('component.header')
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
-            <?php
-            $nav = 'seniman';
-            include(__DIR__ . '/../sidebar.php');
-            ?>
+            @php
+                $nav = 'seniman';
+            @endphp
+            @include('component.sidebar')
         </ul>
     </aside><!-- End Sidebar-->
 
@@ -61,14 +66,14 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <h1>Detail data seniman</h1>
             <nav>
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-                    <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
-                    <?php if ($seniman['status'] == 'diajukan' || $seniman['status'] == 'proses') { ?>
-                        <li class="breadcrumb-item"><a href="/seniman/pengajuan.php">Verifikasi Pengajuan</a></li>
-                    <?php } else if ($seniman['status'] == 'diterima' || $seniman['status'] == 'ditolak') { ?>
-                        <li class="breadcrumb-item"><a href="/seniman/riwayat.php">Riwayat Nomer Induk Seniman</a>
+                    <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="/seniman">Kelola Seniman</a></li>
+                    @if ($senimanData['status'] == 'diajukan' || $senimanData['status'] == 'proses')
+                        <li class="breadcrumb-item"><a href="/seniman/pengajuan">Verifikasi Pengajuan</a></li>
+                    @elseif ($senimanData['status'] == 'diterima' || $senimanData['status'] == 'ditolak')
+                        <li class="breadcrumb-item"><a href="/seniman/riwayat">Riwayat Nomer Induk Seniman</a>
                         </li>
-                    <?php } ?>
+                    @endif
                     <li class="breadcrumb-item active">Detail Data Seniman</li>
                 </ol>
             </nav>
@@ -77,12 +82,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <div class="row">
                 <div class="col-lg-12">
                     <div class="row mb-3 d-flex justify-content-center align-items-center">
-                        <?php if ($seniman['status'] == 'diterima') { ?>
+                        @if ($senimanData['status'] == 'diterima')
                             <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
-                        <?php } else if ($seniman['status'] == 'ditolak') { ?>
+                        @elseif ($senimanData['status'] == 'ditolak')
                             <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
                             </li>
-                        <?php } ?>
+                        @endif
                     </div>
                     <div class="col-lg-12">
                         <div class="card">
@@ -90,21 +95,21 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                 <h5 class="card-title"></h5>
                                 <!-- Multi Columns Form -->
                                 <form class="row g-3">
-                                    <?php if (isset($seniman['nomor_induk']) && !is_null($seniman['nomor_induk']) && !empty($seniman['nomor_induk'])) { ?>
+                                    @if (isset($senimanData['nomor_induk']) && !is_null($senimanData['nomor_induk']) && !empty($senimanData['nomor_induk']))
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Seniman</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo $seniman['nomor_induk'] ?>">
+                                        <input type="text" class="form-control" id="nik" readonly value="{{ $senimanData['nomor_induk'] }}">
                                     </div>
-                                    <?php } ?>
+                                    @endif
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="<?php echo base64_decode($seniman['nik']); ?>">
+                                        <input type="text" class="form-control" id="nik" readonly value="{{ base64_decode($senimanData['nik']) }}">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                                        <input type="text" class="form-control" id="nama_seniman" readonly value="<?php echo $seniman['nama_seniman'] ?>">
+                                        <input type="text" class="form-control" id="nama_seniman" readonly value="{{ $senimanData['nama_seniman'] }}">
                                     </div>
                                     <br>
                                     <div class="col-mb-3 mt-0">
@@ -112,61 +117,61 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                             Kelamin</label>
                                         <div class="col-md-6">
                                             <select class="form-select" aria-label="Default select example" disabled>
-                                                <?php if ($seniman['jenis_kelamin'] == 'laki-laki') { ?>
+                                                @if ($senimanData['jenis_kelamin'] == 'laki-laki')
                                                     <option value="laki-laki" selected="selected">Laki-laki</option>
-                                                <?php } else if ($seniman['jenis_kelamin'] === 'perempuan') { ?>
+                                                @elseif ($senimanData['jenis_kelamin'] === 'perempuan')
                                                     <option value="perempuan" selected="selected">Perempuan</option>
-                                                <?php } ?>
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
                                     <br>
                                     <div class="col-md-8">
                                         <label for="tempat_lahir" class="form-label">Tempat lahir</label>
-                                        <input type="text" class="form-control" id="tempat_lahir" readonly value="<?php echo $seniman['tempat_lahir'] ?>">
+                                        <input type="text" class="form-control" id="tempat_lahir" readonly value="{{ $senimanData['tempat_lahir'] }}">
                                     </div>
                                     <br>
                                     <div class="col-md-4">
                                         <label for="tanggal_lahir" class="form-label">Tanggal lahir</label>
-                                        <input type="text" class="form-control" id="tanggal_lahir" readonly value="<?php echo $seniman['tanggal'] ?>">
+                                        <input type="text" class="form-control" id="tanggal_lahir" readonly value="{{ $senimanData['tanggal'] }}">
                                     </div>
                                     <br>
                                     <div class="col-mb-3 mt-0">
                                         <label for="kecamatan" class="col-md-12 pt-3 col-form-label">Kecamatan</label>
                                         <div class="col-md-6">
                                             <select class="form-select" aria-label="Default select example" disabled>
-                                                <option value="<?php echo $seniman['kecamatan'] ?>" selected="selected"><?php echo ucfirst($seniman['kecamatan'])?></option>
+                                                <option value="{{ $senimanData['kecamatan'] }}" selected="selected">{{ ucfirst($senimanData['kecamatan'])}}</option>
                                             </select>
                                         </div>
                                     </div>
                                     <br>
                                     <div class="col-md-12 ">
                                         <label for="alamat_seniman" class="form-label">Alamat</label>
-                                        <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;" readonly><?php echo $seniman['alamat_seniman'] ?></textarea>
+                                        <textarea class="form-control" id="alamat_seniman" placeholder="Masukkan Alamat" style="height: 100px;" readonly>{{ $senimanData['alamat_seniman'] }}</textarea>
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="no_telpon" class="form-label">Nomor Telepon</label>
-                                        <input type="text" class="form-control" id="no_telpon" readonly value="<?php echo $seniman['no_telpon'] ?>">
+                                        <input type="text" class="form-control" id="no_telpon" readonly value="{{ $senimanData['no_telpon'] }}">
                                     </div>
                                     <br>
                                     <div class="col-mb-3 mt-0">
                                         <label for="kategori_seniman" class="col-md-12 pt-3 col-form-label">Kategori Seniman</label>
                                         <div class="col-md-6">
                                             <select class="form-select" aria-label="Default select example" disabled>
-                                            <option value="<?php echo $seniman['kategori'] ?>" selected="selected"><?php echo ucfirst($seniman['kategori'])?></option>
+                                            <option value="{{ $senimanData['kategori'] }}" selected="selected">{{ ucfirst($senimanData['kategori'])}}</option>
                                             </select>
                                         </div>
                                     </div>
                                     <br>
                                     <div class="col-md-8">
                                         <label for="nama_organisasi" class="form-label">Nama Organisasi</label>
-                                        <input type="text" class="form-control" id="nama_organisasi" readonly value="<?php echo $seniman['nama_organisasi'] ?>">
+                                        <input type="text" class="form-control" id="nama_organisasi" readonly value="{{ $senimanData['nama_organisasi'] }}">
                                     </div>
                                     <br>
                                     <div class="col-md-4">
                                         <label for="jumlah_anggota" class="form-label">Jumlah Anggota</label>
-                                        <input type="number" class="form-control" id="jumlah_anggota" readonly value="<?php echo $seniman['jumlah_anggota'] ?>">
+                                        <input type="number" class="form-control" id="jumlah_anggota" readonly value="{{ $senimanData['jumlah_anggota'] }}">
                                     </div>
                                     <br>
                                     <div class="col-12">
@@ -199,29 +204,29 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                         </div>
                                     </div>
                                     <br>
-                                    <?php if (isset($seniman['catatan']) && !is_null($seniman['catatan']) && !empty($seniman['catatan'])) { ?>
+                                    @if (isset($senimanData['catatan']) && !is_null($senimanData['catatan']) && !empty($senimanData['catatan']))
                                         <div class="col-12">
                                             <label for="inputText" class="form-label">Alasan Penolakan</label>
-                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $seniman['catatan'] ?></textarea>
+                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>{{ $senimanData['catatan'] }}</textarea>
                                         </div>
-                                    <?php } ?>
+                                    @endif
                                     <div class="row mb-3 justify-content-end">
                                         <div class="col-sm-10 text-end">
                                             <br>
-                                            <?php if ($seniman['status'] == 'diajukan' || $seniman['status'] == 'proses') { ?>
-                                                <a href="/seniman/pengajuan.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
-                                            <?php } else if ($seniman['status'] == 'diterima' || $seniman['status'] == 'ditolak') { ?>
-                                                <a href="/seniman/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
-                                            <?php } ?>
-                                            <?php if ($seniman['status'] == 'diajukan') { ?>
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(<?php echo $seniman['id_seniman'] ?>)">Proses
+                                            @if ($senimanData['status'] == 'diajukan' || $senimanData['status'] == 'proses')
+                                                <a href="/seniman/pengajuan" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
+                                            @elseif ($senimanData['status'] == 'diterima' || $senimanData['status'] == 'ditolak')
+                                                <a href="/seniman/riwayat" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
+                                            @endif
+                                            @if ($senimanData['status'] == 'diajukan')
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses({{ $senimanData['id_seniman'] }})">Proses
                                                 </button>
-                                            <?php } else if ($seniman['status'] == 'proses') { ?>
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $seniman['id_seniman'] ?>)">Terima
+                                            @elseif ($senimanData['status'] == 'proses')
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju({{ $senimanData['id_seniman'] }})">Terima
                                                 </button>
-                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $seniman['id_seniman'] ?>)">Tolak
+                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak({{ $senimanData['id_seniman'] }})">Tolak
                                                 </button>
-                                            <?php } ?>
+                                            @endif
                                         </div>
                                     </div>
                                 </form>
@@ -244,11 +249,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                    <form onsubmit="proses(event, 'proses')">
                         <input type="hidden" name="id_seniman" id="inpSenimanP">
-                        <input type="hidden" name="keterangan" value="proses">
                         <button type="submit" class="btn btn-tambah">Proses</button>
                     </form>
                 </div>
@@ -270,12 +272,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                    <form onsubmit="proses(event, 'diterima')">
                         <input type="hidden" name="id_seniman" id="inpSenimanS">
-                        <input type="hidden" name="keterangan" value="diterima">
-                        <input type="hidden" name="desc" value="seniman">
                         <button type="submit" class="btn btn-tambah">Terima</button>
                     </form>
                 </div>
@@ -292,18 +290,14 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     <h5 class="modal-title">Tolak Pengajuan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="/web/seniman/seniman.php" id="prosesForm" method="POST">
+                <form onsubmit="proses(event, 'ditolak')">
                     <div class="modal-body" style="text-align: left;">
                         <label for="catatan" class="form-label">Alasan penolakan</label>
                         <textarea class="form-control" id="catatan" name="catatan" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                         <input type="hidden" name="id_seniman" id="inpSenimanT">
-                        <input type="hidden" name="keterangan" value="ditolak">
-                        <input type="hidden" name="desc" value="seniman">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
                     </div>
                 </form>
@@ -313,10 +307,10 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <!-- end modal tolak -->
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
-        <?php include(__DIR__ . '/../footer.php');
-        ?>
+        @include('component.footer')
     </footer>
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
     <script src="{{ asset($tPath.'js/popup.js') }}"></script>
@@ -327,7 +321,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
         var inpSenimanP = document.getElementById('inpSenimanP');
         var inpSenimanS = document.getElementById('inpSenimanS');
         var inpSenimanT = document.getElementById('inpSenimanT');
-
+        function showLoading(){
+            document.querySelector('div#preloader').style.display = 'block';
+        }
+        function closeLoading(){
+            document.querySelector('div#preloader').style.display = 'none';
+        }
         function openProses(dataU, ) {
             inpSenimanP.value = dataU;
             var myModal = new bootstrap.Modal(modalProses);
@@ -345,6 +344,10 @@ $tPath = app()->environment('local') ? '' : '/public/';
             var myModal = new bootstrap.Modal(modalTolak);
             myModal.show();
         }
+        function closeModal(dataU) {
+            var myModal = new bootstrap.Modal(dataU);
+            myModal.hide();
+        }
         //preview data
         function preview(desc) {
             if (desc != 'ktp' && desc != 'foto' && desc != 'surat') {
@@ -359,7 +362,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/preview.php")
+            xhr.open('POST', domain + "/preview")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             //send the form data
@@ -389,7 +392,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/download.php")
+            xhr.open('POST', domain + "/download")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.responseType = 'blob';
@@ -423,6 +426,54 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     }
                 }
             };
+        }
+        function proses(event, ket) {
+            event.preventDefault();
+            var modals = '';
+            var Id = event.target.querySelector('[name="id_seniman"]').value;
+            var catatan = '';
+            if(ket == 'proses'){
+                modals = modalProses;
+            }else if(ket == 'diterima'){
+                modals = modalSetuju;
+            }else if(ket == 'ditolak'){
+                catatan = event.target.querySelector('[name="catatan"]').value;
+                modals = modalTolak;
+            }
+            showLoading();
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_seniman: Id,
+                keterangan: ket,
+                catatan:catatan,
+            };
+            xhr.open('PUT', domain + "/seniman/pengajuan")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    closeLoading();
+                    closeModal(modals);
+                    var response = JSON.parse(xhr.responseText);
+                    showGreenPopup(response);
+                    setTimeout(() => {
+                        if(ket == 'proses'){
+                            window.location.href = "/seniman/pengajuan";
+                        }else if(ket == 'diterima' || ket == 'ditolak'){
+                            window.location.href = "/seniman/pengajuan";
+                        }
+                    }, 3000);
+                } else {
+                    closeLoading();
+                    closeModal(modals);
+                    var response = JSON.parse(xhr.responseText);
+                    showRedPopup(response);
+                }
+                }
+            }
         }
     </script>
 

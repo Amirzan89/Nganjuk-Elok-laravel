@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,27 +54,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    </script>
+		var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
+  </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
-      $nav = 'seniman';
-      include(__DIR__.'/../sidebar.php');
-      ?>
+      @php
+        $nav = 'seniman';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -84,8 +90,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Riwayat Pengajuan</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/seniman">Kelola Seniman</a></li>
           <li class="breadcrumb-item active">Riwayat Pengajuan</li>
         </ol>
       </nav>
@@ -135,35 +141,30 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                      $query = mysqli_query($conn, "SELECT id_seniman, nama_seniman, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM seniman WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_seniman DESC");
-                      $no = 1;
-                      $senimanData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
-                      foreach ($senimanData as $seniman) {
-                  ?>
+                  @php $no = 1; @endphp
+                  @foreach ($senimanData as $seniman)
                     <tr>
-                      <td><?php echo $no?></td>
-                      <td><?php echo $seniman['nama_seniman']?></td>
-                      <td><?php echo $seniman['tanggal']?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $seniman['nama_seniman'] }}</td>
+                      <td>{{ $seniman['tanggal'] }}</td>
                       <td>
-                        <?php if($seniman['status'] == 'diterima'){ ?>
+                        @if ($seniman['status'] == 'diterima')
                           <span class="badge bg-terima">Diterima</span>
-                          <?php }else if($seniman['status'] == 'ditolak'){ ?>
-                            <span class="badge bg-tolak">Ditolak </span>
-                            <?php } ?>
+                        @elseif ($seniman['status'] == 'ditolak')
+                          <span class="badge bg-tolak">Ditolak</span>
+                        @endif
                       </td>
                       <td>
-                        <a href="/seniman/detail_seniman.php?id_seniman=<?= $seniman['id_seniman'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>  Lihat</a>
+                        <a href="/seniman/detail/{{ $seniman['id_seniman'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>
                     </tr>
-                  <?php $no++;
-                  } ?>
+                  @endforeach
                 </tbody>
               </table>
               <br>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                  <a href="/seniman" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
             </div>
@@ -177,8 +178,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
   <!-- </footer> -->
 
@@ -228,7 +228,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       function getActionButton(status, idAdvis) {
         if (status == 'ditolak' || status == 'diterima') {
-          return `<a href="/seniman/detail_seniman.php?id_seniman=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/seniman/detail/${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -252,7 +252,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.open('POST', domain + "/web/seniman/seniman")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

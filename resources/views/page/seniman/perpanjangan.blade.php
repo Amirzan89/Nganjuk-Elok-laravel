@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,28 +49,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-	  var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
 	</script>
 
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php 
+      @php
         $nav = 'seniman';
-        include(__DIR__.'/../sidebar.php');
-      ?>
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -80,8 +86,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Verifikasi Perpanjangan</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/seniman.php">Kelola Seniman</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/seniman">Kelola Seniman</a></li>
           <li class="breadcrumb-item active">Verifikasi Perpanjangan</li>
         </ol>
       </nav>
@@ -122,48 +128,43 @@ $tPath = app()->environment('local') ? '' : '/public/';
               </div>
               <table class="table datatable" id="tablePerpanjangan">
               <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Nama Seniman</th>
-                    <th scope="col">Tanggal Pengajuan</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Aksi</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <?php
-                      $query = mysqli_query($conn, "SELECT seniman.id_seniman AS id_seniman, id_perpanjangan, nama_seniman, DATE(perpanjangan.tgl_pembuatan) AS tanggal, perpanjangan.status FROM perpanjangan INNER JOIN seniman ON seniman.id_seniman = perpanjangan.id_seniman WHERE perpanjangan.status = 'diajukan' OR perpanjangan.status = 'proses' ORDER BY id_perpanjangan DESC");
-                      $no = 1;
-                      $senimanData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
-                      foreach ($senimanData as $seniman) {
-                  ?>
+                <tr>
+                  <th scope="col">No</th>
+                  <th scope="col">Nama Seniman</th>
+                  <th scope="col">Tanggal Pengajuan</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Aksi</th>
+                </tr>
+                </thead>
+                <tbody>
+                  @php $no = 1; @endphp
+                  @foreach ($senimanData as $seniman)
                     <tr>
-                      <td><?php echo $no?></td>
-                      <td><?php echo $seniman['nama_seniman']?></td>
-                      <td><?php echo $seniman['tanggal']?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $seniman['nama_seniman'] }}</td>
+                      <td>{{ $seniman['tanggal'] }}</td>
                       <td>
-                        <?php if($seniman['status'] == 'diajukan'){ ?>
+                        @if ($seniman['status'] == 'diajukan')
                           <span class="badge bg-proses">Diajukan</span>
-                        <?php }else if($seniman['status'] == 'proses'){ ?>
+                        @elseif ($seniman['status'] == 'proses')
                           <span class="badge bg-terima">Diproses</span>
-                        <?php } ?>
+                        @endif
                       </td>
                       <td>
-                      <?php if($seniman['status'] == 'diajukan'){ ?>
-                          <button class="btn btn-lihat" onclick="proses(<?php echo $seniman['id_seniman'] ?>,<?php echo $seniman['id_perpanjangan'] ?>)"><i class="bi bi-eye-fill"></i>   Lihat</button>
-                        <?php }else if($seniman['status'] == 'proses'){ ?>
-                          <a href="/seniman/detail_perpanjangan.php?id_perpanjangan=<?= $seniman['id_perpanjangan'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i>   Lihat</a>
-                        <?php } ?>
+                        @if ($seniman['status'] == 'diajukan')
+                          <button class="btn btn-lihat" onclick="proses({{ $seniman['id_seniman'] }},{{ $seniman['id_perpanjangan'] }})"><i class="bi bi-eye-fill"></i> Lihat</button>
+                        @elseif ($seniman['status'] == 'proses')
+                          <a href="/perpanjangan/detail/{{ $seniman['id_perpanjangan'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        @endif
                       </td>
                     </tr>
-                  <?php $no++;
-                  } ?>
-               </tbody>
+                  @endforeach
+                </tbody>
               </table>
               <br>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../seniman.php" class="btn btn-secondary">Kembali</a>
+                  <a href="/seniman" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
             </div>
@@ -179,8 +180,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-  <?php include(__DIR__.'/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
   
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -232,7 +232,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         if (status == 'diajukan') {
           return `<button class="btn btn-lihat" onclick="proses('${idSeniman}','${idPerpanjangan}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
         } else if (status == 'proses') {
-          return `<a href="/seniman/detail_perpanjangan.php?id_perpanjangan=${idPerpanjangan}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/seniman/detail_perpanjangan?id_perpanjangan=${idPerpanjangan}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -256,7 +256,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.open('POST', domain + "/web/seniman/seniman")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
@@ -305,33 +305,26 @@ $tPath = app()->environment('local') ? '' : '/public/';
         }, 250);
       }, 50);
     }
-    function proses(IdSeniman, Idperpanjangan) {
+    function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {
-        _method: 'PUT',
-        id_user: idUser,
-        id_seniman: IdSeniman,
-        id_perpanjangan: Idperpanjangan,
-        desc:'perpanjangan',
-        keterangan: 'proses',
+        email: email,
+        id_perpanjangan: Id,
+        keterangan: 'proses'
       };
       //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman.php")
+      xhr.open('PUT', domain + "/perpanjangan")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      //send the form data
       xhr.send(JSON.stringify(requestBody));
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            window.location.href = "/seniman/detail_perpanjangan.php?id_perpanjangan="+Idperpanjangan;
+            var response = JSON.parse(xhr.responseText);
+            window.location.href = "/perpanjangan/detail/"+ Id;
           } else {
-            console.log(xhr.responseText);
-            try {
-                eval(xhr.responseText);
-            } catch (error) {
-                console.error('Error evaluating JavaScript:', error);
-            }
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
           }
         }
       }

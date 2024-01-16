@@ -29,9 +29,6 @@ Route::group(['middleware'=>'auth'],function(){
     Route::get('/pentas', function () {
         return view('page.pentas');
     });
-    Route::get('/seniman', function () {
-        return view('page.seniman');
-    });
     Route::group(['prefix'=>'/event'],function(){
         Route::get('/',[ShowEventController::class,'showEvent']);
         Route::get('/formulir',[ShowEventController::class,'showFormulir']);
@@ -42,7 +39,19 @@ Route::group(['middleware'=>'auth'],function(){
         Route::put('/riwayat', [EventController::class,'prosesEvent']);
     });
     Route::group(['prefix'=>'/seniman'],function(){
-        //
+        Route::get('/',[ShowSenimanController::class,'showSeniman']);
+        Route::get('/formulir',[ShowSenimanController::class,'showFormulir']);
+        Route::get('/pengajuan', [ShowSenimanController::class,'showPengajuan']);
+        Route::get('/riwayat', [ShowSenimanController::class,'showRiwayat']);
+        Route::get('/data',[ShowSenimanController::class,'showData']);
+        Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailSeniman']);
+        Route::put('/pengajuan', [SenimanController::class,'prosesSeniman']);
+        Route::put('/riwayat', [SenimanController::class,'prosesSeniman']);
+    });
+    Route::group(['prefix'=>'/perpanjangan'],function(){
+        Route::get('/', [ShowSenimanController::class,'showPerpanjangan']);
+        Route::put('/', [ShowSenimanController::class,'prosesPerpanjangan']);
+        Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailPerpanjangan']);
     });
     Route::group(['prefix'=>'/pentas'],function(){
         //

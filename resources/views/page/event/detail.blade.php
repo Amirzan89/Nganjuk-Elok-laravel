@@ -291,7 +291,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
       var requestBody = {
         email: email,
         id_event: idEvent,
-        item: 'event',
         deskripsi: desc
       };
       //open the request
@@ -375,7 +374,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
       showLoading();
       var xhr = new XMLHttpRequest();
       var requestBody = {
-        _method: 'PUT',
         email: email,
         id_event: Id,
         keterangan: ket,
