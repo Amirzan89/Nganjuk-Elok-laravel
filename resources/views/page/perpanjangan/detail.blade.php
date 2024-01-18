@@ -68,12 +68,9 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
                     <li class="breadcrumb-item"><a href="/seniman">Kelola Seniman</a></li>
-                    <?php if ($perpanjangan['status'] == 'diajukan' || $perpanjangan['status'] == 'proses') { }}
+                    @if ($perpanjanganData['status'] == 'diajukan' || $perpanjanganData['status'] == 'proses')
                         <li class="breadcrumb-item"><a href="/seniman/perpanjangan">Verifikasi Perpanjangan</a></li>
-                    <?php // } else if ($perpanjangan['status'] == 'diterima' || $perpanjangan['status'] == 'ditolak') { }}
-                        <!-- <li class="breadcrumb-item"><a href="/seniman/riwayat">Riwayat Nomer Induk Seniman</a>
-                        </li> -->
-                    <?php } }}
+                    @endif
                     <li class="breadcrumb-item active">Detail Data perpanjangan Seniman</li>
                 </ol>
             </nav>
@@ -82,12 +79,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <div class="row">
                 <div class="col-lg-12">
                     <div class="row mb-3 d-flex justify-content-center align-items-center">
-                        <?php if ($perpanjangan['status'] == 'diterima') { }}
+                        @if ($perpanjanganData['status'] == 'diterima')
                             <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
-                        <?php } else if ($perpanjangan['status'] == 'ditolak') { }}
+                        @elseif ($perpanjanganData['status'] == 'ditolak')
                             <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
                             </li>
-                        <?php } }}
+                        @endif
                     </div>
                     <div class="col-lg-12">
                         <div class="card">
@@ -97,17 +94,17 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                 <form class="row g-3">
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="}} base64_decode($perpanjangan['nik']) }}">
+                                        <input type="text" class="form-control" id="nik" readonly value="}} base64_decode($perpanjanganData['nik']) }}">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                                        <input type="text" class="form-control" id="nama_seniman" readonly value="}} $perpanjangan['nama_seniman'] }}">
+                                        <input type="text" class="form-control" id="nama_seniman" readonly value="}} $perpanjanganData['nama_seniman'] }}">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Seniman</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="}} $perpanjangan['nomor_induk'] }}">
+                                        <input type="text" class="form-control" id="nik" readonly value="}} $perpanjanganData['nomor_induk'] }}">
                                     </div>
                                     <br>
                                     <div class="col-12">
@@ -140,29 +137,27 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                         </div>
                                     </div>
                                     <br>
-                                    <?php if (isset($perpanjangan['catatan']) && !is_null($perpanjangan['catatan']) && !empty($perpanjangan['catatan'])) { }}
+                                    @if (isset($perpanjanganData['catatan']) && !is_null($perpanjanganData['catatan']) && !empty($perpanjanganData['catatan']))
                                         <div class="col-12">
                                             <label for="inputText" class="form-label">Alasan Penolakan</label>
-                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>}} $perpanjangan['catatan'] }}</textarea>
+                                            <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>{{ $perpanjanganData['catatan'] }}</textarea>
                                         </div>
-                                    <?php } }}
+                                    @endif
                                     <div class="row mb-3 justify-content-end">
                                         <div class="col-sm-10 text-end">
                                             <br>
-                                            <?php if ($perpanjangan['status'] == 'diajukan' || $perpanjangan['status'] == 'proses') { }}
+                                            @if ($perpanjanganData['status'] == 'diajukan' || $perpanjanganData['status'] == 'proses')
                                                 <a href="/seniman/perpanjangan" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
-                                            <?php // } else if ($perpanjangan['status'] == 'diterima' || $perpanjangan['status'] == 'ditolak') { }}
-                                                <!-- <a href="/seniman/riwayat" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a> -->
-                                            <?php } }}
-                                            <?php if ($perpanjangan['status'] == 'diajukan') { }}
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses(}} $perpanjangan['id_seniman'] }})">Proses
+                                            @endif
+                                            @if ($perpanjanganData['status'] == 'diajukan')
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses( {{ $perpanjanganData['id_seniman'] }})">Proses
                                                 </button>
-                                            <?php } else if ($perpanjangan['status'] == 'proses') { }}
-                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(}} $perpanjangan['id_seniman'] }})">Terima
+                                            @elseif ($perpanjanganData['status'] == 'proses')
+                                                <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju( {{ $perpanjanganData['id_seniman'] }})">Terima
                                                 </button>
-                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(}} $perpanjangan['id_seniman'] }})">Tolak
+                                                <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak({{ $perpanjanganData['id_seniman'] }})">Tolak
                                                 </button>
-                                            <?php } }}
+                                            @endif
                                         </div>
                                     </div>
                                 </form>
@@ -186,11 +181,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <form action="/web/seniman/seniman" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="}} $userAuth['id_user'] }}">
                         <input type="hidden" name="id_perpanjangan" value="}} $id }}">
                         <input type="hidden" name="id_seniman" id="inpSenimanP">
-                        <input type="hidden" name="keterangan" value="proses">
                         <button type="submit" class="btn btn-tambah">Proses</button>
                     </form>
                 </div>
@@ -213,12 +205,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <form action="/web/seniman/seniman" id="prosesForm" method="POST">
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="}} $userAuth['id_user'] }}">
                         <input type="hidden" name="id_perpanjangan" value="}} $id }}">
                         <input type="hidden" name="id_seniman" id="inpSenimanS">
-                        <input type="hidden" name="keterangan" value="diterima">
-                        <input type="hidden" name="desc" value="perpanjangan">
                         <button type="submit" class="btn btn-tambah">Terima</button>
                     </form>
                 </div>
@@ -231,7 +219,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <div class="modal fade" id="modalTolak" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="/web/seniman/seniman" id="prosesForm" method="POST">
+                <form onsubmit="proses(event, 'ditolak')">
                     <div class="modal-header">
                         <h5 class="modal-title">Tolak Pengajuan</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -242,12 +230,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     </div>
                     <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <input type="hidden" name="_method" value="PUT">
-                        <input type="hidden" name="id_user" value="}} $userAuth['id_user'] }}">
                         <input type="hidden" name="id_perpanjangan" value="}} $id }}">
-                        <input type="hidden" name="id_seniman" id="inpSenimanT">
-                        <input type="hidden" name="keterangan" value="ditolak">
-                        <input type="hidden" name="desc" value="perpanjangan">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
                     </div>
                 </form>
@@ -260,6 +243,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         @include('component.footer')
     </footer>
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <div id="preloader" style="display: none;"></div>
     <div id="greenPopup" style="display:none"></div>
     <div id="redPopup" style="display:none"></div>
     <script src="{{ asset($tPath.'js/popup.js') }}"></script>
@@ -270,23 +254,30 @@ $tPath = app()->environment('local') ? '' : '/public/';
         var inpSenimanP = document.getElementById('inpSenimanP');
         var inpSenimanS = document.getElementById('inpSenimanS');
         var inpSenimanT = document.getElementById('inpSenimanT');
-
+        function showLoading(){
+            document.querySelector('div#preloader').style.display = 'block';
+        }
+        function closeLoading(){
+            document.querySelector('div#preloader').style.display = 'none';
+        }
         function openProses(dataU, ) {
             inpSenimanP.value = dataU;
             var myModal = new bootstrap.Modal(modalProses);
             myModal.show();
         }
-
         function openSetuju(dataU) {
             inpSenimanS.value = dataU;
             var myModal = new bootstrap.Modal(modalSetuju);
             myModal.show();
         }
-
         function openTolak(dataU) {
             inpSenimanT.value = dataU;
             var myModal = new bootstrap.Modal(modalTolak);
             myModal.show();
+        }
+        function closeModal(dataU) {
+            var myModal = new bootstrap.Modal(dataU);
+            myModal.hide();
         }
         //preview data
         function preview(desc) {
@@ -366,6 +357,54 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     }
                 }
             };
+        }
+        function proses(event, ket) {
+            event.preventDefault();
+            var modals = '';
+            var Id = event.target.querySelector('[name="id_perpanjangan"]').value;
+            var catatan = '';
+            if(ket == 'proses'){
+                modals = modalProses;
+            }else if(ket == 'diterima'){
+                modals = modalSetuju;
+            }else if(ket == 'ditolak'){
+                catatan = event.target.querySelector('[name="catatan"]').value;
+                modals = modalTolak;
+            }
+            showLoading();
+            var xhr = new XMLHttpRequest();
+            var requestBody = {
+                email: email,
+                id_perpanjangan: Id,
+                keterangan: ket,
+                catatan:catatan
+            };
+            xhr.open('PUT', domain + "/perpanjangan/pengajuan")
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.send(JSON.stringify(requestBody));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    closeLoading();
+                    closeModal(modals);
+                    var response = JSON.parse(xhr.responseText);
+                    showGreenPopup(response);
+                    setTimeout(() => {
+                    if(ket == 'proses'){
+                        window.location.href = "/perpanjangan";
+                    }else if(ket == 'diterima' || ket == 'ditolak'){
+                        window.location.href = "/perpanjangan";
+                    }
+                    }, 3000);
+                } else {
+                    closeLoading();
+                    closeModal(modals);
+                    var response = JSON.parse(xhr.responseText);
+                    showRedPopup(response);
+                }
+                }
+            }
         }
     </script>
 
