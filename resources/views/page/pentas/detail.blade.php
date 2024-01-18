@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -29,32 +29,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    var idPentas = "<?php echo $id ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-
-    <?php
-    include(__DIR__ . '/../header.php');
-    ?>
-
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'pentas';
-      include(__DIR__ . '/../sidebar.php');
-      ?>
+      @php
+        $nav = 'pentas';
+      @endphp
+      @include('component.sidebar')
     </ul>
 
   </aside><!-- End Sidebar-->
@@ -65,13 +67,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Detail Pentas</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/pentas.php">Kelola Pentas</a></li>
-          <?php if ($pentas['status'] == 'diajukan' || $pentas['status'] == 'proses') { ?>
-            <li class="breadcrumb-item"><a href="/pentas/pengajuan.php">Pengajuan Pentas</a></li>
-          <?php } else if ($pentas['status'] == 'diterima' || $pentas['status'] == 'ditolak') { ?>
-            <li class="breadcrumb-item"><a href="/pentas/riwayat.php">Riwayat Pengajuan Pentas</a></li>
-          <?php } ?>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/pentas">Kelola Pentas</a></li>
+          @if ($pentasData['status'] == 'diajukan' || $pentasData['status'] == 'proses')
+            <li class="breadcrumb-item"><a href="/pentas/pengajuan">Pengajuan Pentas</a></li>
+          @elseif ($pentasData['status'] == 'diterima' || $pentasData['status'] == 'ditolak')
+            <li class="breadcrumb-item"><a href="/pentas/riwayat">Riwayat Pengajuan Pentas</a></li>
+          @endif
           <li class="breadcrumb-item active">Detail pentas</li>
         </ol>
       </nav>
@@ -81,12 +83,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <div class="row">
         <div class="col-lg-12">
           <div class="row mb-3 d-flex justify-content-center align-items-center">
-            <?php if ($pentas['status'] == 'diterima') { ?>
+            @if ($pentasData['status'] == 'diterima')
               <span class="badge bg-terima"><i class="bi bi-check-circle-fill"></i> Diterima</span>
-            <?php } else if ($pentas['status'] == 'ditolak') { ?>
+            @elseif ($pentasData['status'] == 'ditolak')
               <span class="badge bg-tolak"><i class="bi bi-x-circle-fill"></i> Ditolak</span>
               </li>
-            <?php } ?>
+            @endif
           </div>
           <div class="card">
             <div class="card-body">
@@ -97,68 +99,68 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </strong>
               </h5>
 
-              <form method="POST" action="../users/proses-tambah-user.php">
+              <form method="POST" action="../users/proses-tambah-user">
                 <div class="col-md-12">
                   <label for="nama_seniman" class="form-label">Nomor Induk Seniman</label>
-                  <input type="text" class="form-control" name="nik" value="<?php echo $pentas['nomor_induk'] ?>" readonly>
+                  <input type="text" class="form-control" name="nik" value="{{ $pentasData['nomor_induk'] }}" readonly>
                 </div>
                 <br>
                 <div class="col-md-12">
                   <label for="nama_seniman" class="form-label">Nama Pemohon</label>
-                  <input type="text" class="form-control" name="nama" value="<?php echo $pentas['nama_advis'] ?>" readonly>
+                  <input type="text" class="form-control" name="nama" value="{{ $pentasData['nama_advis'] }}" readonly>
                 </div>
                 <br>
                 <div class="col-md-12 ">
                   <label for="alamat_seniman" class="form-label">Alamat</label>
-                  <textarea class="form-control" id="alamat_seniman" style="height: 100px;" readonly><?php echo $pentas['alamat_advis'] ?></textarea>
+                  <textarea class="form-control" id="alamat_seniman" style="height: 100px;" readonly>{{ $pentasData['alamat_advis'] }}</textarea>
                 </div>
                 <br>
                 <div class="col-md-12">
                   <label for="no_telpon" class="form-label">Untuk Pentas</label>
-                  <input type="text" class="form-control" name="phone" value="<?php echo $pentas['deskripsi_advis'] ?>" readonly>
+                  <input type="text" class="form-control" name="phone" value="{{ $pentasData['deskripsi_advis'] }}" readonly>
                 </div>
                 <br>
                 <div class="col-md-12">
                   <label for="tgl_awal_peminjaman" class="form-label">Tanggal</label>
-                  <input type="text" class="form-control" readonly value="<?php echo $pentas['tanggal'] ?>">
+                  <input type="text" class="form-control" readonly value="{{ $pentasData['tanggal'] }}">
                 </div>
                 <br>
                 <div class="col-md-12">
                   <label for="nama_seniman" class="form-label">Bertempat di</label>
-                  <input type="text" class="form-control" name="tempatL" readonly value="<?php echo $pentas['tempat_advis'] ?>">
+                  <input type="text" class="form-control" name="tempatL" readonly value="{{ $pentasData['tempat_advis'] }}">
                 </div>
                 <br>
-                <?php if (isset($pentas['catatan']) && !is_null($pentas['catatan']) && !empty($pentas['catatan'])) { ?>
+                @if (isset($pentasData['catatan']) && !is_null($pentasData['catatan']) && !empty($pentasData['catatan']))
                   <div class="col-12">
                     <label for="inputText" class="form-label">Alasan Penolakan</label>
-                    <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly><?php echo $pentas['catatan'] ?></textarea>
+                    <textarea class="form-control" id="inputTextarea" style="height: 100px;" readonly>{{ $pentasData['catatan'] }}</textarea>
                   </div>
                   <br>
-                  <?php } ?>
-                <?php if (isset($pentas['kode_verifikasi']) && !is_null($pentas['kode_verifikasi']) && !empty($pentas['kode_verifikasi'])) { ?>
+                @endif
+                @if (isset($pentasData['kode_verifikasi']) && !is_null($pentasData['kode_verifikasi']) && !empty($pentasData['kode_verifikasi']))
                 <div class="col-md-12">
                   <label for="nik" class="form-label">Kode Surat</label>
-                  <input type="text" class="form-control" id="nik" readonly value="<?php echo $pentas['kode_verifikasi'] ?>">
+                  <input type="text" class="form-control" id="nik" readonly value="{{ $pentasData['kode_verifikasi'] }}">
                 </div>
-                <?php } ?>
+                @endif
                 <br>
                 <div class="row mb-3 justify-content-end">
                   <div class="col-sm-10 text-end">
-                    <?php if ($pentas['status'] == 'diajukan' || $pentas['status'] == 'proses') { ?>
-                      <a href="/pentas/pengajuan.php" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
-                    <?php } else if ($pentas['status'] == 'diterima' || $pentas['status'] == 'ditolak') { ?>
-                      <a href="/pentas/riwayat.php" class="btn btn-secondary" style="margin-right: 5px;"><i></i>Kembali</a>
-                    <?php } ?>
-                    <?php if ($pentas['status'] == 'diajukan') { ?>
-                      <button type="button" class="btn btn-success" style="margin-right: 5px;" onclick="openProses(<?php echo $pentas['id_advis'] ?>)">
+                    @if ($pentasData['status'] == 'diajukan' || $pentasData['status'] == 'proses')
+                      <a href="/pentas/pengajuan" class="btn btn-secondary" style="margin-right: 5px;">Kembali</a>
+                    @elseif ($pentasData['status'] == 'diterima' || $pentasData['status'] == 'ditolak')
+                      <a href="/pentas/riwayat" class="btn btn-secondary" style="margin-right: 5px;"><i></i>Kembali</a>
+                    @endif
+                    @if ($pentasData['status'] == 'diajukan')
+                      <button type="button" class="btn btn-success" style="margin-right: 5px;" onclick="openProses({{ $pentasData['id_advis'] }})">
                         <i class="bi bi-edit-fill">Proses</i>
                       </button>
-                    <?php } else if ($pentas['status'] == 'proses') { ?>
-                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju(<?php echo $pentas['id_advis'] ?>)">Terima
+                    @elseif ($pentasData['status'] == 'proses')
+                      <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openSetuju({{ $pentasData['id_advis'] }})">Terima
                       </button>
-                      <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak(<?php echo $pentas['id_advis'] ?>)">Tolak
+                      <button type="button" class="btn btn-tolak" style="margin-right: 5px;" onclick="openTolak({{ $pentasData['id_advis'] }})">Tolak
                       </button>
-                    <?php } ?>
+                    @endif
                   </div>
                 </div>
               </form><!-- End General Form Elements -->
@@ -186,11 +188,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+          <form onsubmit="proses(event, 'proses')">
             <input type="hidden" name="id_pentas" id="inpPentasP">
-            <input type="hidden" name="keterangan" value="proses">
             <button type="submit" class="btn btn-tamnbah">Proses</button>
           </form>
         </div>
@@ -212,11 +211,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+          <form onsubmit="proses(event, 'diterima')">
             <input type="hidden" name="id_pentas" id="inpPentasS">
-            <input type="hidden" name="keterangan" value="diterima">
             <button type="submit" class="btn btn-tambah">Terima</button>
           </form>
         </div>
@@ -233,17 +229,14 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <h5 class="modal-title">Tolak Pengajuan</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form action="/web/pentas/pentas.php" id="prosesForm" method="POST">
+        <form onsubmit="proses(event, 'ditolak')">
           <div class="modal-body" style="text-align: left;">
             <label for="catatan" class="form-label">Alasan penolakan</label>
             <textarea class="form-control" id="catatan" name="catatan" placeholder="Masukkan Alasan Penolakan" style="height: 100px;"></textarea>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <input type="hidden" name="_method" value="PUT">
-            <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
             <input type="hidden" name="id_pentas" id="inpPentasT">
-            <input type="hidden" name="keterangan" value="ditolak">
             <button type="submit" class="btn btn-tolak">Tolak</button>
           </div>
         </form>
@@ -253,12 +246,11 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <!-- end modal tolak -->
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <div class="copyright">
-      &copy; Copyright <strong><span>Huffle Puff</span></strong>. All Rights Reserved
-    </div>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <div id="preloader" style="display: none;"></div>
   <div id="greenPopup" style="display:none"></div>
   <div id="redPopup" style="display:none"></div>
   <script src="{{ asset($tPath.'js/popup.js') }}"></script>
@@ -275,23 +267,30 @@ $tPath = app()->environment('local') ? '' : '/public/';
     var inpPentasP = document.getElementById('inpPentasP');
     var inpPentasS = document.getElementById('inpPentasS');
     var inpPentasT = document.getElementById('inpPentasT');
-
+    function showLoading(){
+      document.querySelector('div#preloader').style.display = 'block';
+    }
+    function closeLoading(){
+      document.querySelector('div#preloader').style.display = 'none';
+    }
     function openProses(dataU, ) {
       inpPentasP.value = dataU;
       var myModal = new bootstrap.Modal(modalProses);
       myModal.show();
     }
-
     function openSetuju(dataU) {
       inpPentasS.value = dataU;
       var myModal = new bootstrap.Modal(modalSetuju);
       myModal.show();
     }
-
     function openTolak(dataU) {
       inpPentasT.value = dataU;
       var myModal = new bootstrap.Modal(modalTolak);
       myModal.show();
+    }
+    function closeModal(dataU) {
+      var myModal = new bootstrap.Modal(dataU);
+      myModal.hide();
     }
     document.addEventListener('DOMContentLoaded', function() {
       var currentPageURL = window.location.href;
@@ -317,7 +316,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         deskripsi: desc
       };
       //open the request
-      xhr.open('POST', domain + "/preview.php")
+      xhr.open('POST', domain + "/preview")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
@@ -347,7 +346,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         deskripsi: desc
       };
       //open the request
-      xhr.open('POST', domain + "/download.php")
+      xhr.open('POST', domain + "/download")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.responseType = 'blob';
@@ -380,6 +379,54 @@ $tPath = app()->environment('local') ? '' : '/public/';
           }
         }
       };
+    }
+    function proses(event, ket) {
+      event.preventDefault();
+      var modals = '';
+      var Id = event.target.querySelector('[name="id_pentas"]').value;
+      var catatan = '';
+      if(ket == 'proses'){
+        modals = modalProses;
+      }else if(ket == 'diterima'){
+        modals = modalSetuju;
+      }else if(ket == 'ditolak'){
+        catatan = event.target.querySelector('[name="catatan"]').value;
+        modals = modalTolak;
+      }
+      showLoading();
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        email: email,
+        id_pentas: Id,
+        keterangan: ket,
+        catatan:catatan
+      };
+      xhr.open('PUT', domain + "/pentas/pengajuan")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            closeLoading();
+            closeModal(modals);
+            var response = JSON.parse(xhr.responseText);
+            showGreenPopup(response);
+            setTimeout(() => {
+              if(ket == 'proses'){
+                window.location.href = "/pentas/pengajuan";
+              }else if(ket == 'diterima' || ket == 'ditolak'){
+                window.location.href = "/pentas/pengajuan";
+              }
+            }, 3000);
+          } else {
+            closeLoading();
+            closeModal(modals);
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
+          }
+        }
+      }
     }
   </script>
 </body>

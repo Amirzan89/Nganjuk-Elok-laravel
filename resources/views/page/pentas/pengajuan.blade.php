@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -53,27 +53,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__ . '/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'pentas';
-      include(__DIR__ . '/../sidebar.php');
-      ?>
+      @php
+        $nav = 'pentas';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -83,8 +89,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Pengajuan Pentas</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/pentas.php">Kelola Pentas</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/pentas">Kelola Pentas</a></li>
           <li class="breadcrumb-item active">Pengajuan Pentas</li>
         </ol>
       </nav>
@@ -101,23 +107,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <div class="col-lg-12">
                   <div class="row">
                     <div class="col-lg-3">
-                      <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                      <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="{{ date('Y') }}" oninput="tampilkanTahun()">
                     </div>
                     <div class="col-lg-5">
-                      <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                      <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="{{ date('M')  }}">
                         <option value="semua">semua</option>
-                        <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?>>Januari</option>
-                        <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?>>Februari</option>
-                        <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?>>Maret</option>
-                        <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?>>April</option>
-                        <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?>>Mei</option>
-                        <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?>>Juni</option>
-                        <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?>>Juli</option>
-                        <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?>>Agustus</option>
-                        <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?>>September</option>
-                        <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?>>Oktober</option>
-                        <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?>>November</option>
-                        <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?>>Desember</option>
+                        <option value="1" {{ (date('m') == 1) ? 'selected' : ''}} >Januari</option>
+                        <option value="2" {{ (date('m') == 2) ? 'selected' : ''}} >Februari</option>
+                        <option value="3" {{ (date('m') == 3) ? 'selected' : ''}} >Maret</option>
+                        <option value="4" {{ (date('m') == 4) ? 'selected' : ''}} >April</option>
+                        <option value="5" {{ (date('m') == 5) ? 'selected' : ''}} >Mei</option>
+                        <option value="6" {{ (date('m') == 6) ? 'selected' : ''}} >Juni</option>
+                        <option value="7" {{ (date('m') == 7) ? 'selected' : ''}} >Juli</option>
+                        <option value="8" {{ (date('m') == 8) ? 'selected' : ''}} >Agustus</option>
+                        <option value="9" {{ (date('m') == 9) ? 'selected' : ''}} >September</option>
+                        <option value="10" {{ (date('m') == 10) ? 'selected' : ''}} >Oktober</option>
+                        <option value="11" {{ (date('m') == 11) ? 'selected' : ''}} >November</option>
+                        <option value="12" {{ (date('m') == 12) ? 'selected' : ''}} >Desember</option>
                       </select>
                     </div>
                   </div>
@@ -135,40 +141,35 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status, catatan FROM surat_advis WHERE status = 'diajukan' OR status = 'proses' ORDER BY id_advis DESC");
-                  $no = 1;
-                  $advisData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
-                  foreach ($advisData as $advis) {  
-                  ?>
+                  @php $no = 1; @endphp
+                  @foreach ($pentasData as $pentas)
                     <tr>
-                      <td><?php echo $no ?></td>
-                      <td><?php echo $advis['nomor_induk'] ?></td>
-                      <td><?php echo $advis['nama_advis'] ?></td>
-                      <td><?php echo $advis['tanggal'] ?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $pentas['nomor_induk'] }}</td>
+                      <td>{{ $pentas['nama_advis'] }}</td>
+                      <td>{{ $pentas['tanggal'] }}</td>
                       <td>
-                        <?php if ($advis['status'] == 'diajukan') { ?>
+                        @if ($pentas['status'] == 'diajukan')
                           <span class="badge bg-proses">Diajukan</span>
-                        <?php } else if ($advis['status'] == 'proses') { ?>
+                        @elseif ($pentas['status'] == 'proses')
                           <span class="badge bg-terima">Diproses</span>
-                        <?php } ?>
+                        @endif
                       </td>
                       <td>
-                        <?php if ($advis['status'] == 'diajukan') { ?>
-                          <button class="btn btn-lihat" onclick="proses(<?php echo $advis['id_advis'] ?>)"><i class="bi bi-eye-fill"></i> Lihat</button>
-                        <?php } else if ($advis['status'] == 'proses') { ?>
-                          <a href="/pentas/detail_pentas.php?id_pentas=<?= $advis['id_advis'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
-                        <?php } ?>
+                        @if ($pentas['status'] == 'diajukan')
+                          <button class="btn btn-lihat" onclick="proses({{ $pentas['id_advis'] }})"><i class="bi bi-eye-fill"></i> Lihat</button>
+                        @elseif ($pentas['status'] == 'proses')
+                          <a href="/pentas/detail/{{ $pentas['id_advis'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        @endif
                       </td>
                     </tr>
-                  <?php $no++;
-                  } ?>
+                  @endforeach
                 </tbody>
               </table>
               <br>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../pentas.php" class="btn btn-secondary">Kembali</a>
+                  <a href="/pentas" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
             </div>
@@ -181,8 +182,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__ . '/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
@@ -236,7 +236,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         if (status == 'diajukan') {
           return `<button class="btn btn-lihat" onclick="proses('${idAdvis}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
         } else if (status == 'proses') {
-          return `<a href="/pentas/detail_pentas.php?id_pentas=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/pentas/detail/${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -259,7 +259,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/pentas/pentas.php")
+      xhr.open('POST', domain + "/web/pentas/pentas")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data
@@ -314,27 +314,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
     function proses(Id) {
       var xhr = new XMLHttpRequest();
       var requestBody = {
-        _method: 'PUT',
-        id_user: idUser,
+        email: email,
         id_pentas: Id,
         keterangan: 'proses'
       };
       //open the request
-      xhr.open('POST', domain + "/web/pentas/pentas.php")
+      xhr.open('PUT', domain + "/pentas/pengajuan")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      //send the form data
       xhr.send(JSON.stringify(requestBody));
       xhr.onreadystatechange = function() {
         if (xhr.readyState == XMLHttpRequest.DONE) {
           if (xhr.status === 200) {
-            window.location.href = "/pentas/detail_pentas.php?id_pentas=" + Id;
+            var response = JSON.parse(xhr.responseText);
+            window.location.href = "/pentas/detail/"+ Id;
           } else {
-            try {
-              eval(xhr.responseText);
-            } catch (error) {
-              console.error('Error evaluating JavaScript:', error);
-            }
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
           }
         }
       }

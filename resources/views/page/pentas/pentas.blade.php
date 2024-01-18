@@ -27,27 +27,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
-		var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
 	</script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__.'/header.php');
-        ?>
+    @include('component.header')
   </header>
   <!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-        $nav = 'pentas'; 
-        include(__DIR__.'/sidebar.php');
-      ?>
+      @php
+        $nav = 'pentas';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside>
   <!-- End Sidebar-->
@@ -57,7 +63,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Kelola Pentas</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
           <li class="breadcrumb-item active">Kelola Pentas</li>
         </ol>
       </nav>
@@ -70,7 +76,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <div class="row">
             <div class="row">
               <div class="col-xxl-4 col-md-4">
-                <div class="card success-card revenue-card"><a href="/pentas/formulir.php">
+                <div class="card success-card revenue-card"><a href="/pentas/formulir">
                     <div class="card-body">
                       <h5 class="card-title">Formulir</h5>
                       <div class="d-flex align-items-center">
@@ -83,7 +89,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
               </div>
             </div>
             <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card"><a href="/pentas/pengajuan.php">
+              <div class="card success-card revenue-card"><a href="/pentas/pengajuan">
                   <div class="card-body">
                     <h5 class="card-title">Verifikasi Pengajuan</h5>
                     <div class="d-flex align-items-center">
@@ -91,11 +97,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                         <i class="bi bi-bell-fill"></i>
                       </div>
                       <div class="ps-3">
-                        <?php
-                        $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan' OR status = 'proses'");
-                        $data = mysqli_fetch_assoc($sql);
-                        echo "<h4>" . $data['total'] . "</h4>";
-                        ?>
+                        <h4> {{ $totalPengajuan }}</h4>
                       </div>
                     </div>
                 </a>
@@ -103,7 +105,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
             </div>
           </div>
           <div class="col-xxl-4 col-md-4">
-            <div class="card success-card revenue-card"><a href="/pentas/riwayat.php">
+            <div class="card success-card revenue-card"><a href="/pentas/riwayat">
                 <div class="card-body">
                   <h5 class="card-title">Riwayat</h5>
                   <div class="d-flex align-items-center">
@@ -111,11 +113,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <i class="bi bi-clock-fill"></i>
                     </div>
                     <div class="ps-3">
-                      <?php
-                      $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak'");
-                      $data = mysqli_fetch_assoc($sql);
-                      echo "<h4>" . $data['total'] . "</h4>";
-                      ?>
+                      <h4> {{ $totalRiwayat }}</h4>
                     </div>
                   </div>
                 </div>
@@ -124,104 +122,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
           </div>
         </div>
       </div>
-      <!-- <div class="row">
-      <div class="col-lg-12">
-            <div class="row">
-              <div class="col-xxl-4 col-md-4">
-                  <div class="card success-card revenue-card">
-                      <div class="card-body">
-                          <h5 class="card-title">Pengajuan</h5>
-                          <div class="d-flex align-items-center">
-                              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                  <i class="bi bi-bell-fill"></i>
-                              </div>
-                              <div class="ps-3">
-                                <?php 
-                                  // $sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan' OR status = 'proses'");
-                                  // $data = mysqli_fetch_assoc($sql);
-                                  // echo "<h4>".$data['total']."</h4>";
-                                ?>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-xxl-4 col-md-4">
-                  <div class="card success-card revenue-card">
-                      <div class="card-body">
-                          <h5 class="card-title">Riwayat</h5>
-                          <div class="d-flex align-items-center">
-                              <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                  <i class="bi bi-clock-fill"></i>
-                              </div>
-                              <div class="ps-3">
-                                <?php 
-                                  //$sql  = mysqli_query($conn, "SELECT COUNT(*) AS total FROM surat_advis WHERE status = 'diajukan' OR status = 'proses'");
-                                  //$data = mysqli_fetch_assoc($sql);
-                                  //echo "<h4>".$data['total']."</h4>";
-                                ?>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-            </div>
-        </div>
-        <div class="col-lg-12">
-          <div class="row">
-            <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded d-flex align-items-center justify-content-center">
-                      <i class="bi bi-file-earmark-text-fill"></i>
-                    </div>
-                    <div class="ps-1">
-                      <h5 class="card-title"><a href="/pentas/formulir-advis.php">Formulir</a></h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded d-flex align-items-center justify-content-center">
-                      <i class="bi bi-bell-fill"></i>
-                    </div>
-                    <div class="ps-1">
-                      <h5 class="card-title"><a href="/pentas/pengajuan.php">Verifikasi Pengajuan</a></h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-xxl-4 col-md-4">
-              <div class="card success-card revenue-card">
-                <div class="card-body">
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded d-flex align-items-center justify-content-center">
-                      <i class="bi bi-clock-fill"></i>
-                    </div>
-                    <div class="ps-1">
-                      <h5 class="card-title"><a href="/pentas/riwayat.php">Riwayat Pengajuan pentas</a></h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> -->
     </section>
   </main>
   <!-- End #main -->
 
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__.'/footer.php');
-        ?>
+    @include('component.footer')
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i

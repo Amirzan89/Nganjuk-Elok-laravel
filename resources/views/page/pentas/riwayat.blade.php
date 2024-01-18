@@ -51,27 +51,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
+    <script>
+      var tPath = '';
+    </script>
+  @else
+    <script>
+      var tPath = '/public/';
+    </script>
+  @endif
   <script>
     const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <?php include(__DIR__ . '/../header.php');
-    ?>
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'pentas';
-      include(__DIR__ . '/../sidebar.php');
-      ?>
+      @php
+        $nav = 'pentas';
+      @endphp
+      @include('component.sidebar')
     </ul>
   </aside><!-- End Sidebar-->
 
@@ -81,8 +87,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Riwayat Pengajuan Pentas</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
-          <li class="breadcrumb-item"><a href="/pentas.php">Kelola Pentas</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/pentas">Kelola Pentas</a></li>
           <li class="breadcrumb-item active">Riwayat Pengajuan Pentas</li>
         </ol>
       </nav>
@@ -133,37 +139,32 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   </tr>
                 </thead>
                 <tbody>
-                  <?php
-                  $query = mysqli_query($conn, "SELECT id_advis, nomor_induk, nama_advis, DATE(created_at) AS tanggal, status, catatan, kode_verifikasi FROM surat_advis WHERE status = 'diterima' OR status = 'ditolak' ORDER BY id_advis DESC");
-                  $no = 1;
-                  $pentasData = changeMonth(mysqli_fetch_all($query, MYSQLI_ASSOC));
-                  foreach ($pentasData as $pentas) {
-                  ?>
+                  @php $no = 1; @endphp
+                  @foreach ($pentasData as $pentas)
                     <tr>
-                      <td><?php echo $no ?></td>
-                      <td><?php echo $pentas['nomor_induk'] ?></td>
-                      <td><?php echo $pentas['nama_advis'] ?></td>
-                      <td><?php echo $pentas['tanggal'] ?></td>
+                      <td>{{ $no++ }}</td>
+                      <td>{{ $pentas['nomor_induk'] }}</td>
+                      <td>{{ $pentas['nama_advis'] }}</td>
+                      <td>{{ $pentas['tanggal'] }}</td>
                       <td>
-                        <?php if ($pentas['status'] == 'diterima') { ?>
-                          <span class="badge bg-terima"> Diterima</span>
-                          <?php } else if ($pentas['status'] == 'ditolak') { ?>
-                            <span class="badge bg-tolak"> Ditolak </span>
-                            <?php } ?>
+                        @if ($pentas['status'] == 'diterima')
+                          <span class="badge bg-terima">Diterima</span>
+                        @elseif ($pentas['status'] == 'ditolak')
+                          <span class="badge bg-tolak">Ditolak</span>
+                        @endif
                       </td>
                       <td><?php echo $pentas['kode_verifikasi'] ?></td>
                       <td>
-                        <a href="/pentas/detail_pentas.php?id_pentas=<?= $pentas['id_advis'] ?>" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
+                        <a href="/pentas/detail/{{ $pentas['id_advis'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                       </td>
                     </tr>
-                  <?php $no++;
-                  } ?>
+                  @endforeach
                 </tbody>
               </table>
               <br>
               <div class="row mb-3 justify-content-end">
                 <div class="col-sm-10 text-end">
-                  <a href="../pentas.php" class="btn btn-secondary">Kembali</a>
+                  <a href="../pentas" class="btn btn-secondary">Kembali</a>
                 </div>
               </div>
 
@@ -175,8 +176,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <div id="redPopup" style="display:none"></div>
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
-    <?php include(__DIR__ . '/../footer.php');
-    ?>
+    @include('component.footer')
   </footer>
   <!-- </footer> -->
 
@@ -228,7 +228,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       function getActionButton(status, idAdvis) {
         if (status == 'ditolak' || status == 'diterima') {
-          return `<a href="/pentas/detail_pentas.php?id_pentas=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
+          return `<a href="/pentas/detail_pentas?id_pentas=${idAdvis}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
         return '';
       }
@@ -251,7 +251,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/pentas/pentas.php")
+      xhr.open('POST', domain + "/web/pentas/pentas")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

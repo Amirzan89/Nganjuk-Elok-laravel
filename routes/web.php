@@ -26,9 +26,6 @@ Route::group(['middleware'=>'auth'],function(){
         return view('page.login');
     })->name('login');
     Route::get('/dashboard',[DashboardController::class,'show']);
-    Route::get('/pentas', function () {
-        return view('page.pentas');
-    });
     Route::group(['prefix'=>'/event'],function(){
         Route::get('/',[ShowEventController::class,'showEvent']);
         Route::get('/formulir',[ShowEventController::class,'showFormulir']);
@@ -54,7 +51,13 @@ Route::group(['middleware'=>'auth'],function(){
         Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailPerpanjangan']);
     });
     Route::group(['prefix'=>'/pentas'],function(){
-        //
+        Route::get('/',[ShowPentasController::class,'showPentas']);
+        Route::get('/formulir',[ShowPentasController::class,'showFormulir']);
+        Route::get('/pengajuan', [ShowPentasController::class,'showPengajuan']);
+        Route::get('/riwayat', [ShowPentasController::class,'showRiwayat']);
+        Route::get('/detail/{id}',[ShowPentasController::class,'showDetail']);
+        Route::put('/pengajuan', [PentasController::class,'prosesPentas']);
+        Route::put('/riwayat', [PentasController::class,'prosesPentas']);
     });
     Route::group(['prefix'=>'/sewa'],function(){
         Route::get('/',[ShowSewaController::class,'showSewa']);
