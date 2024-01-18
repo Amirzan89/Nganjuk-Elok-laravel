@@ -120,4 +120,32 @@ class TempatController extends Controller
         }
         return response()->json(['status' =>'success','message'=>'Data Tempat berhasil di perbarui']);
     }
+    public function deleteTempat(Request $request){
+        $validator = Validator::make($request->only('id_tempat'), [
+            'id_tempat' => 'required',
+        ], [
+            'id_tempat.required' => 'ID tempat wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+            }
+            return response()->json(['status' => 'error', 'message' => $errors], 400);
+        }
+        $tempat = ListTempat::find($request->input('id_tempat'));
+        if (!$tempat) {
+            return response()->json(['status' => 'error', 'message' => 'Data Tempat tidak ditemukan'], 400);
+        }
+        if (app()->environment('local')) {
+            $destinationPath = public_path('img/tempat');
+        } else {
+            $destinationPath = base_path('../public_html/public/img/tempat/');
+        }
+        if (file_exists($destinationPath . $tempat->foto_tempat)) {
+            unlink($destinationPath . $tempat->foto_tempat);
+        }
+        $tempat->delete();
+        return response()->json(['status' => 'success', 'message' => 'Data Tempat berhasil dihapus']);
+    }
 }

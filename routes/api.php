@@ -1,8 +1,12 @@
 <?php
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Mobile\Services\EventController AS MobileEventController;
+use App\Http\Controllers\Mobile\Services\PentasController AS MobilePentasController;
+use App\Http\Controllers\Mobile\Services\TempatController AS MobileTempatController;
+use App\Http\Controllers\Mobile\Services\SenimanController AS MobileSenimanController;
+use App\Http\Controllers\Mobile\Auth\LoginController AS MobileLoginController;
+use App\Http\Controllers\Mobile\Auth\RegisterController AS MobileRegisterController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,7 +17,26 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix'=>'/mobile'],function(){
+    Route::group(['prefix'=>'/users'],function(){
+        Route::post('/login', [MobileLoginController::class,'Login']);
+        Route::post('/register', [MobileRegisterController::class,'Login']);
+    });
+    Route::group(['prefix'=>'/event'],function(){
+        Route::post('/tambah', [MobileEventController::class,'tambahEvent']);
+        Route::put('/edit', [MobileEventController::class,'editEvent']);
+        Route::delete('/delete', [MobileEventController::class,'hapusEvent']);
+    });
+    Route::group(['prefix'=>'/seniman'],function(){
+        //
+    });
+    Route::group(['prefix'=>'/pentas'],function(){
+        //
+    });
+    Route::group(['prefix'=>'/tempat'],function(){
+        //
+    });
 });
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
