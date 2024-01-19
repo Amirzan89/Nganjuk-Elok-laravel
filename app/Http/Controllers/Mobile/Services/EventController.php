@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Mobile\Services;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -83,7 +81,7 @@ class EventController extends Controller
         $event = Events::create([
             'nama_pengirim' => $request->input('nama_pengirim'),
             'status' => 'diajukan',
-            'catatan' => $request->input('catatan'),
+            'catatan' => '',
             'id_detail' => $detailEvent->id_detail,
             'id_user' => $idUser,
             'created_at'=> Carbon::now(),
@@ -140,7 +138,7 @@ class EventController extends Controller
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //check data event
-        $event = Events::select('events.id_user', 'events.status')->where('users.email', $request->input('email'))->where('events.id_event', $request->input('id_event'))->join('users', 'events.id_user', '=', 'users.id_user')->first();
+        $event = Events::select('events.id_user', 'status')->where('users.email', $request->input('email'))->where('events.id_event', $request->input('id_event'))->join('users', 'events.id_user', '=', 'users.id_user')->first();
         if (!$event) {
             return response()->json(['status' => 'error', 'message' => 'Data Event tidak ditemukan'], 404);
         }
@@ -210,13 +208,19 @@ class EventController extends Controller
             return response()->json(['status' => 'error', 'message' => $errors], 400);
         }
         //check data event
-        $event = Events::select('events.id_user', 'events.status')->where('users.email', $request->input('email'))->where('events.id_event', $request->input('id_event'))->join('users', 'events.id_user', '=', 'users.id_user')->first();
+        $event = Events::select('events.id_user', 'status')->where('users.email', $request->input('email'))->where('events.id_event', $request->input('id_event'))->join('users', 'events.id_user', '=', 'users.id_user')->first();
         if (!$event) {
             return response()->json(['status' => 'error', 'message' => 'Data Event tidak ditemukan'], 404);
         }
         $detailEvent = DetailEvents::select('id_detail','poster_event')->find($request->input('id_event'));
         if (!$detailEvent) {
             return response()->json(['status' => 'error', 'message' => 'Data Detail Event tidak ditemukan'], 404);
+        }
+        //check status
+        if($event->status == 'proses'){
+            return response()->json(['status' => 'error', 'message' => 'Data event sedang diproses'], 400);
+        }else if($event->status == 'diterima' || $event->status == 'ditolak'){
+            return response()->json(['status' => 'error', 'message' => 'Data event sudah diverifikasi'], 400);
         }
         $destinationPath = storage_path('app/event/');
         $fileToDelete = $destinationPath . $detailEvent->poster_event;

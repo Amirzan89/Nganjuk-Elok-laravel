@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('nama_tempat',50);
             $table->string('deskripsi_sewa_tempat',100);
             $table->string('nama_kegiatan_sewa',50);
-            $table->unsignedBigInteger('jumlah_peserta')->nullable();
             $table->string('instansi',50)->nullable();
+            $table->unsignedBigInteger('jumlah_peserta')->nullable();
             $table->text('surat_ket_sewa');
             $table->dateTime('tgl_awal_peminjaman');
             $table->dateTime('tgl_akhir_peminjaman');
@@ -24,6 +24,8 @@ return new class extends Migration
             $table->enum('status',['diajukan','proses','diterima','ditolak']);
             $table->text('catatan')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('id_tempat');
+            $table->foreign('id_tempat')->references('id_tempat')->on('list_tempat')->onDelete('cascade');
             $table->unsignedBigInteger('id_user');
             $table->foreign('id_user')->references('id_user')->on('users')->onDelete('cascade');
         });

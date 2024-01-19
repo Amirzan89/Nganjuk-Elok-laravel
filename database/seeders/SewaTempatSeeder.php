@@ -32,6 +32,7 @@ class SewaTempatSeeder extends Seeder
                 'created_at'=>Carbon::now(),
                 'updated_at'=>Carbon::now(),
                 'id_user'=>$user->id_user,
+                'id_tempat'=>1,
             ]);
         }
     }

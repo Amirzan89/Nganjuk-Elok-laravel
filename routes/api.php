@@ -3,6 +3,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Mobile\Services\EventController AS MobileEventController;
 use App\Http\Controllers\Mobile\Services\PentasController AS MobilePentasController;
+use App\Http\Controllers\Mobile\Services\SewaController AS MobileSewaController;
 use App\Http\Controllers\Mobile\Services\TempatController AS MobileTempatController;
 use App\Http\Controllers\Mobile\Services\SenimanController AS MobileSenimanController;
 use App\Http\Controllers\Mobile\Auth\LoginController AS MobileLoginController;
@@ -35,6 +36,11 @@ Route::group(['prefix'=>'/mobile'],function(){
     });
     Route::group(['prefix'=>'/tempat'],function(){
         //
+    });
+    Route::group(['prefix'=>'/sewa'],function(){
+        Route::post('/tambah', [MobileSewaController::class,'pengajuanSewa']);
+        Route::post('/edit', [MobileSewaController::class,'editSewa']);
+        Route::delete('/delete', [MobileSewaController::class,'hapusSewa']);
     });
 });
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
