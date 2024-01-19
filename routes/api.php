@@ -29,7 +29,9 @@ Route::group(['prefix'=>'/mobile'],function(){
         Route::delete('/delete', [MobileEventController::class,'hapusEvent']);
     });
     Route::group(['prefix'=>'/seniman'],function(){
-        //
+        Route::post('/tambah', [MobileSenimanController::class,'tambahSeniman']);
+        Route::post('/edit', [MobileSenimanController::class,'editSeniman']);
+        Route::delete('/delete', [MobileSenimanController::class,'hapusSeniman']);
     });
     Route::group(['prefix'=>'/pentas'],function(){
         //

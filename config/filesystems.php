@@ -40,6 +40,11 @@ return [
             'root' => storage_path('app/seniman'),
             'throw' => false,
         ],
+        'perpanjangan' => [
+            'driver' => 'local',
+            'root' => storage_path('app/perpanjangan'),
+            'throw' => false,
+        ],
         'sewa' => [
             'driver' => 'local',
             'root' => storage_path('app/sewa'),

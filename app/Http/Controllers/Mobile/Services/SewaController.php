@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
-use App\Models\SewaTempat;
 use App\Models\ListTempat;
+use App\Models\SewaTempat;
 use Carbon\Carbon;
 class SewaController extends Controller
 {
@@ -77,7 +77,7 @@ class SewaController extends Controller
         $fileData = Crypt::encrypt(file_get_contents($file));
         Storage::disk('sewa')->put('/' . $fileName, $fileData);
         //add sewa
-        $sewa = SewaTempat::create([
+        $tambahSewa = SewaTempat::create([
             'nama_tempat' => $tempat->nama_tempat,
             'nama_pengirim' => $request->input('nama_pengirim'),
             'nik_sewa' => $request->input('nik_penyewa'),
@@ -96,7 +96,7 @@ class SewaController extends Controller
             'id_user' => $idUser,
             'id_tempat' => $request->input('id_tempat'),
         ]);
-        if (!$sewa) {
+        if (!$tambahSewa) {
             return response()->json(['status' => 'error', 'message' => 'Gagal menambahkan data Sewa Tempat'], 500);
         }
         return response()->json(['status'=>'success','message'=>'Data Sewa tempat berhasil ditambahkan']);
@@ -169,11 +169,11 @@ class SewaController extends Controller
         }
         //process file
         if (!$request->hasFile('surat_keterangan')) {
-            return response()->json(['status'=>'error','message'=>'Poster sewa wajib di isi'], 400);
+            return response()->json(['status'=>'error','message'=>'Surat keterangan wajib di isi'], 400);
         }
         $file = $request->file('surat_keterangan');
         if(!($file->isValid() && in_array($file->extension(), ['jpeg', 'png', 'jpg']))){
-            return response()->json(['status'=>'error','message'=>'Format poster tidak valid. Gunakan format jpeg, png, jpg'], 400);
+            return response()->json(['status'=>'error','message'=>'Format Surat Keterangan tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
         $destinationPath = storage_path('app/sewa/');
         $fileToDelete = $destinationPath . $sewa->surat_ket_sewa;
@@ -237,8 +237,8 @@ class SewaController extends Controller
         }
         Storage::disk('sewa')->delete('/'.$sewa->surat_ket_sewa);
         if (!SewaTempat::where('id_sewa',$request->input('id_sewa'))->delete()) {
-            return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Sewa'], 500);
+            return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Sewa Tempat'], 500);
         }
-        return response()->json(['status' => 'success', 'message' => 'Data Sewa berhasil dihapus']);
+        return response()->json(['status' => 'success', 'message' => 'Data Sewa Tempat berhasil dihapus']);
     }
 }
