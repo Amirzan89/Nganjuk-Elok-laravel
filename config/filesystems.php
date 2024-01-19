@@ -30,9 +30,19 @@ return [
 
     'disks' => [
 
-        'local' => [
+        'event' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => storage_path('app/event'),
+            'throw' => false,
+        ],
+        'seniman' => [
+            'driver' => 'local',
+            'root' => storage_path('app/seniman'),
+            'throw' => false,
+        ],
+        'sewa' => [
+            'driver' => 'local',
+            'root' => storage_path('app/sewa'),
             'throw' => false,
         ],
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('tempat_event',2000);
             $table->date('tanggal_awal');
             $table->date('tanggal_akhir');
-            $table->string('link_pendaftaran',2000);
+            $table->string('link_pendaftaran',2000)->nullable();
             $table->text('poster_event');
         });
     }

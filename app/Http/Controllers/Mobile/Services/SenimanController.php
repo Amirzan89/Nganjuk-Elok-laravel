@@ -7,5 +7,6 @@ use Illuminate\Http\Request;
 
 class SenimanController extends Controller
 {
-    //
+    //$encryptedContent = encrypt(file_get_contents($path));
+
 }

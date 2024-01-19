@@ -30,8 +30,9 @@ class TempatController extends Controller
             $errors = [];
             foreach ($validator->errors()->toArray() as $field => $errorMessages) {
                 $errors[$field] = $errorMessages[0];
+                break;
             }
-            return response()->json(['status'=>'error','message'=>$errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //get last id
         $id = ListTempat::select('id_tempat')->orderBy('id_tempat','DESC')->limit(1)->get()[0]['id_tempat'];
@@ -86,8 +87,9 @@ class TempatController extends Controller
             $errors = [];
             foreach ($validator->errors()->toArray() as $field => $errorMessages) {
                 $errors[$field] = $errorMessages[0];
+                break;
             }
-            return response()->json(['status' =>'error','message'=>$errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         $tempat = ListTempat::find($request->input('id_tempat'));
         if ($tempat) {
@@ -130,8 +132,9 @@ class TempatController extends Controller
             $errors = [];
             foreach ($validator->errors()->toArray() as $field => $errorMessages) {
                 $errors[$field] = $errorMessages[0];
+                break;
             }
-            return response()->json(['status' => 'error', 'message' => $errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         $tempat = ListTempat::find($request->input('id_tempat'));
         if (!$tempat) {

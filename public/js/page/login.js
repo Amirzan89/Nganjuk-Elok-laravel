@@ -11,6 +11,17 @@ function showLoading(){
 function closeLoading(){
     document.querySelector('div#preloader').style.display = 'none';
 }
+// function doLogin(e) {
+//     e.preventDefault();
+//     grecaptcha.ready(function() {
+//         grecaptcha.execute('6LfymUQpAAAAAM1Q_faqJrmFCuvAAKXVDWnlbpGI', {
+//             action: 'submit'
+//         }).then(function(token) {
+//             document.getElementById("g-recaptcha-response").value = token;
+//             document.getElementById("sim-online-login-form").submit();
+//         });
+//     });
+// }
 loginForm.onsubmit = function(event){
     event.preventDefault();
     const email = inpEmail.value;

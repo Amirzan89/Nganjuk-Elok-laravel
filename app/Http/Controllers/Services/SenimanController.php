@@ -70,8 +70,9 @@ class SenimanController extends Controller
                 $errors = [];
                 foreach ($validator->errors()->toArray() as $field => $errorMessages) {
                     $errors[$field] = $errorMessages[0];
+                    break;
                 }
-                return response()->json(['status' => 'error', 'message' => $errors], 400);
+                return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
             }
             $ketInput = $request->input('keterangan');
             $catatanInput = $request->input('catatan');
@@ -137,8 +138,9 @@ class SenimanController extends Controller
                 $errors = [];
                 foreach ($validator->errors()->toArray() as $field => $errorMessages) {
                     $errors[$field] = $errorMessages[0];
+                    break;
                 }
-                return response()->json(['status' => 'error', 'message' => $errors], 400);
+                return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
             }
             $ketInput = $request->input('keterangan');
             $catatanInput = $request->input('catatan');

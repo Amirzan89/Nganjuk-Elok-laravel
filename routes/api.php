@@ -24,7 +24,7 @@ Route::group(['prefix'=>'/mobile'],function(){
     });
     Route::group(['prefix'=>'/event'],function(){
         Route::post('/tambah', [MobileEventController::class,'tambahEvent']);
-        Route::put('/edit', [MobileEventController::class,'editEvent']);
+        Route::post('/edit', [MobileEventController::class,'editEvent']);
         Route::delete('/delete', [MobileEventController::class,'hapusEvent']);
     });
     Route::group(['prefix'=>'/seniman'],function(){
