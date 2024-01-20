@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str; 
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use App\Models\KategoriSeniman;
 use App\Models\Seniman;
@@ -37,7 +38,7 @@ class SuratAdvisSeeder extends Seeder
                 $total = $total == 0 ? 1 : $total++;
                 $total = str_pad($total, 3, '0', STR_PAD_LEFT);
                 $seniman = [
-                    'nik'=>base64_encode(mt_rand(1000000000000000,9999999999999999)),
+                    'nik'=>Crypt::encrypt(base64_encode(mt_rand(1000000000000000,9999999999999999))),
                     'nomor_induk'=>$kategoriData[$index]->singkatan_kategori.'/'.str_pad($total, 3, '0', STR_PAD_LEFT).'/411.302/'.date('Y'),
                     'nama_seniman'=>Str::random(30),
                     'jenis_kelamin'=>['laki-laki', 'perempuan'][rand(0, 1)],
@@ -48,7 +49,6 @@ class SuratAdvisSeeder extends Seeder
                     'ktp_seniman'=>Str::random(30),
                     'pass_foto'=>Str::random(30),
                     'surat_keterangan'=>Str::random(30),
-                    'tgl_pembuatan'=>Carbon::now(),
                     'tgl_berlaku'=>Carbon::now()->endOfYear(),
                     'status'=>'diterima',
                     'created_at'=>Carbon::now(),

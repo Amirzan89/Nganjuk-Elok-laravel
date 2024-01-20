@@ -80,7 +80,7 @@ class SewaController extends Controller
         $tambahSewa = SewaTempat::create([
             'nama_tempat' => $tempat->nama_tempat,
             'nama_pengirim' => $request->input('nama_pengirim'),
-            'nik_sewa' => $request->input('nik_penyewa'),
+            'nik_sewa' => Crypt::encrypt($request->input('nik_penyewa')),
             'nama_peminjam' => $request->input('nama_peminjam'),
             'deskripsi_sewa_tempat' => $request->input('deskripsi'),
             'nama_kegiatan_sewa' => $request->input('nama_kegiatan_sewa'),
@@ -187,7 +187,7 @@ class SewaController extends Controller
         //update sewa
         $updatedSewa = SewaTempat::where('id_sewa',$request->input('id_sewa'))->update([
             'nama_tempat' => $tempat->nama_tempat,
-            'nik_sewa' => $request->input('nik_penyewa'),
+            'nik_sewa' => Crypt::encrypt($request->input('nik_penyewa')),
             'nama_peminjam' => $request->input('nama_peminjam'),
             'deskripsi_sewa_tempat' => $request->input('deskripsi'),
             'nama_kegiatan_sewa' => $request->input('nama_kegiatan_sewa'),
@@ -217,7 +217,7 @@ class SewaController extends Controller
                 $errors[$field] = $errorMessages[0];
                 break;
             }
-            return response()->json(['status' => 'error', 'message' => $errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //check data sewa
         $sewa = SewaTempat::select('sewa_tempat.id_user', 'status','surat_ket_sewa')->where('users.email', $request->input('email'))->where('sewa_tempat.id_sewa', $request->input('id_sewa'))->join('users', 'sewa_tempat.id_user', '=', 'users.id_user')->first();

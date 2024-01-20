@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('sewa_tempat', function (Blueprint $table) {
             $table->id('id_sewa');
-            $table->string('nik_sewa',50);
+            $table->string('nik_sewa',500);
             $table->string('nama_peminjam',30);
             $table->string('nama_tempat',50);
             $table->string('deskripsi_sewa_tempat',100);

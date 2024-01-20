@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use App\Models\KategoriSeniman;
 use App\Models\User;
@@ -25,7 +26,7 @@ class SenimanSeeder extends Seeder
         }
         foreach($masyarakatData as $user){
             Seniman::insert([
-                'nik'=>base64_encode(mt_rand(1000000000000000,9999999999999999)),
+                'nik'=>Crypt::encrypt(base64_encode(mt_rand(1000000000000000,9999999999999999))),
                 'nama_seniman'=>Str::random(30),
                 'jenis_kelamin'=>['laki-laki', 'perempuan'][rand(0, 1)],
                 'tempat_lahir'=>Str::random(30),
@@ -35,7 +36,6 @@ class SenimanSeeder extends Seeder
                 'ktp_seniman'=>Str::random(30),
                 'pass_foto'=>Str::random(30),
                 'surat_keterangan'=>Str::random(30),
-                'tgl_pembuatan'=>Carbon::now(),
                 'tgl_berlaku'=>Carbon::now()->endOfYear(),
                 'status'=>'diajukan',
                 'created_at'=>Carbon::now(),

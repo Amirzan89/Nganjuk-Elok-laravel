@@ -205,7 +205,7 @@ class EventController extends Controller
                 $errors[$field] = $errorMessages[0];
                 break;
             }
-            return response()->json(['status' => 'error', 'message' => $errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //check data event
         $event = Events::select('events.id_user', 'status')->where('users.email', $request->input('email'))->where('events.id_event', $request->input('id_event'))->join('users', 'events.id_user', '=', 'users.id_user')->first();

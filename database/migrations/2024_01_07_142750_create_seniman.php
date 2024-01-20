@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('seniman', function (Blueprint $table) {
             $table->id('id_seniman');
-            $table->string('nik',50);
+            $table->string('nik',500);
             $table->string('nomor_induk',30)->nullable();
             $table->string('nama_seniman',30);
             $table->enum('jenis_kelamin',['laki-laki','perempuan']);
@@ -24,7 +24,6 @@ return new class extends Migration
             $table->text('ktp_seniman');
             $table->text('pass_foto');
             $table->text('surat_keterangan');
-            $table->date('tgl_pembuatan');
             $table->date('tgl_berlaku');
             $table->string('kode_verifikasi',45)->nullable();
             $table->enum('status',['diajukan','proses','diterima','ditolak']);

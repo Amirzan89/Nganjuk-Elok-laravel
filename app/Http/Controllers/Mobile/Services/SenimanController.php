@@ -11,14 +11,41 @@ use App\Models\Seniman;
 use Carbon\Carbon;
 class SenimanController extends Controller
 {
-    public function pengajuanSeniman(Request $request){
+    private function kategori($data = null, $con){
+        //check if cache have kategori
+        // if(Redis::exists('kategori_seniman')){
+        //     $kategoriData = Redis::get('kategori_seniman');
+        // }else{
+            //get data from database
+            //     Redis::set('kategori_seniman', json_encode($kategoriData));
+            //     Redis::expire('kategori_seniman',604800); // 1 week
+            // }
+        $kategoriData = json_decode(KategoriSeniman::get(),true);
+        if($con == 'validation'){
+            $formattedKategoriData = [];
+            foreach ($kategoriData as $kategori) {
+                unset($kategori['id_kategori_seniman']);
+                unset($kategori['nama_kategori']);
+                $formattedKategoriData[] = implode(', ', $kategori);
+            }
+            return implode(', ', $formattedKategoriData);
+        }
+        if($con == 'singkatan'){
+            foreach($kategoriData as $key => $value){
+                if(isset($value['singkatan_kategori']) && $value['singkatan_kategori'] ==  $data){
+                    return $kategoriData[$key]['id_kategori_seniman'];
+                }
+            }
+        }
+    }
+    public function tambahSeniman(Request $request){
         $validator = Validator::make($request->only('nama_seniman', 'nik', 'alamat_seniman', 'no_telpon', 'jenis_kelamin', 'kategori', 'kecamatan', 'tempat_lahir', 'tanggal_lahir', 'nama_organisasi', 'jumlah_anggota', 'ktp_seniman', 'pass_foto', 'surat_keterangan'), [
             'nama_seniman' => 'required|max:50',
             'nik' => 'required|numeric|digits_between:10,30',
             'alamat_seniman' => 'required',
             'no_telpon' => 'required',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'kategori' => 'required',
+            'jenis_kelamin' => 'required|in:laki-laki,perempuan',
+            'kategori' => 'required|in:'. $this->kategori(null, 'validation'),
             'kecamatan' => 'required|in:bagor,baron,berbek,gondang,jatikalen,kertosono,lengkong,loceret,nganjuk,ngetos,ngluyu,ngronggot,pace,patianrowo,prambon,rejoso,sawahan,sukomoro,tanjunganom,wilangan',
             'tempat_lahir' => 'required',
             'tanggal_lahir' => 'required|date',
@@ -38,6 +65,7 @@ class SenimanController extends Controller
             'jenis_kelamin.required' => 'Jenis kelamin wajib di isi',
             'jenis_kelamin.in' => 'Jenis kelamin harus Laki-laki atau Perempuan',
             'kategori.required' => 'Kategori wajib di isi',
+            'kategori.in' => 'Kategori tidak valid',
             'kecamatan.required' => 'Kecamatan wajib di isi',
             'kecamatan.in' => 'Kecamatan tidak valid',
             'tempat_lahir.required' => 'Tempat lahir wajib di isi',
@@ -68,11 +96,6 @@ class SenimanController extends Controller
             }
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
-        //check seniman
-        $seniman = Seniman::select('nama_tempat')->find($request->input('id_tempat'));
-        if(!$seniman){
-            return response()->json(['status' => 'error', 'message' => 'Data seniman tidak ditemukan'], 404);
-        }
         //get user
         $idUser = User::select("id_user")->whereRaw("BINARY email = ?",[$request->input('email')])->limit(1)->get()[0]['id_user'];
 
@@ -84,9 +107,9 @@ class SenimanController extends Controller
         if(!($file->isValid() && in_array($file->extension(), ['pdf', 'jpeg', 'png', 'jpg']))){
             return response()->json(['status'=>'error','message'=>'Format Foto KTP tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
-        $fileName = $file->hashName();
+        $ktpName = $file->hashName();
         $fileData = Crypt::encrypt(file_get_contents($file));
-        Storage::disk('seniman')->put('ktp_seniman/' . $fileName, $fileData);
+        Storage::disk('seniman')->put('ktp_seniman/' . $ktpName, $fileData);
 
         //process file pass foto
         if (!$request->hasFile('pass_foto')) {
@@ -96,9 +119,9 @@ class SenimanController extends Controller
         if(!($file->isValid() && in_array($file->extension(), ['pdf', 'jpeg', 'png', 'jpg']))){
             return response()->json(['status'=>'error','message'=>'Format Pass foto tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
-        $fileName = $file->hashName();
+        $fotoName = $file->hashName();
         $fileData = Crypt::encrypt(file_get_contents($file));
-        Storage::disk('seniman')->put('pass_foto/' . $fileName, $fileData);
+        Storage::disk('seniman')->put('pass_foto/' . $fotoName, $fileData);
 
         //process file surat keterangan
         if (!$request->hasFile('surat_keterangan')) {
@@ -108,13 +131,13 @@ class SenimanController extends Controller
         if(!($file->isValid() && in_array($file->extension(), ['pdf', 'jpeg', 'png', 'jpg']))){
             return response()->json(['status'=>'error','message'=>'Format Surat Keterangan tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
-        $fileName = $file->hashName();
+        $suratName = $file->hashName();
         $fileData = Crypt::encrypt(file_get_contents($file));
-        Storage::disk('seniman')->put('surat/' . $fileName, $fileData);
+        Storage::disk('seniman')->put('surat_keterangan/' . $suratName, $fileData);
         //add seniman
         $tambahSeniman = Seniman::create([
             'nama_seniman' => $request->input('nama_seniman'),
-            'nik' => $request->input('nik'),
+            'nik' => Crypt::encrypt($request->input('nik')),
             'alamat_seniman' => $request->input('alamat_seniman'),
             'no_telpon' => $request->input('no_telpon'),
             'jenis_kelamin' => $request->input('jenis_kelamin'),
@@ -124,13 +147,15 @@ class SenimanController extends Controller
             'tanggal_lahir' => Carbon::createFromFormat('d-m-Y', $request->input('tanggal_lahir'))->format('Y-m-d'),
             'nama_organisasi' => $request->input('nama_organisasi'),
             'jumlah_anggota' => $request->input('jumlah_anggota'),
-            'ktp_seniman' => $request->input('ktp_seniman'),
-            'pass_foto' => $request->input('pass_foto'),
-            'surat_keterangan' => $request->input('surat_keterangan'),
+            'ktp_seniman' => $ktpName,
+            'pass_foto' => $fotoName,
+            'surat_keterangan' => $suratName,
+            'tgl_berlaku' => Carbon::now()->endOfYear(),
             'status' => 'diajukan',
             'catatan' => '',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
+            'id_kategori_seniman'=> $this->kategori($request->input('kategori'),'singkatan'),
             'id_user' => $idUser,
         ]);
         if (!$tambahSeniman) {
@@ -139,13 +164,14 @@ class SenimanController extends Controller
         return response()->json(['status'=>'success','message'=>'Data Seniman berhasil ditambahkan']);
     }
     public function editSeniman(Request $request){
-        $validator = Validator::make($request->only('nama_seniman', 'nik', 'alamat_seniman', 'no_telpon', 'jenis_kelamin', 'kategori', 'kecamatan', 'tempat_lahir', 'tanggal_lahir', 'nama_organisasi', 'jumlah_anggota', 'ktp_seniman', 'pass_foto', 'surat_keterangan'), [
-            'nama_seniman' => 'required|max:50',
+        $validator = Validator::make($request->only('id_seniman', 'nik', 'nama_seniman', 'jenis_kelamin', 'alamat_seniman', 'no_telpon','kategori', 'kecamatan', 'tempat_lahir', 'tanggal_lahir', 'nama_organisasi', 'jumlah_anggota', 'ktp_seniman', 'pass_foto', 'surat_keterangan'), [
+            'id_seniman' => 'required',
             'nik' => 'required|numeric|digits_between:10,30',
+            'nama_seniman' => 'required|max:50',
+            'jenis_kelamin' => 'required|in:laki-laki,perempuan',
             'alamat_seniman' => 'required',
             'no_telpon' => 'required',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'kategori' => 'required',
+            'kategori' => 'required|in:'.$this->kategori(null, 'validation'),
             'kecamatan' => 'required|in:bagor,baron,berbek,gondang,jatikalen,kertosono,lengkong,loceret,nganjuk,ngetos,ngluyu,ngronggot,pace,patianrowo,prambon,rejoso,sawahan,sukomoro,tanjunganom,wilangan',
             'tempat_lahir' => 'required',
             'tanggal_lahir' => 'required|date',
@@ -155,16 +181,18 @@ class SenimanController extends Controller
             'pass_foto' => 'required|image|mimes:jpeg,png,jpg|max:5120',
             'surat_keterangan' => 'required|file|mimes:pdf,jpeg,png,jpg|max:5120',
         ], [
-            'nama_seniman.required' => 'Nama seniman wajib di isi',
-            'nama_seniman.max' => 'Nama seniman maksimal 50 karakter',
+            'id_seniman.required' => 'ID seniman wajib di isi',
             'nik.required' => 'NIK wajib di isi',
             'nik.numeric' => 'NIK harus berupa angka',
             'nik.digits_between' => 'NIK maksimal 30 digit',
-            'alamat_seniman.required' => 'Alamat seniman wajib di isi',
-            'no_telpon.required' => 'Nomor telepon wajib di isi',
+            'nama_seniman.required' => 'Nama seniman wajib di isi',
+            'nama_seniman.max' => 'Nama seniman maksimal 50 karakter',
             'jenis_kelamin.required' => 'Jenis kelamin wajib di isi',
             'jenis_kelamin.in' => 'Jenis kelamin harus Laki-laki atau Perempuan',
+            'alamat_seniman.required' => 'Alamat seniman wajib di isi',
+            'no_telpon.required' => 'Nomor telepon wajib di isi',
             'kategori.required' => 'Kategori wajib di isi',
+            'kategori.in' => 'Kategori tidak valid',
             'kecamatan.required' => 'Kecamatan wajib di isi',
             'kecamatan.in' => 'Kecamatan tidak valid',
             'tempat_lahir.required' => 'Tempat lahir wajib di isi',
@@ -196,7 +224,7 @@ class SenimanController extends Controller
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //check data seniman
-        $seniman = Seniman::select('seniman.id_user', 'status', 'ktp_seniman', 'pass_foto', 'surat_ket_sewa')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
+        $seniman = Seniman::select('seniman.id_user', 'status', 'ktp_seniman', 'pass_foto', 'surat_keterangan')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
         if (!$seniman) {
             return response()->json(['status' => 'error', 'message' => 'Data Seniman tidak ditemukan'], 404);
         }
@@ -216,14 +244,14 @@ class SenimanController extends Controller
             return response()->json(['status'=>'error','message'=>'Format Foto KTP tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
         $destinationPath = storage_path('app/seniman/');
-        $fileToDelete = $destinationPath . $seniman->surat_ket_sewa;
+        $fileToDelete = $destinationPath . $seniman->ktp_seniman;
         if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
             unlink($fileToDelete);
         }
-        Storage::disk('seniman')->delete('/'.$seniman->surat_ket_sewa);
-        $fileName = $file->hashName();
+        Storage::disk('seniman')->delete('/'.$seniman->ktp_seniman);
+        $ktpName = $file->hashName();
         $fileData = Crypt::encrypt(file_get_contents($file));
-        Storage::disk('seniman')->put('/' . $fileName, $fileData);
+        Storage::disk('seniman')->put('ktp_seniman/' . $ktpName, $fileData);
 
         //process file pass foto
         if (!$request->hasFile('pass_foto')) {
@@ -234,47 +262,52 @@ class SenimanController extends Controller
             return response()->json(['status'=>'error','message'=>'Format Pass Foto tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
         $destinationPath = storage_path('app/seniman/');
-        $fileToDelete = $destinationPath . $seniman->surat_ket_sewa;
+        $fileToDelete = $destinationPath . $seniman->pass_foto;
         if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
             unlink($fileToDelete);
         }
-        Storage::disk('seniman')->delete('/'.$seniman->surat_ket_sewa);
-        $fileName = $file->hashName();
+        Storage::disk('seniman')->delete('/'.$seniman->pass_foto);
+        $fotoName = $file->hashName();
         $fileData = Crypt::encrypt(file_get_contents($file));
-        Storage::disk('seniman')->put('/' . $fileName, $fileData);
+        Storage::disk('seniman')->put('pass_foto/' . $fotoName, $fileData);
 
         //process file surat keterangan
         if (!$request->hasFile('surat_keterangan')) {
             return response()->json(['status'=>'error','message'=>'Surat keterangan wajib di isi'], 400);
         }
         $file = $request->file('surat_keterangan');
-        if(!($file->isValid() && in_array($file->extension(), ['jpeg', 'png', 'jpg']))){
+        if(!($file->isValid() && in_array($file->extension(), ['pdf', 'jpeg', 'png', 'jpg']))){
             return response()->json(['status'=>'error','message'=>'Format Surat Keterangan tidak valid. Gunakan format jpeg, png, jpg'], 400);
         }
         $destinationPath = storage_path('app/seniman/');
-        $fileToDelete = $destinationPath . $seniman->surat_ket_sewa;
+        $fileToDelete = $destinationPath . $seniman->surat_keterangan;
         if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
             unlink($fileToDelete);
         }
-        Storage::disk('seniman')->delete('/'.$seniman->surat_ket_sewa);
-        $fileName = $file->hashName();
+        Storage::disk('seniman')->delete('/'.$seniman->surat_keterangan);
+        $suratName = $file->hashName();
         $fileData = Crypt::encrypt(file_get_contents($file));
-        Storage::disk('seniman')->put('/' . $fileName, $fileData);
+        Storage::disk('seniman')->put('surat_keterangan/' . $suratName, $fileData);
 
         //update seniman
         $updatedSeniman = Seniman::where('id_seniman',$request->input('id_seniman'))->update([
-            'nik_sewa' => $request->input('nik_penyewa'),
-            'nama_peminjam' => $request->input('nama_peminjam'),
-            'deskripsi_sewa_tempat' => $request->input('deskripsi'),
-            'nama_kegiatan_sewa' => $request->input('nama_kegiatan_sewa'),
-            'instansi' => (is_null($request->input('instansi')) || empty($request->input('instansi'))) ? '' : $request->input('instansi'),
-            'jumlah_peserta' => (is_null($request->input('jumlah_peserta')) || empty($request->input('jumlah_peserta'))) ? 0 : $request->input('jumlah_peserta'),
-            'tgl_awal_peminjaman' => Carbon::createFromFormat('d-m-Y', $request->input('tanggal_awal_sewa'))->format('Y-m-d'),
-            'tgl_akhir_peminjaman' => Carbon::createFromFormat('d-m-Y', $request->input('tanggal_akhir_sewa'))->format('Y-m-d'),
-            'surat_ket_sewa' => $fileName,
+            'nama_seniman' => $request->input('nama_seniman'),
+            'nik' => Crypt::encrypt($request->input('nik')),
+            'alamat_seniman' => $request->input('alamat_seniman'),
+            'no_telpon' => $request->input('no_telpon'),
+            'jenis_kelamin' => $request->input('jenis_kelamin'),
+            'kecamatan' => $request->input('kecamatan'),
+            'tempat_lahir' => $request->input('tempat_lahir'),
+            'tanggal_lahir' => Carbon::createFromFormat('d-m-Y', $request->input('tanggal_lahir'))->format('Y-m-d'),
+            'nama_organisasi' => $request->input('nama_organisasi'),
+            'jumlah_anggota' => $request->input('jumlah_anggota'),
+            'ktp_seniman' => $ktpName,
+            'pass_foto' => $fotoName,
+            'surat_keterangan' => $suratName,
+            'tgl_berlaku' => Carbon::now()->endOfYear(),
             'status' => (is_null($seniman->status) || empty($seniman->status)) ? 'diajukan' : $seniman->status,
-            'id_tempat'=>$request->input('id_tempat'),
             'updated_at' => Carbon::now(),
+            'id_kategori_seniman'=> $this->kategori($request->input('kategori'),'singkatan'),
         ]);
         if (!$updatedSeniman) {
             return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui data Seniman'], 500);
@@ -293,10 +326,10 @@ class SenimanController extends Controller
                 $errors[$field] = $errorMessages[0];
                 break;
             }
-            return response()->json(['status' => 'error', 'message' => $errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //check data seniman
-        $seniman = Seniman::select('seniman.id_user', 'status','surat_ket_sewa')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
+        $seniman = Seniman::select('seniman.id_user', 'status','ktp_seniman', 'pass_foto', 'surat_keterangan')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
         if (!$seniman) {
             return response()->json(['status' => 'error', 'message' => 'Data Seniman tidak ditemukan'], 404);
         }
@@ -306,12 +339,31 @@ class SenimanController extends Controller
         }else if($seniman->status == 'diterima' || $seniman->status == 'ditolak'){
             return response()->json(['status' => 'error', 'message' => 'Data Seniman sudah diverifikasi'], 400);
         }
+
+        //delete file ktp
         $destinationPath = storage_path('app/seniman/');
-        $fileToDelete = $destinationPath . $seniman->surat_ket_sewa;
+        $fileToDelete = $destinationPath . $seniman->ktp_seniman;
         if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
             unlink($fileToDelete);
         }
-        Storage::disk('seniman')->delete('/'.$seniman->surat_ket_sewa);
+        Storage::disk('seniman')->delete('ktp_seniman/'.$seniman->ktp_seniman);
+
+        //delete pass foto
+        $destinationPath = storage_path('app/seniman/');
+        $fileToDelete = $destinationPath . $seniman->pass_foto;
+        if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
+            unlink($fileToDelete);
+        }
+        Storage::disk('seniman')->delete('pass_foto/'.$seniman->pass_foto);
+
+        //delete surat keterangan
+        $destinationPath = storage_path('app/seniman/');
+        $fileToDelete = $destinationPath . $seniman->surat_keterangan;
+        if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
+            unlink($fileToDelete);
+        }
+        Storage::disk('seniman')->delete('surat_keterangan/'.$seniman->surat_keterangan);
+
         if (!Seniman::where('id_seniman',$request->input('id_seniman'))->delete()) {
             return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Seniman'], 500);
         }
