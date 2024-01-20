@@ -39,7 +39,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <!-- ======= Header ======= -->
   <header id="header" class="fixed-top ">
     <div class="container d-flex align-items-center">
-      <h1 class="logo me-auto"><a href="/.php">DISPORABUDPAR</a></h1>
+      <h1 class="logo me-auto"><a href="/">DISPORABUDPAR</a></h1>
       <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto active" href="#hero">Beranda</a></li>
@@ -47,7 +47,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <li><a class="nav-link scrollto" href="#about">Informasi</a></li>
           <li><a class="nav-link scrollto" href="#layanan">Layanan</a></li>
           <li><a class="nav-link   scrollto" href="#profil">Profil</a></li>
-          <li><a class="getstarted scrollto" href="login.php">Masuk</a></li>
+          <li><a class="getstarted scrollto" href="/login">Masuk</a></li>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav>
@@ -122,21 +122,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
         </div>
         <div class="row content">
           <div class="row row-cols-1 row-cols-md-3 g-3">
+            @foreach ($eventData as $event)
             <div class="col">
               <div class="card">
-              {{-- <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" /> --}}
+                <img src="{{ asset($tPath.'img/event/'.$event['poster_event']) }}" class="card-img-top" alt="Hollywood Sign on The Hill" />
                 <div class="card-body">
-                  {{-- <h5 class="card-title"><?php echo $events['nama_event']?></h5> --}}
-                  <p class="card-text">
-                    {{-- Tanggal Pelaksanaan : <?php echo $events['tanggal_awal']?> --}}
+                  <h5 class="card-title">{{ $event['nama_event'] }}</h5>
+                  <p class="card-text">                                                               
+                    Tanggal Pelaksanaan : {{ $event['tanggal_awal'] }}
                     <br>
-                    {{-- Tempat : <?php echo $events['tempat_event'] ?> --}}
+                    Tempat : {{ $event['tempat_event']  }}
                   </p>
                 </div>
               </div>
             </div>
+            @endforeach
           </div>
-          <a href="/home1.php" class="btn-learn-more">Lainnya</a>
+          <a href="/event/semua" class="btn-learn-more">Lainnya</a>
         </div>
 
       </div>
@@ -152,8 +154,18 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <p>Gedung dan Tempat Wisata Yang dikelola oleh Dinas Kepemudaan, Olahraga, Kebudayaan dan Pariwisata Kab.
             Nganjuk</p>
         </div>
-
         <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="200">
+          @foreach ($tempatData as $tempat)
+          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
+            <div class="portfolio-img"><img src="{{ asset($tPath.'img/tempat' .$tempat['foto_tempat']) }}" class="img-fluid" alt=""></div>
+            <div class="portfolio-info">
+              <h4>{{ $tempat['nama_tempat'] }}</h4>
+              <a href="{{ asset($tPath.'img/tempat'. $tempat['foto_tempat']) }} " data-gallery="portfolioGallery"
+                class="portfolio-lightbox preview-link" title="{{ $tempat['nama_tempat'] }}"><i class="bx bx-plus"></i></a>
+              <a href="/tempat/{{ $tempat['id_tempat'] }}" class="details-link" title="Selengkapnya"><i class="bx bx-link"></i></a>
+            </div>
+          </div>
+          @endforeach
         </div>
       </div>
     </section>
@@ -176,7 +188,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <p>Masyrakar dapat mengupload event atau kegiatan yang akan dilaksanakan.</p>
                 <br>
                 <div>
-                  <a href="/home3.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/syarat/event" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>
@@ -191,7 +203,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </p>
                 <br>
                 <div>
-                  <a href="/home5.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/syarat/sewa" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>
@@ -205,7 +217,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <p>Masyarakat dapat mendaftarkan nomer induk seniman dan memperpanjang masa berlaku kartu.</p>
                 <br>
                 <div>
-                  <a href="/home4.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/syarat/seniman" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>
@@ -219,7 +231,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <p>Masyarakat dapat mengajukan surat advis / surat perizinan pentas kesenian.</p>
                 <br>
                 <div>
-                  <a href="/home6.php" class="btn-baca">Baca Selengkapnya</a>
+                  <a href="/syarat/pentas" class="btn-baca">Baca Selengkapnya</a>
                 </div>
               </div>
             </div>

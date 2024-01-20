@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\ListTempat;
+use Illuminate\Support\Facades\File;
 class ListTempatSeeder extends Seeder
 {
     private function tempatData(): array
@@ -61,11 +62,19 @@ class ListTempatSeeder extends Seeder
     }
     public function run(): void
     {
+        if (app()->environment('local')) {
+            $destinationPath = public_path('img/tempat');
+        } else {
+            $destinationPath = base_path('../public_html/public/img/tempat/');
+        }
+        if (File::isDirectory($destinationPath)) {
+            File::deleteDirectory($destinationPath);
+        }
+        mkdir(public_path('img/tempat'));
         foreach($this->tempatData() as $tempat){
             ListTempat::insert($tempat);
-            database_path('seeders/FotoTempat'.$tempat['foto_tempat']);
             $fotoPublic = public_path('img/tempat'.$tempat['foto_tempat']);
-                if (!file_exists($fotoPublic)) {
+            if (!file_exists($fotoPublic)) {
                 copy(database_path('seeders/FotoTempat'.$tempat['foto_tempat']), $fotoPublic);
             }
         }

@@ -65,20 +65,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
                 <div class="row content">
                     <div class="row row-cols-1 row-cols-md-3 g-3">
-                        <div class="col">
-                            <div class="card">
-                                {{-- <img src="<?php echo $tPath; ?>/DatabaseMobile/uploads/events<?php echo $events['poster_event']?>" class="card-img-top" alt="Hollywood Sign on The Hill" /> --}}
-                                <div class="card-body">
-                                    <h5 class="card-title"></h5>
-                                    <p class="card-text">
-                                        Tanggal Pelaksanaan : 
-                                        <br><br>
-                                        Tempat : 
-                                        <br><br>
-                                    </p>
+                        @foreach ($eventData as $event)
+                            <div class="col">
+                                <div class="card">
+                                    <img src="{{ asset($tPath.'img/event/'.$event['poster_event']) }}" class="card-img-top" alt="Hollywood Sign on The Hill" />
+                                    <div class="card-body">
+                                        <h5 class="card-title"></h5>
+                                        <p class="card-text">
+                                            Tanggal Pelaksanaan : {{ $event['tanggal_awal']  }}  
+                                            <br><br>
+                                            Tempat : {{ $event['tempat_event'] }}
+                                            <br><br>
+                                            {{ $event['deskripsi'] }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
         </section>
@@ -142,7 +145,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
     <script src="{{ asset($tPath.'assets/vendor/php-email-form/validate.js') }}"></script>
 
     <!-- Template Main JS File -->
-    <script src="{{ asset($tPath.'assets/js/LandingPage.js"></script>
+    <script src="{{ asset($tPath.'assets/js/LandingPage.js') }}"></script>
 
 </body>
 

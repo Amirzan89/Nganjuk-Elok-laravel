@@ -8,6 +8,7 @@ use App\Http\Controllers\Services\SenimanController;
 use App\Http\Controllers\Services\SewaController;
 use App\Http\Controllers\Services\TempatController;
 
+use App\Http\Controllers\Page\HomeController AS ShowHomeController;
 use App\Http\Controllers\Page\EventController AS ShowEventController;
 use App\Http\Controllers\Page\PentasController AS ShowPentasController;
 use App\Http\Controllers\Page\SenimanController AS ShowSenimanController;
@@ -87,28 +88,20 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         return view('page.login');
     })->withoutMiddleware('authorized');
     Route::get('/dashboard',[DashboardController::class,'show']);
-    Route::get('/', function () {
-        return view('page.home');
-    })->withoutMiddleware('authorized');
-    Route::get('/{event?}', function ($event = null) {
-        if ($event === 'syarat') {
+    Route::get('/event/semua',[ShowHomeController::class,'showHome1'])->withoutMiddleware('authorized');
+    Route::group(['prefix'=>'/syarat'],function(){
+        Route::get('/event', function () {
             return view('page.home3');
-        }
-        return view('page.home1');
-    })->withoutMiddleware('authorized');
-    Route::get('/seniman/{seniman?}', function ($seniman = null) {
-        if ($seniman === 'syarat') {
+        });
+        Route::get('/seniman', function () {
             return view('page.home4');
-        }
-    })->withoutMiddleware('authorized');
-    Route::get('/sewa/{sewa?}', function ($sewa = null) {
-        if ($sewa === 'syarat') {
+        });
+        Route::get('/sewa', function () {
             return view('page.home5');
-        }
-    })->withoutMiddleware('authorized');
-    Route::get('/pentas/{pentas?}', function ($pentas = null) {
-        if ($pentas === 'syarat') {
+        });
+        Route::get('/pentas', function () {
             return view('page.home6');
-        }
+        });
     })->withoutMiddleware('authorized');
+    Route::get('/',[ShowHomeController::class,'showHome'])->withoutMiddleware('authorized');
 });
