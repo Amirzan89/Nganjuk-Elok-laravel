@@ -18,7 +18,7 @@ use App\Http\Controllers\Mobile\Auth\RegisterController AS MobileRegisterControl
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::group(['prefix'=>'/mobile'],function(){
+Route::group(['prefix'=>'/mobile','middleware'=>'authorized'],function(){
     Route::group(['prefix'=>'/users'],function(){
         Route::post('/login', [MobileLoginController::class,'Login']);
         Route::post('/register', [MobileRegisterController::class,'Login']);
@@ -47,6 +47,3 @@ Route::group(['prefix'=>'/mobile'],function(){
         Route::delete('/delete', [MobileSewaController::class,'hapusSewa']);
     });
 });
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });

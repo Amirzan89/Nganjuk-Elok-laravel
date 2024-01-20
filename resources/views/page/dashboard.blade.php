@@ -41,6 +41,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   </script>
   @endif
   <script>
+    var csrfToken = "{{ csrf_token() }}";
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
     var role = "{{ $userAuth['role'] }}";

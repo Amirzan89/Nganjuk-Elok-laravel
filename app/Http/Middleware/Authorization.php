@@ -12,14 +12,15 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Http\Response;
 use App\Models\User;
 use Closure;
-class Authorizaton
+class Authorization
 {
     private $roleAdmin = ['super admin','admin event','admin seniman','admin tempat'];
     public function handle(Request $request, Closure $next){
-        $role = $request->input('role');
+        $userAuth = $request->input('user_auth');
         $path = $request->path();
-        if(empty($role)){
-            $validator = Validator::make($request->only('email'), [
+        $checkEmail = function() use ($userAuth, $request){
+            $email = $userAuth['email'] ?? $request->input('email');
+            $validator = Validator::make(['email'=>$email], [
                 'email' => 'required|email',
             ], [
                 'email.required' => 'Email wajib di isi',
@@ -29,31 +30,58 @@ class Authorizaton
                 $errors = [];
                 foreach ($validator->errors()->toArray() as $field => $errorMessages) {
                     $errors[$field] = $errorMessages[0];
+                    break;
                 }
-                return response()->json(['status' => 'error', 'message' => $errors], 400);
+                return ['status' => 'error', 'message' => implode(', ', $errors),'code'=>400];
             }
             $email = $request->input('email');
-            $role = json_decode(User::select('role')->whereRaw("BINARY email = ?",[$email])->limit(1)->get(),true)[0]['role'];
+            $userDB = User::select('role')->whereRaw("BINARY email = ?", [$request->input('email')])->limit(1)->get();
+            if ($userDB->isEmpty()) {
+                return ['status'=>'error','message'=>'User not found','code'=>404];
+            }
+            return ['status'=>'success','data' =>json_decode($userDB, true)[0]['role']];
+        };
+        if(isset($userAuth) && !empty($userAuth)){
+            $role = $userAuth['role'];
+            if(empty($role)){
+                $cEmail = $checkEmail();
+                if($cEmail['status'] == 'error'){
+                    $code = $cEmail['code'];
+                    unset($cEmail['code']);
+                    return response()->json($cEmail,$code);
+                }
+                $role = $cEmail['data'];
+                unset($cEmail);
+            }
+        }else{
+            $cEmail = $checkEmail();
+            if($cEmail['status'] == 'error'){
+                $code = $cEmail['code'];
+                unset($cEmail['code']);
+                return response()->json($cEmail,$code);
+            }
+            $role = $cEmail['data'];
+            unset($cEmail);
         }
         //only super admin can access /admin
         if(in_array($role,['admin event','admin seniman','admin tempat','masyarakat']) && Str::startsWith($path, '/admin')){
-            return response()->json(['status'=>'error','message'=>'User Unauthorized'],400);
+            return response()->json(['status'=>'error','message'=>'User Unauthorized'],403);
         }
         //only super admin and admin event can access /event
         if(in_array($role,['admin seniman','admin tempat','masyarakat']) && Str::startsWith($path, '/event')){
-            return response()->json(['status'=>'error','message'=>'User Unauthorized'],400);
+            return response()->json(['status'=>'error','message'=>'User Unauthorized'],403);
         }
         //only super admin and admin seniman can access /seniman or /pentas
         if(in_array($role,['admin event','admin tempat','masyarakat']) && (Str::startsWith($path, '/seniman') || Str::startsWith($path, '/pentas'))){
-            return response()->json(['status'=>'error','message'=>'User Unauthorized'],400);
+            return response()->json(['status'=>'error','message'=>'User Unauthorized'],403);
         }
         //only super admin and admin tempat can access /tempat
         if(in_array($role,['admin event','admin seniman','masyarakat']) && Str::startsWith($path, '/tempat')){
-            return response()->json(['status'=>'error','message'=>'User Unauthorized'],400);
+            return response()->json(['status'=>'error','message'=>'User Unauthorized'],403);
         }
         //when admin access mobile
         if(in_array($role,$this->roleAdmin) && Str::startsWith($path, '/mobile')){
-            return response()->json(['status'=>'error','message'=>'User Unauthorized'],400);
+            return response()->json(['status'=>'error','message'=>'User Unauthorized'],403);
         }
         return $next($request);
     }

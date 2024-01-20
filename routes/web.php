@@ -15,8 +15,9 @@ use App\Http\Controllers\Page\SewaController AS ShowSewaController;
 use App\Http\Controllers\Page\TempatController AS ShowTempatController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Page\DashboardController;
+use App\Http\Middleware\Authorization;
 
-Route::group(['middleware'=>'auth'],function(){
+Route::group(['middleware'=>['auth','authorized']],function(){
     //event route
     Route::group(['prefix'=>'/event'],function(){
         Route::get('/',[ShowEventController::class,'showEvent']);
@@ -84,30 +85,30 @@ Route::group(['middleware'=>'auth'],function(){
     Route::get('/auth/google', 'Auth\LoginController@handleProviderCallback');
     Route::get('/login', function () {
         return view('page.login');
-    })->name('login');
+    })->withoutMiddleware('authorized');
     Route::get('/dashboard',[DashboardController::class,'show']);
     Route::get('/', function () {
         return view('page.home');
-    });
+    })->withoutMiddleware('authorized');
     Route::get('/{event?}', function ($event = null) {
         if ($event === 'syarat') {
             return view('page.home3');
         }
         return view('page.home1');
-    });
+    })->withoutMiddleware('authorized');
     Route::get('/seniman/{seniman?}', function ($seniman = null) {
         if ($seniman === 'syarat') {
             return view('page.home4');
         }
-    });
+    })->withoutMiddleware('authorized');
     Route::get('/sewa/{sewa?}', function ($sewa = null) {
         if ($sewa === 'syarat') {
             return view('page.home5');
         }
-    });
+    })->withoutMiddleware('authorized');
     Route::get('/pentas/{pentas?}', function ($pentas = null) {
         if ($pentas === 'syarat') {
             return view('page.home6');
         }
-    });
+    })->withoutMiddleware('authorized');
 });
