@@ -9,7 +9,7 @@ class Seniman extends Model
 {
     use HasFactory;
     protected $table = "seniman";
-    protected $primaryKey = "seniman";
+    protected $primaryKey = "id_seniman";
     public $incrementing = true;
     public $timestamps = true;
     protected $fillable = [

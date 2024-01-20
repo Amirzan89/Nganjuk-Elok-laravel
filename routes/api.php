@@ -34,7 +34,9 @@ Route::group(['prefix'=>'/mobile'],function(){
         Route::delete('/delete', [MobileSenimanController::class,'hapusSeniman']);
     });
     Route::group(['prefix'=>'/pentas'],function(){
-        //
+        Route::post('/tambah', [MobilePentasController::class,'tambahPentas']);
+        Route::post('/edit', [MobilePentasController::class,'editPentas']);
+        Route::delete('/delete', [MobilePentasController::class,'hapusPentas']);
     });
     Route::group(['prefix'=>'/tempat'],function(){
         //
