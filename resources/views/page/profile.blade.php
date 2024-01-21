@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -72,32 +72,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
 </head>
 
 <body>
+  @if(app()->environment('local'))
   <script>
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    var users = <?php echo json_encode($userAuth) ?>;
-    var tPath = "<?php echo $tPath ?>";
+      var tPath = '';
+  </script>
+  @else
+  <script>
+      var tPath = '/public/';
+  </script>
+  @endif
+  <script>
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-
-    <?php
-    include(__DIR__.'/header.php');
-    ?>
-
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'admin';
-      include(__DIR__.'/sidebar.php');
-      ?>
+      @php
+        $nav = 'admin';
+      @endphp
+      @include('component.sidebar')
     </ul>
 
   </aside><!-- End Sidebar-->
@@ -107,7 +109,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Profil</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
           <li class="breadcrumb-item active">Profil</li>
         </ol>
       </nav>
@@ -144,64 +145,48 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 <div class="tab-pane fade show active profile-overview" id="profile-overview">
 
                   <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                  <?php
-                  if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){ 
-                  ?>
-                    <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" class="">
-                  <?php 
-                  }else{
-                    if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'laki-laki'){
-                  ?>
-                      <img src="/private/profile/admin/default_boy.jpg" alt="Profile" class="">
-                    <?php 
-                    }else if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'perempuan'){
-                    ?>
-                      <img src="/private/profile/admin/default_girl.png" alt="Profile" class="">
-                  <?php } 
-                  } ?>
+                    <img src="{{ route('download.foto') }}" alt="Profile" class="">
                     <h2>
                       <center>
-                        <?php echo $userAuth['nama_lengkap'] ?>
+                        {{ $userAuth['nama_lengkap'] }}
                       </center>
                     </h2>
                     <h3>
-                      <?php echo $userAuth['role'] ?>
+                      {{ $userAuth['role'] }}
                     </h3>
                   </div>
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Nama Lengkap</div>
                     <div class="col-lg-9 col-md-8">
-                      <?php echo $userAuth['nama_lengkap'] ?>
+                      {{ $userAuth['nama_lengkap'] }}
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Nomor Telepon</div>
                     <div class="col-lg-9 col-md-8">
-                      <?php echo $userAuth['no_telpon'] ?>
+                      {{ $userAuth['no_telpon'] }}
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Jenis Kelamin</div>
                     <div class="col-lg-9 col-md-8">
-                      <?php echo $userAuth['jenis_kelamin'] ?>
+                      {{ $userAuth['jenis_kelamin'] }}
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Tanggal Lahir</div>
                     <div class="col-lg-9 col-md-8">
-                      <?php
-                      echo changeMonth([['tanggal'=>$userAuth['tanggal_lahir']]])[0]['tanggal'];
-                      ?>
+                      {{ $tanggal_lahir }}
                     </div>
                   </div>
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Role</div>
                     <div class="col-lg-9 col-md-8">
-                      <?php echo $userAuth['role'] ?>
+                      {{ $userAuth['role'] }}
                     </div>
                     <!-- <div class="col-lg-9 col-md-8">Admin</div> -->
                   </div>
@@ -209,39 +194,21 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Email</div>
                     <div class="col-lg-9 col-md-8">
-                      <?php echo $userAuth['email'] ?>
+                      {{ $userAuth['email'] }}
                     </div>
                   </div>
 
                 </div>
 
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-
+                  <form onsubmit="uploadEdit(event)">
                   <!-- Profile Edit Form -->
-                  <form method="POST" action="/web/User.php" enctype="multipart/form-data">
-                    <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
-                    <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Foto Profil</label>
                       <div class="col-md-8 col-lg-9">
                         <div id="divImg" ondrop="dropHandler(event)" ondragover="dragHandler(event,'over')" ondragleave="dragHandler(event,'leave')">
                           <input class="form-control" type="file" multiple="false" id="inpFile" name="foto" style="display:none">
-                          <?php
-                          if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto'])){ 
-                          ?>
-                            <img src="/private/profile/admin<?php echo $userAuth['foto'] ?>" alt="Profile" id="inpImg" class="">
-                          <?php 
-                          }else{
-                            if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'laki-laki'){
-                              ?>
-                              <img src="/private/profile/admin/default_boy.jpg" alt="Profile" id="inpImg" class="">
-                            <?php 
-                            }else if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'perempuan'){
-                            ?>
-                              <img src="/private/profile/admin/default_girl.png" alt="Profile" id="inpImg" class="">
-                          <?php }
-                          } ?>
+                          <img src="{{ route('download.foto') }}" alt="Profile" id="inpImg" class="">
                         </div>
                       </div>
                     </div>
@@ -249,7 +216,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <label for="Nama Lengkap" class="col-md-4 col-lg-3 col-form-label">Nama Lengkap</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="nama" type="text" class="form-control" id="Nama Lengkap"
-                          value="<?php echo $userAuth['nama_lengkap'] ?>">
+                          value="{{ $userAuth['nama_lengkap'] }}">
                       </div>
                     </div>
 
@@ -257,44 +224,27 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <label for="Nomor Telepon" class="col-md-4 col-lg-3 col-form-label">Nomor Telepon</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="phone" type="text" class="form-control" id="phone"
-                          value="<?php echo $userAuth['no_telpon'] ?>">
+                          value="{{ $userAuth['no_telpon'] }}">
                       </div>
                     </div>
                     <div class="row mb-3">
                       <label class="col-form-label col-md-4 col-lg-3">Jenis Kelamin</label>
                       <div class="col-md-8 col-lg-9">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" <?php echo ($userAuth['jenis_kelamin'] == 'laki-laki') ? 'checked' : ''; ?>>
+                          <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" {{ ($userAuth['jenis_kelamin'] == 'laki-laki') ? 'checked' : '' }}>
                           Laki-Laki
                         </div>
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="jenisK" value="perempuan" <?php echo ($userAuth['jenis_kelamin'] == 'perempuan') ? 'checked' : ''; ?>>
+                          <input class="form-check-input" type="radio" name="jenisK" value="perempuan" {{ ($userAuth['jenis_kelamin'] == 'perempuan') ? 'checked' : '' }}>
                           Perempuan
                         </div>
                       </div>
                     </div>
-                    <!-- <fieldset class="row mb-3">
-                      <legend class="col-form-label col-sm-2 pt-0">Jenis Kelamin</legend>
-                      <div class="col-sm-10">
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="jenisK" value="laki-laki" checked>
-                          <label class="form-check-label" for="gridRadios1">
-                            Laki-Laki
-                          </label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="radio" name="jenisK" value="perempuan">
-                          <label class="form-check-label" for="gridRadios2">
-                            Perempuan
-                          </label>
-                        </div>
-                      </div>
-                    </fieldset> -->
                     <div class="row mb-3">
                       <label for="Tanggal Lahir" class="col-md-4 col-lg-3 col-form-label">Tanggal Lahir</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="tanggalL" type="date" class="form-control" id="Tanggal Lahir"
-                          value="<?php echo $userAuth['tanggal_lahir'] ?>">
+                          value="{{ $userAuth['tanggal_lahir'] }}">
                       </div>
                     </div>
 
@@ -302,33 +252,33 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       <label for="Tempat Lahir" class="col-md-4 col-lg-3 col-form-label">Tempat Lahir</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="tempatL" type="text" class="form-control" id="Tempat Lahir"
-                          value="<?php echo $userAuth['tempat_lahir'] ?>">
+                          value="{{ $userAuth['tempat_lahir'] }}">
                       </div>
                     </div>
 
-                    <?php if($userAuth['role'] != 'super admin'){?>
+                    @if($userAuth['role'] != 'super admin')
                     <div class="row mb-3">
                       <label for="Role" class="col-md-4 col-lg-3 col-form-label">Role</label>
                       <div class="col-md-8 col-lg-9">
                       <select class="form-select" name="role" aria-label="Default select example">
-                        <option value="admin event" <?php echo ($userAuth['role'] == 'admin event') ? 'selected' : ''; ?>>Admin Event</option>
-                        <option value="admin tempat" <?php echo ($userAuth['role'] == 'admin tempat') ? 'selected' : ''; ?>>Admin Tempat</option>
-                        <option value="admin seniman" <?php echo ($userAuth['role'] == 'admin seniman') ? 'selected' : ''; ?>>Admin Seniman</option>
+                        <option value="admin event" {{ ($userAuth['role'] == 'admin event') ? 'selected' : '' }}>Admin Event</option>
+                        <option value="admin tempat" {{ ($userAuth['role'] == 'admin tempat') ? 'selected' : '' }}>Admin Tempat</option>
+                        <option value="admin seniman" {{ ($userAuth['role'] == 'admin seniman') ? 'selected' : '' }}>Admin Seniman</option>
                       </select> 
                     </div>
                     </div>
-                    <?php } ?>
+                    @endif
 
                     <div class="row mb-3">
                       <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
                       <div class="col-md-8 col-lg-9">
                         <input name="email" type="email" class="form-control" id="Email"
-                          value="<?php echo $userAuth['email'] ?>">
+                          value="{{ $userAuth['email'] }}">
                       </div>
                     </div>
 
                     <div class="text-center">
-                      <button type="button" onclick="uploadEdit()" class="btn btn-primary">Edit</button>
+                      <button type="button" class="btn btn-primary">Edit</button>
                     </div>
                   </form><!-- End Profile Edit Form -->
 
@@ -336,21 +286,18 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
                 <div class="tab-pane fade pt-3" id="profile-change-password">
                   <!-- Change Password Form -->
-                  <!-- <form> -->
-                  <form method="POST" action="/web/User.php" enctype="multipart/form-data">
-                    <input type="hidden" name="_method" value="PUT">
-                    <input type="hidden" name="id_user" value="<?php echo $userAuth['id_user'] ?>">
+                  <form onsubmit="updatePassword(event)">
                     <div class="row mb-3">
                       <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Password Lama</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="pass_old" type="password" class="form-control" id="currentPassword">
+                        <input name="password_old" type="password" class="form-control" id="currentPassword">
                       </div>
                     </div>
 
                     <div class="row mb-3">
                       <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">Password Baru</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="pass_new" type="password" class="form-control" id="newPassword">
+                        <input name="password" type="password" class="form-control" id="newPassword">
                       </div>
                     </div>
 
@@ -384,15 +331,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <!-- ======= Footer ======= -->
   <footer id="footer" class="footer">
     <div class="copyright">
-
-      <?php
-      include(__DIR__.'/footer.php');
-      ?>
-
+      @include('component.footer')
     </div>
   </footer>
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <div id="preloader" style="display: none;"></div>
   <div id="greenPopup" style="display:none"></div>
   <div id="redPopup" style="display:none"></div>
   <!-- Vendor JS Files -->
@@ -410,7 +354,16 @@ $tPath = app()->environment('local') ? '' : '/public/';
     divImg.addEventListener("click", function(){
       inpFile.click();
     });
-    function uploadEdit(){
+    function showLoading(){
+      document.querySelector('div#preloader').style.display = 'block';
+    }
+    function closeLoading(){
+      document.querySelector('div#preloader').style.display = 'none';
+    }
+    function uploadEdit(event){
+      console.log('update profile');
+      return;
+      event.preventDefault();
       if(uploadStat){
         return;
       }
@@ -420,49 +373,42 @@ $tPath = app()->environment('local') ? '' : '/public/';
       var inpTempat = document.querySelector("input[name='tempatL']").value;
       var inpTanggal = document.querySelector("input[name='tanggalL']").value;
       var inpEmail = document.querySelector("input[name='email']").value;
-      <?php if($userAuth['role'] == 'super admin'){ ?>
         //check data if edit or not
         if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpEmail === users.email){
           showRedPopup('Data belum diubah');
         }
-        <?php }else{ ?>
           var inpRole = document.querySelector("select[name='role']").value;
         //check data if edit or not
           if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpRole === users.role && inpEmail === users.email){
             showRedPopup('Data belum diubah');
           }
-      <?php } ?>
       uploadStat = true;
+      showLoading();
       const formData = new FormData();
-      formData.append('editAdmin','');
-      formData.append('desc','profile');
-      formData.append('_method','PUT');
-      formData.append('id_admin',idUser);
-      formData.append('id_user',idUser);
-      formData.append('nama', document.querySelector('input[name="nama"]').value);
-      formData.append('phone', document.querySelector('input[name="phone"]').value);
-      formData.append('jenisK', document.querySelector('input[name="jenisK"]:checked').value);
-      formData.append('tempatL', document.querySelector('input[name="tempatL"]').value);
-      formData.append('tanggalL', document.querySelector('input[name="tanggalL"]').value);
-      <?php if($userAuth['role'] == 'super admin'){ ?>
-        formData.append('role', 'super admin');
-      <?php }else{ ?>
+      formData.append('email',email);
+      formData.append('email_new', document.querySelector('input[name="email"]').value);
+      formData.append('nama_lengkap', document.querySelector('input[name="nama"]').value);
+      formData.append('jenis_kelamin', document.querySelector('input[name="jenisK"]:checked').value);
+      formData.append('no_telpon', document.querySelector('input[name="phone"]').value);
+      formData.append('tempat_lahir', document.querySelector('input[name="tempatL"]').value);
+      formData.append('tanggal_lahir', document.querySelector('input[name="tanggalL"]').value);
+      @if($userAuth['role'] != 'super admin')
         formData.append('role', document.querySelector('select[name="role"]').value);
-      <?php } ?>
-      formData.append('email', document.querySelector('input[name="email"]').value);
+      @endif
       if(fileImg !== null && fileImg !== ''){
         formData.append('foto', fileImg, fileImg.name);
       }
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/web/User.php', true);
+      xhr.open('PUT', '/admin/update/profile', true);
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.onload = function () {
         if (xhr.status === 200) {
+          closeLoading();
+          uploadStat = false;
           showGreenPopup(JSON.parse(xhr.responseText));
-          setTimeout(() => {
-                window.location.href = '/profile.php';
-            }, 1000);
           return;
         } else {
+          closeLoading();
           uploadStat = false;
           showRedPopup(JSON.parse(xhr.responseText));
           return;
@@ -528,6 +474,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
         divImg.classList.remove('drag');
       }
     }
+    function updatePassword(event, ket) {
+      event.preventDefault();
+      showLoading();
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        email: email,
+        password_old: event.target.querySelector('[name="password_old"]').value,
+        password: event.target.querySelector('[name="password"]').value,
+        password_confirm:event.target.querySelector('[name="password_new"]').value
+      };
+      xhr.open('PUT', domain + "/admin/update/password")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            closeLoading();
+            var response = JSON.parse(xhr.responseText);
+            showGreenPopup(response);
+          } else {
+            closeLoading();
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
+          }
+        }
+      }
+    }
     </script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
@@ -540,19 +514,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
           }
         });
       });
-    </script>
-  // <!-- Template Main JS File -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var currentPageURL = window.location.href;
-      var menuLinks = document.querySelectorAll('.nav-link');
-      menuLinks.forEach(function (menuLink) {
-        var menuLinkURL = menuLink.getAttribute('href');
-        if (currentPageURL === menuLinkURL) {
-          menuLink.parentElement.classList.add('active');
-        }
-      });
-    });
     </script>
     <script src="{{ asset($tPath.'assets/js/admin/main.js') }}"></script>
 </body>

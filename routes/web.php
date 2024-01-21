@@ -14,7 +14,7 @@ use App\Http\Controllers\Page\PentasController AS ShowPentasController;
 use App\Http\Controllers\Page\SenimanController AS ShowSenimanController;
 use App\Http\Controllers\Page\SewaController AS ShowSewaController;
 use App\Http\Controllers\Page\TempatController AS ShowTempatController;
-use App\Http\Controllers\Page\DashboardController;
+use App\Http\Controllers\Page\AdminController AS ShowAdminController;
 use App\Http\Controllers\Auth\LoginController;
 
 Route::group(['middleware'=>['auth','authorized']],function(){
@@ -80,6 +80,10 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     Route::group(['prefix'=>'/admin'],function(){
         Route::post('/login',[LoginController::class,'Login']);
         Route::post('/logout',[AdminController::class,'logout']);
+        Route::group(['prefix'=>'/update'],function(){
+            Route::put('/profile', [AdminController::class, 'updateProfile']);
+            Route::put('/password', [AdminController::class, 'updatePassword']);
+        });
     });
     //download only for admin
     Route::group(['prefix'=>'/public'],function(){
@@ -92,7 +96,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     Route::get('/login', function () {
         return view('page.login');
     })->withoutMiddleware('authorized');
-    Route::get('/dashboard',[DashboardController::class,'show']);
+    Route::get('/dashboard',[ShowAdminController::class,'showDashboard']);
+    Route::get('/profile',[ShowAdminController::class,'showProfile']);
     Route::get('/event/semua',[ShowHomeController::class,'showHome1'])->withoutMiddleware('authorized');
     Route::group(['prefix'=>'/syarat'],function(){
         Route::get('/event', function () {

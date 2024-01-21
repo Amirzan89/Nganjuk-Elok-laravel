@@ -74,13 +74,11 @@ class Authenticate
                     'number'=>$number
                 ];
                 //check user is exist in database
-                $exist = $userController->isExistUser($email);
-                if($exist['status'] == 'error'){
+                // $exist = $userController->isExistUser($email);
+                $exist = User::select('email')->whereRaw("BINARY email = ?",[$email])->limit(1)->exists();
+                if(!$exist){
                     return redirect('/login')->withCookies([Cookie::forget('token1'),Cookie::forget('token2'),Cookie::forget('token3')]);
                 }else{
-                    if(!$exist['data']){
-                        return redirect('/login')->withCookies([Cookie::forget('token1'),Cookie::forget('token2'),Cookie::forget('token3')]);
-                    }else{
                         //check token if exist in database
                         if($jwtController->checkExistRefreshWebsiteNew(['token'=>$token3])){
                             $decodedRefresh = $jwtController->decode($decodeRefresh);
@@ -150,7 +148,6 @@ class Authenticate
                                 return redirect('/login')->withCookies([Cookie::forget('token1'),Cookie::forget('token2'),Cookie::forget('token3')]);
                             }
                         }
-                    }
                 }
                 return $next($request);
             }
