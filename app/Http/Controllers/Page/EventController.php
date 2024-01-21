@@ -58,6 +58,7 @@ class EventController extends Controller
     public function showEvent(Request $request){
         $totalPengajuan = Events::where('status', 'diajukan')->orWhere('status', 'proses')->count();
         $totalRiwayat = Events::where('status', 'diterima')->orWhere('status', 'ditolak')->count();
+        unset($request->input('user_auth')['foto']);
         $dataShow = [
             'userAuth'=>$request->input('user_auth'),
             'totalPengajuan'=>$totalPengajuan,
@@ -76,6 +77,7 @@ class EventController extends Controller
         ->where(function ($query) {
             $query->where('status', 'diajukan')->orWhere('status', 'proses');
         })->orderBy('id_event', 'DESC')->get());
+        unset($request->input('user_auth')['foto']);
         $dataShow = [
             'userAuth'=>$request->input('user_auth'),
             'eventsData'=>$eventsData,
@@ -87,6 +89,7 @@ class EventController extends Controller
         ->where(function ($query) {
             $query->where('status', 'diterima')->orWhere('status', 'ditolak');
         })->orderBy('id_event', 'DESC')->get());
+        unset($request->input('user_auth')['foto']);
         $dataShow = [
             'userAuth'=>$request->input('user_auth'),
             'eventsData'=>$eventsData,
@@ -107,6 +110,7 @@ class EventController extends Controller
             DB::raw('DATE(tanggal_akhir) AS tanggal_akhir'),
             'link_pendaftaran'
         )->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->where('events.id_event', '=', $eventId)->limit(1)->get()[0]);
+        unset($request->input('user_auth')['foto']);
         $dataShow = [
             'userAuth'=>$request->input('user_auth'),
             'eventsData'=>$eventsData,

@@ -14,9 +14,8 @@ use App\Http\Controllers\Page\PentasController AS ShowPentasController;
 use App\Http\Controllers\Page\SenimanController AS ShowSenimanController;
 use App\Http\Controllers\Page\SewaController AS ShowSewaController;
 use App\Http\Controllers\Page\TempatController AS ShowTempatController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Page\DashboardController;
-use App\Http\Middleware\Authorization;
+use App\Http\Controllers\Auth\LoginController;
 
 Route::group(['middleware'=>['auth','authorized']],function(){
     //event route
@@ -77,10 +76,16 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::post('/tambah', [TempatController::class,'tambahTempat']);
         Route::put('/edit',[TempatController::class,'editTempat']);
     });
-    //users route
-    Route::group(['prefix'=>'/users'],function(){
+    //admin route
+    Route::group(['prefix'=>'/admin'],function(){
         Route::post('/login',[LoginController::class,'Login']);
         Route::post('/logout',[AdminController::class,'logout']);
+    });
+    //download only for admin
+    Route::group(['prefix'=>'/public'],function(){
+        Route::group(['prefix'=>'/download'],function(){
+            Route::get('/foto',[AdminController::class,'getFotoAdmin'])->name('download.foto');
+        });
     });
     Route::get('/auth/redirect', 'Auth\LoginController@redirectToProvider');
     Route::get('/auth/google', 'Auth\LoginController@handleProviderCallback');

@@ -17,7 +17,7 @@ class Authorization
     private $roleAdmin = ['super admin','admin event','admin seniman','admin tempat'];
     public function handle(Request $request, Closure $next){
         $userAuth = $request->input('user_auth');
-        $path = $request->path();
+        $path = '/'.$request->path();
         $checkEmail = function() use ($userAuth, $request){
             $email = $userAuth['email'] ?? $request->input('email');
             $validator = Validator::make(['email'=>$email], [

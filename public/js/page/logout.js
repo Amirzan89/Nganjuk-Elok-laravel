@@ -5,7 +5,7 @@ function logout(){
         number:number
     };
     //open the request
-    xhr.open('POST', "/users/logout");
+    xhr.open('POST', "/admin/logout");
     xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     //send the form data

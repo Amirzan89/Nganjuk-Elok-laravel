@@ -10,6 +10,7 @@ use App\Models\RefreshToken;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cookie;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,20 @@ use Carbon\Carbon;
 use Exception;
 class AdminController extends Controller
 {
+    public function getFotoAdmin(Request $request){
+        $userAuth = $request->input('user_auth');
+        $referer = $request->header('referer');
+        if ($referer && str_contains($referer, 'public/download/foto')) {
+            if (empty($userAuth['foto']) || is_null($userAuth['foto'])) {
+                $defaultPhotoPath = $userAuth['jenis_kelamin'] == 'laki-laki' ? 'admin/default_boy.jpg' : 'admin/default_girl.png';
+                return response()->download(storage_path('app/' . $defaultPhotoPath), 'foto.' . pathinfo($defaultPhotoPath, PATHINFO_EXTENSION));
+            } else {
+                return response()->download(storage_path('app/admin/' . $userAuth['foto']), 'foto.' . $userAuth['foto']->extension());
+            }
+        } else {
+            abort(404);
+        }
+    }
     public function getChangePass(Request $request, User $user, $any = null){
         $changePassPage = new ChangePasswordController();
         $notificationPage = new NotificationPageController();

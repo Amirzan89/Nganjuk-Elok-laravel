@@ -50,6 +50,11 @@ return [
             'root' => storage_path('app/sewa'),
             'throw' => false,
         ],
+        'admin' => [
+            'driver' => 'local',
+            'root' => storage_path('app/admin'),
+            'throw' => false,
+        ],
 
         'public' => [
             'driver' => 'local',

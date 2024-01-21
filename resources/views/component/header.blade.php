@@ -1,6 +1,5 @@
     <div class="d-flex align-items-center justify-content-between">
       <a href="/home" class="logo d-flex align-items-center">
-        <!-- <img src="assets/img/logo.png" alt=""> -->
         <span class="d-none d-lg-block">Nganjuk Elok</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn" id="btn"> </i>
@@ -12,15 +11,7 @@
         <li class="nav-item dropdown pe-3">
 
           <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-            @if(isset($userAuth['foto']) && !empty($userAuth['foto']) && !is_null($userAuth['foto']))
-              <img src="{{ asset($tPath . 'private/profile/admin/' . $userAuth['foto']) }}" alt="Profile" class="rounded-circle">
-            @else
-              @if(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'laki-laki')
-                <img src="{{ asset($tPath.'private/profile/admin/default_boy.jpg') }}" alt="Profile" class="rounded-circle">
-              @elseif(isset($userAuth['jenis_kelamin']) && $userAuth['jenis_kelamin'] === 'perempuan')
-                <img src="{{ asset($tPath.'private/profile/admin/default_girl.png') }}" alt="Profile" class="rounded-circle">
-              @endif
-            @endif
+            <img src="{{ route('download.foto') }}" alt="Profile" class="rounded-circle">
             <span class="d-none d-md-block dropdown-toggle ps-2">{{ $userAuth['nama_lengkap'] }}</span>
           </a><!-- End Profile Image Icon -->
 

@@ -40,7 +40,7 @@ loginForm.onsubmit = function(event){
         email: inpEmail.value,
         password:inpPassword.value
     };
-    xhr.open('POST',"/users/login")
+    xhr.open('POST',"/admin/login")
     xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(requestBody));
