@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 use App\Models\KategoriSeniman;
 use App\Models\Seniman;
@@ -29,8 +30,6 @@ class SenimanController extends Controller
         ];
         // Check if it's an associative array (single data)
         if (array_keys($inpDate) !== range(0, count($inpDate) - 1)) {
-            echo 'single data';
-            echo '<br>';
             foreach (['tanggal','tanggal_awal', 'tanggal_akhir'] as $dateField) {
                 if (isset($inpDate[$dateField]) && $inpDate[$dateField] !== null) {
                     $date = new DateTime($inpDate[$dateField]);
@@ -132,6 +131,7 @@ class SenimanController extends Controller
             'status',
             'catatan',
             )->join('kategori_seniman', 'seniman.id_kategori_seniman', '=', 'kategori_seniman.id_kategori_seniman')->where('id_seniman', '=', $senimanId)->limit(1)->get()[0]);
+            $senimanData['nik'] = Crypt::decrypt($senimanData['nik']);
             $dataShow = [
                 'userAuth'=>$request->input('user_auth'),
                 'senimanData'=>$senimanData,

@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Services;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Seniman;
 use App\Models\Perpanjangan;
@@ -14,7 +15,12 @@ class SenimanController extends Controller
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                 throw new Exception('ID Kategori harus di isi');
             }
-            $kategoriData = $this->kategoriFile(['id_kategori_seniman'=>$data['id_kategori']],'get');
+            $kategoriData = json_decode(Storage::disk('kategori_seniman')->get('kategori_seniman.json'), true);
+            foreach($kategoriData as $kategori){
+                if($kategori['id_kategori_seniman'] === $data['id_kategori']){
+                    $kategoriData = $kategori;
+                }
+            }
             //get last NIS
             date_default_timezone_set('Asia/Jakarta');
             if ($desc == 'diterima') {
@@ -35,7 +41,7 @@ class SenimanController extends Controller
             }else if($desc == 'perpanjangan'){
                 $nis = $kategoriData['singkatan_kategori'].'/'.$total.'/'.self::$constID.'/'.(date('Y')+1);
             }
-            return ['nis'=>$nis,'kategori'=>$data['id_kategori']];
+            return $nis;
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);
@@ -47,12 +53,10 @@ class SenimanController extends Controller
             }else{
                 $responseData = array(
                     'status' => 'error',
-                    'message' => $errorJson['message'],
+                    'message' => $errorJson->message,
                 );
             }
-            isset($errorJson['code']) ? http_response_code($errorJson['code']) : http_response_code(400);
-            echo json_encode($responseData);
-            exit();
+            return response()->json($responseData,isset($errorJson['code']) ? $errorJson['code'] : 400);
         }
     }
     public function prosesSeniman(Request $request){
@@ -76,7 +80,7 @@ class SenimanController extends Controller
             }
             $ketInput = $request->input('keterangan');
             $catatanInput = $request->input('catatan');
-            $seniman = Seniman::select('status')->whereRaw("BINARY id_seniman = ?",[$request->input('id_seniman')])->first();
+            $seniman = Seniman::select('status','id_kategori_seniman')->whereRaw("BINARY id_seniman = ?",[$request->input('id_seniman')])->first();
             if (!$seniman) {
                 return response()->json(['status' => 'error', 'message' => 'Seniman tidak ditemukan'], 400);
             }
@@ -95,10 +99,10 @@ class SenimanController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
-
             // Update the event using a raw query
             $updateQuery = Seniman::whereRaw("BINARY id_seniman = ?", [$request->input('id_seniman')])
             ->update([
+                'nomor_induk' => $ketInput == 'diterima' ? $this->generateNIS(['id_kategori'=>$seniman->id_kategori_seniman],'diterima') : '',
                 'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
                 'catatan' => ($ketInput == 'proses' || $ketInput == 'diterima') ? '' : $catatanInput,
             ]);

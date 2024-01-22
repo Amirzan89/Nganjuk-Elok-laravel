@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
 use App\Models\ListTempat;
 use App\Models\SewaTempat;
@@ -114,6 +115,7 @@ class SewaController extends Controller
             'status',
             'catatan'
         )->where('id_sewa', $sewaId)->limit(1)->get()[0]);
+        $sewaData['nik_sewa'] = Crypt::decrypt($sewaData['nik_sewa']);
         $dataShow = [
             'userAuth'=>$request->input('user_auth'),
             'sewaData'=>$sewaData,

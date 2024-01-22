@@ -33,6 +33,7 @@ class AdminController extends Controller
         }
     }
     public function updateProfile(Request $request){
+        $userAuth = $request->input('user_auth');
         $rules = [
             'email_new'=>'required|email',
             'nama_lengkap' => 'required|max:50',
@@ -43,7 +44,7 @@ class AdminController extends Controller
             'foto' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ];
         $messages = [
-            'email_new.required'=>'Email wajib di isi',
+            'email_new.required'=>'Email dvdsvsvwajib di isi',
             'email_new.email'=>'Email yang anda masukkan invalid',
             'nama_lengkap.required' => 'Nama peminjam wajib di isi',
             'nama_lengkap.max' => 'Nama peminjam maksimal 50 karakter',
@@ -61,7 +62,7 @@ class AdminController extends Controller
             'foto.mimes' => 'Format foto admin tidak valid. Gunakan format jpeg, png, jpg',
             'foto.max' => 'Ukuran foto admin tidak boleh lebih dari 5MB',
         ];
-        if($request->input('user_auth')['role'] !== 'super admin'){
+        if($userAuth['role'] !== 'super admin'){
             $rules = array_merge($rules, [
                 'role' => 'required|in:admin event, admin seniman, admin tempat',
             ]);
@@ -70,7 +71,12 @@ class AdminController extends Controller
                 'role.in' => 'Role tidak valid',
             ]);
         }
-        $validator = Validator::make($request->only('email_new', 'nama_lengkap', 'jenis_kelamin', 'no_telpon', 'tempat_lahir', 'tanggal_lahir', $request->input('user_auth')['role'] !== 'super admin' ? 'role' : '', 'foto'), $rules, $messages);
+        $validator = Validator::make(
+            $request->only('email_new', 'nama_lengkap', 'jenis_kelamin', 'no_telpon', 'tempat_lahir', 'tanggal_lahir', $userAuth['role'] !== 'super admin' ? 'role' : '', 'foto'),
+            $rules,
+            $messages
+        );
+        // $validator = Validator::make($request->only('email_new', 'nama_lengkap', 'jenis_kelamin', 'no_telpon', 'tempat_lahir', 'tanggal_lahir', 'foto'), $rules, $messages);
         if ($validator->fails()) {
             $errors = [];
             foreach ($validator->errors()->toArray() as $field => $errorMessages) {

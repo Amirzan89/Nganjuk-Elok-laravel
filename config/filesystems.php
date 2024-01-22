@@ -35,6 +35,11 @@ return [
             'root' => storage_path('app/event'),
             'throw' => false,
         ],
+        'kategori_seniman' => [
+            'driver' => 'local',
+            'root' => storage_path('app/kategori_seniman'),
+            'throw' => false,
+        ],
         'seniman' => [
             'driver' => 'local',
             'root' => storage_path('app/seniman'),

@@ -86,6 +86,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
     var csrfToken = "{{ csrf_token() }}";
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
+    var users = "{{ json_encode($userAuth) }}";
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -278,7 +279,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     </div>
 
                     <div class="text-center">
-                      <button type="button" class="btn btn-primary">Edit</button>
+                      <button type="submit" class="btn btn-primary">Edit</button>
                     </div>
                   </form><!-- End Profile Edit Form -->
 
@@ -361,8 +362,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
       document.querySelector('div#preloader').style.display = 'none';
     }
     function uploadEdit(event){
-      console.log('update profile');
-      return;
       event.preventDefault();
       if(uploadStat){
         return;
@@ -373,11 +372,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
       var inpTempat = document.querySelector("input[name='tempatL']").value;
       var inpTanggal = document.querySelector("input[name='tanggalL']").value;
       var inpEmail = document.querySelector("input[name='email']").value;
+      @if($userAuth['role'] != 'super admin')
+      var inpRole = document.querySelector("select[name='role']").value;
+      @endif
         //check data if edit or not
         if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpEmail === users.email){
           showRedPopup('Data belum diubah');
         }
-          var inpRole = document.querySelector("select[name='role']").value;
         //check data if edit or not
           if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpRole === users.role && inpEmail === users.email){
             showRedPopup('Data belum diubah');
