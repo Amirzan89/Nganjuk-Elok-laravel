@@ -371,43 +371,4 @@ class SenimanController extends Controller
         }
         return response()->json(['status' => 'success', 'message' => 'Data Seniman berhasil dihapus']);
     }
-    public function tambahPerpanjangan(Request $request){
-        //
-    }
-    public function hapusPerpanjangan(Request $request){
-        $validator = Validator::make($request->only('id_seniman'), [
-            'id_seniman' => 'required',
-        ], [
-            'id_seniman.required' => 'ID Seniman wajib di isi',
-        ]);
-        if ($validator->fails()) {
-            $errors = [];
-            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                $errors[$field] = $errorMessages[0];
-                break;
-            }
-            return response()->json(['status' => 'error', 'message' => $errors], 400);
-        }
-        //check data seniman
-        $seniman = Seniman::select('seniman.id_user', 'status','surat_ket_sewa')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
-        if (!$seniman) {
-            return response()->json(['status' => 'error', 'message' => 'Data Seniman tidak ditemukan'], 404);
-        }
-        //check status
-        if($seniman->status == 'proses'){
-            return response()->json(['status' => 'error', 'message' => 'Data Seniman sedang diproses'], 400);
-        }else if($seniman->status == 'diterima' || $seniman->status == 'ditolak'){
-            return response()->json(['status' => 'error', 'message' => 'Data Seniman sudah diverifikasi'], 400);
-        }
-        $destinationPath = storage_path('app/seniman/');
-        $fileToDelete = $destinationPath . $seniman->surat_ket_sewa;
-        if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
-            unlink($fileToDelete);
-        }
-        Storage::disk('seniman')->delete('/'.$seniman->surat_ket_sewa);
-        if (!Seniman::where('id_seniman',$request->input('id_seniman'))->delete()) {
-            return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Seniman'], 500);
-        }
-        return response()->json(['status' => 'success', 'message' => 'Data Seniman berhasil dihapus']);
-    }
 }

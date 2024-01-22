@@ -40,10 +40,8 @@ class PentasController extends Controller
             }
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
-        //get user
-        $idUser = User::select("id_user")->whereRaw("BINARY email = ?",[$request->input('email')])->limit(1)->get()[0]['id_user'];
         //check seniman
-        $seniman = Seniman::select('seniman.id_user', 'nomor_induk', 'status')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
+        $seniman = Seniman::select('seniman.id_user AS id_user', 'nomor_induk', 'status')->where('users.email', $request->input('email'))->where('seniman.id_seniman', $request->input('id_seniman'))->join('users', 'seniman.id_user', '=', 'users.id_user')->first();
         if(!$seniman){
             return response()->json(['status' => 'error', 'message' => 'Data seniman tidak ditemukan'], 404);
         }
@@ -67,7 +65,7 @@ class PentasController extends Controller
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'id_seniman'=> $request->input('id_seniman'),
-            'id_user' => $idUser,
+            'id_user' => $seniman->id_user,
         ]);
         if (!$tambahPentas) {
             return response()->json(['status' => 'error', 'message' => 'Gagal menambahkan data Surat Advis'], 500);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Mobile\Services\PentasController AS MobilePentasControl
 use App\Http\Controllers\Mobile\Services\SewaController AS MobileSewaController;
 use App\Http\Controllers\Mobile\Services\TempatController AS MobileTempatController;
 use App\Http\Controllers\Mobile\Services\SenimanController AS MobileSenimanController;
+use App\Http\Controllers\Mobile\Services\PerpanjanganController AS MobilePerpanjanganController;
 use App\Http\Controllers\Mobile\Auth\LoginController AS MobileLoginController;
 use App\Http\Controllers\Mobile\Auth\RegisterController AS MobileRegisterController;
 /*
@@ -34,9 +35,9 @@ Route::group(['prefix'=>'/mobile','middleware'=>'authorized'],function(){
         Route::delete('/delete', [MobileSenimanController::class,'hapusSeniman']);
     });
     Route::group(['prefix'=>'/perpanjangan'],function(){
-        Route::post('/tambah', [MobileSenimanController::class,'tambahPerpanjangan']);
-        Route::post('/edit', [MobileSenimanController::class,'editPerpanjangan']);
-        Route::delete('/delete', [MobileSenimanController::class,'hapusPerpanjangan']);
+        Route::post('/tambah', [MobilePerpanjanganController::class,'tambahPerpanjangan']);
+        Route::post('/edit', [MobilePerpanjanganController::class,'editPerpanjangan']);
+        Route::delete('/delete', [MobilePerpanjanganController::class,'hapusPerpanjangan']);
     });
     Route::group(['prefix'=>'/pentas'],function(){
         Route::post('/tambah', [MobilePentasController::class,'tambahPentas']);
