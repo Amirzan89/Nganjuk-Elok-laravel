@@ -26,7 +26,7 @@ class SenimanSeeder extends Seeder
         }
         foreach($masyarakatData as $user){
             Seniman::insert([
-                'nik'=>Crypt::encrypt(base64_encode(mt_rand(1000000000000000,9999999999999999))),
+                'nik'=>Crypt::encrypt(mt_rand(1000000000000000,9999999999999999)),
                 'nama_seniman'=>Str::random(30),
                 'jenis_kelamin'=>['laki-laki', 'perempuan'][rand(0, 1)],
                 'tempat_lahir'=>Str::random(30),

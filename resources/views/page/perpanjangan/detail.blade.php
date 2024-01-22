@@ -94,17 +94,17 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                 <form class="row g-3">
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="}} base64_decode($perpanjanganData['nik']) }}">
+                                        <input type="text" class="form-control" id="nik" readonly value="{{ $perpanjanganData['nik'] }}">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nama_seniman" class="form-label">Nama Lengkap</label>
-                                        <input type="text" class="form-control" id="nama_seniman" readonly value="}} $perpanjanganData['nama_seniman'] }}">
+                                        <input type="text" class="form-control" id="nama_seniman" readonly value="{{ $perpanjanganData['nama_seniman'] }}">
                                     </div>
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Seniman</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="}} $perpanjanganData['nomor_induk'] }}">
+                                        <input type="text" class="form-control" id="nik" readonly value="{{ $perpanjanganData['nomor_induk'] }}">
                                     </div>
                                     <br>
                                     <div class="col-12">
@@ -147,7 +147,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                         <div class="col-sm-10 text-end">
                                             <br>
                                             @if ($perpanjanganData['status'] == 'diajukan' || $perpanjanganData['status'] == 'proses')
-                                                <a href="/seniman/perpanjangan" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
+                                                <a href="/perpanjangan" class="btn btn-secondary" style="margin-right: 5px;"><i></i>kembali</a>
                                             @endif
                                             @if ($perpanjanganData['status'] == 'diajukan')
                                                 <button type="button" class="btn btn-tambah" style="margin-right: 5px;" onclick="openProses( {{ $perpanjanganData['id_seniman'] }})">Proses
@@ -180,9 +180,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/seniman/seniman" id="prosesForm" method="POST">
-                        <input type="hidden" name="id_perpanjangan" value="}} $id }}">
-                        <input type="hidden" name="id_seniman" id="inpSenimanP">
+                    <form onsubmit="proses(event, 'proses')">
+                        <input type="hidden" name="id_perpanjangan" value="{{ $perpanjanganData['id_perpanjangan'] }}">
                         <button type="submit" class="btn btn-tambah">Proses</button>
                     </form>
                 </div>
@@ -204,9 +203,8 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form action="/web/seniman/seniman" id="prosesForm" method="POST">
-                        <input type="hidden" name="id_perpanjangan" value="}} $id }}">
-                        <input type="hidden" name="id_seniman" id="inpSenimanS">
+                    <form onsubmit="proses(event, 'diterima')">
+                        <input type="hidden" name="id_perpanjangan" value="{{ $perpanjanganData['id_perpanjangan'] }}">
                         <button type="submit" class="btn btn-tambah">Terima</button>
                     </form>
                 </div>
@@ -230,7 +228,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     </div>
                     <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <input type="hidden" name="id_perpanjangan" value="}} $id }}">
+                        <input type="hidden" name="id_perpanjangan" value="{{ $perpanjanganData['id_perpanjangan'] }}">
                         <button type="submit" class="btn btn-tolak">Tolak</button>
                     </div>
                 </form>
@@ -251,9 +249,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
         var modalProses = document.getElementById('modalProses');
         var modalSetuju = document.getElementById('modalSetuju');
         var modalTolak = document.getElementById('modalTolak');
-        var inpSenimanP = document.getElementById('inpSenimanP');
-        var inpSenimanS = document.getElementById('inpSenimanS');
-        var inpSenimanT = document.getElementById('inpSenimanT');
         function showLoading(){
             document.querySelector('div#preloader').style.display = 'block';
         }
@@ -261,17 +256,14 @@ $tPath = app()->environment('local') ? '' : '/public/';
             document.querySelector('div#preloader').style.display = 'none';
         }
         function openProses(dataU, ) {
-            inpSenimanP.value = dataU;
             var myModal = new bootstrap.Modal(modalProses);
             myModal.show();
         }
         function openSetuju(dataU) {
-            inpSenimanS.value = dataU;
             var myModal = new bootstrap.Modal(modalSetuju);
             myModal.show();
         }
         function openTolak(dataU) {
-            inpSenimanT.value = dataU;
             var myModal = new bootstrap.Modal(modalTolak);
             myModal.show();
         }
@@ -379,7 +371,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 keterangan: ket,
                 catatan:catatan
             };
-            xhr.open('PUT', domain + "/perpanjangan/pengajuan")
+            xhr.open('PUT', domain + "/perpanjangan")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(JSON.stringify(requestBody));

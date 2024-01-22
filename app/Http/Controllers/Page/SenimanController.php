@@ -139,7 +139,7 @@ class SenimanController extends Controller
             return view('page.seniman.detail',$dataShow);
         }
         public function showPerpanjangan(Request $request){
-            $senimanData = $this->changeMonth(Perpanjangan::select('seniman.id_seniman AS id_seniman', 'id_perpanjangan', 'nama_seniman', DB::raw('DATE(perpanjangan.tgl_pembuatan) AS tanggal'), 'perpanjangan.status')->join('seniman', 'seniman.id_seniman', '=', 'perpanjangan.id_seniman')
+            $senimanData = $this->changeMonth(Perpanjangan::select('seniman.id_seniman AS id_seniman', 'id_perpanjangan', 'nama_seniman', DB::raw('DATE(perpanjangan.created_at) AS tanggal'), 'perpanjangan.status')->join('seniman', 'seniman.id_seniman', '=', 'perpanjangan.id_seniman')
             ->where(function ($query) {
                 $query->where('perpanjangan.status', 'diajukan')->orWhere('perpanjangan.status', 'proses');
             })->orderBy('id_perpanjangan', 'DESC')->get());
@@ -147,6 +147,23 @@ class SenimanController extends Controller
                 'userAuth'=>$request->input('user_auth'),
                 'senimanData'=>$senimanData,
             ];
-            return view('page.seniman.pengajuan',$dataShow);
+            return view('page.perpanjangan.perpanjangan',$dataShow);
+        }
+        public function showDetailPerpanjangan(Request $request, $perpanjannganId){
+            $perpanjanganData = $this->changeMonth(Perpanjangan::select(
+                'id_perpanjangan',
+                'seniman.id_seniman',
+                'perpanjangan.nik AS nik',
+                'nomor_induk',
+                'nama_seniman',
+                DB::raw('DATE(perpanjangan.created_at) AS tanggal'),
+                'perpanjangan.status AS status',
+            )->join('seniman', 'seniman.id_seniman', '=', 'perpanjangan.id_seniman')->where('id_perpanjangan', '=', $perpanjannganId)->limit(1)->get()[0]);
+            $perpanjanganData['nik'] = Crypt::decrypt($perpanjanganData['nik']);
+            $dataShow = [
+                'userAuth'=>$request->input('user_auth'),
+                'perpanjanganData'=>$perpanjanganData,
+            ];
+            return view('page.perpanjangan.detail',$dataShow);
         }
     }

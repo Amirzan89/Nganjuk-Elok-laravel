@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Services;
 use App\Http\Controllers\Controller;
+use App\Models\HistoriNis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -99,7 +100,7 @@ class SenimanController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
-            // Update the event using a raw query
+            // Update  seniman using a raw query
             $updateQuery = Seniman::whereRaw("BINARY id_seniman = ?", [$request->input('id_seniman')])
             ->update([
                 'nomor_induk' => $ketInput == 'diterima' ? $this->generateNIS(['id_kategori'=>$seniman->id_kategori_seniman],'diterima') : '',
@@ -147,13 +148,13 @@ class SenimanController extends Controller
                 return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
             }
             $ketInput = $request->input('keterangan');
-            $catatanInput = $request->input('catatan');
-            $perpanjangan = Seniman::select('status')->whereRaw("BINARY id_perpanjangan = ?",[$request->input('id_perpanjangan')])->first();
+
+            //check perpanjangan
+            $perpanjangan = Perpanjangan::select('id_seniman','status')->whereRaw("BINARY id_perpanjangan = ?",[$request->input('id_perpanjangan')])->first();
             if (!$perpanjangan) {
-                return response()->json(['status' => 'error', 'message' => 'Perpanjangan tidak ditemukan'], 400);
+                return response()->json(['status' => 'error', 'message' => 'Data Perpanjangan tidak ditemukan'], 400);
             }
             $statusDB = $perpanjangan->status;
-
             //check status
             if($ketInput ==  'proses' && ($statusDB == 'diterima' || $statusDB == 'ditolak')){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
@@ -168,16 +169,42 @@ class SenimanController extends Controller
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
 
-            // Update the event using a raw query
-            $updateQuery = Seniman::whereRaw("BINARY id_perpanjangan = ?", [$request->input('id_perpanjangan')])
-            ->update([
-                'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
-                'catatan' => ($ketInput == 'proses' || $ketInput == 'diterima') ? '' : $catatanInput,
-            ]);
-            if ($updateQuery <= 0) {
-                return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
+            //get nomor_induk, id_kategori
+            if($ketInput == 'proses'){
+                // Update perpanjangan status
+                $updateQuery = Perpanjangan::whereRaw("BINARY id_perpanjangan = ?", [$request->input('id_perpanjangan')])
+                ->update([
+                    'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
+                ]);
+                if ($updateQuery <= 0) {
+                    return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
+                }
+                return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
+            }else{
+                $seniman = Seniman::select('nomor_induk','id_kategori_seniman')->whereRaw("BINARY id_seniman = ?",[$perpanjangan->id_seniman])->first();
+                //add histori
+                $ins = HistoriNis::insert([
+                    'nis' => $seniman->nomor_induk,
+                    'tahun' => substr($seniman->nomor_induk, strrpos($seniman->nomor_induk, '/') + 1),
+                    'id_seniman' => $perpanjangan->id_seniman,
+                ]);
+                if(!$ins){
+                    return response()->json(['status'=>'error','message'=>'Gagal menambahkan data histori nis'], 500);
+                }
+                // Update  seniman nomor_induk
+                $updateQuery = Seniman::whereRaw("BINARY id_seniman = ?", [$perpanjangan->id_seniman])
+                ->update([
+                    'nomor_induk' => $this->generateNIS(['id_kategori'=>$seniman->id_kategori_seniman],'perpanjangan'),
+                ]);
+                if ($updateQuery <= 0) {
+                    return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
+                }
+                //delete perpanjangan
+                if (!Perpanjangan::where('id_perpanjangan',$request->input('id_perpanjangan'))->delete()) {
+                    return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Sewa Tempat'], 500);
+                }
+                return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
             }
-            return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
         }catch(Exception $e){
             $error = $e->getMessage();
             $errorJson = json_decode($error, true);

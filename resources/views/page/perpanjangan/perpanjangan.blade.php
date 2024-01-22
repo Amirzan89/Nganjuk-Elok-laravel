@@ -104,23 +104,23 @@ $tPath = app()->environment('local') ? '' : '/public/';
                   <div class="col-lg-12">
                     <div class="row">
                       <div class="col-lg-3">
-                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="<?php echo date('Y') ?>" oninput="tampilkanTahun()">
+                        <input type="text" name="" id="inpTahun" placeholder="Tahun" class="inp" value="{{ date('Y') }}" oninput="tampilkanTahun()">
                       </div>
                       <div class="col-lg-5">
-                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="<?php echo date('M')  ?>">
+                        <select id="inpBulan" onchange="tampilkanBulan()" class="inp" value="{{ date('M')  }}">
                           <option value="semua">semua</option>
-                          <option value="1" <?php echo (date('m') == 1) ? 'selected' : ''; ?> >Januari</option>
-                          <option value="2" <?php echo (date('m') == 2) ? 'selected' : ''; ?> >Februari</option>
-                          <option value="3" <?php echo (date('m') == 3) ? 'selected' : ''; ?> >Maret</option>
-                          <option value="4" <?php echo (date('m') == 4) ? 'selected' : ''; ?> >April</option>
-                          <option value="5" <?php echo (date('m') == 5) ? 'selected' : ''; ?> >Mei</option>
-                          <option value="6" <?php echo (date('m') == 6) ? 'selected' : ''; ?> >Juni</option>
-                          <option value="7" <?php echo (date('m') == 7) ? 'selected' : ''; ?> >Juli</option>
-                          <option value="8" <?php echo (date('m') == 8) ? 'selected' : ''; ?> >Agustus</option>
-                          <option value="9" <?php echo (date('m') == 9) ? 'selected' : ''; ?> >September</option>
-                          <option value="10" <?php echo (date('m') == 10) ? 'selected' : ''; ?> >Oktober</option>
-                          <option value="11" <?php echo (date('m') == 11) ? 'selected' : ''; ?> >November</option>
-                          <option value="12" <?php echo (date('m') == 12) ? 'selected' : ''; ?> >Desember</option>
+                          <option value="1" {{ (date('m') == 1) ? 'selected' : ''}} >Januari</option>
+                          <option value="2" {{ (date('m') == 2) ? 'selected' : ''}} >Februari</option>
+                          <option value="3" {{ (date('m') == 3) ? 'selected' : ''}} >Maret</option>
+                          <option value="4" {{ (date('m') == 4) ? 'selected' : ''}} >April</option>
+                          <option value="5" {{ (date('m') == 5) ? 'selected' : ''}} >Mei</option>
+                          <option value="6" {{ (date('m') == 6) ? 'selected' : ''}} >Juni</option>
+                          <option value="7" {{ (date('m') == 7) ? 'selected' : ''}} >Juli</option>
+                          <option value="8" {{ (date('m') == 8) ? 'selected' : ''}} >Agustus</option>
+                          <option value="9" {{ (date('m') == 9) ? 'selected' : ''}} >September</option>
+                          <option value="10" {{ (date('m') == 10) ? 'selected' : ''}} >Oktober</option>
+                          <option value="11" {{ (date('m') == 11) ? 'selected' : ''}} >November</option>
+                          <option value="12" {{ (date('m') == 12) ? 'selected' : ''}} >Desember</option>
                         </select>
                       </div>
                     </div>
@@ -152,7 +152,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                       </td>
                       <td>
                         @if ($seniman['status'] == 'diajukan')
-                          <button class="btn btn-lihat" onclick="proses({{ $seniman['id_seniman'] }},{{ $seniman['id_perpanjangan'] }})"><i class="bi bi-eye-fill"></i> Lihat</button>
+                          <button class="btn btn-lihat" onclick="proses({{ $seniman['id_perpanjangan'] }})"><i class="bi bi-eye-fill"></i> Lihat</button>
                         @elseif ($seniman['status'] == 'proses')
                           <a href="/perpanjangan/detail/{{ $seniman['id_perpanjangan'] }}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>
                         @endif
@@ -230,7 +230,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       function getActionButton(status, idSeniman, idPerpanjangan) {
         if (status == 'diajukan') {
-          return `<button class="btn btn-lihat" onclick="proses('${idSeniman}','${idPerpanjangan}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
+          return `<button class="btn btn-lihat" onclick="proses('${idPerpanjangan}')"><i class="bi bi-eye-fill"></i> Lihat</button>`;
         } else if (status == 'proses') {
           return `<a href="/seniman/detail_perpanjangan?id_perpanjangan=${idPerpanjangan}" class="btn btn-lihat"><i class="bi bi-eye-fill"></i> Lihat</a>`;
         }
@@ -256,7 +256,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         };
       }
       //open the request
-      xhr.open('POST', domain + "/web/seniman/seniman")
+      xhr.open('POST', domain + "/perpanjangan")
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.setRequestHeader('Content-Type', 'application/json');
       //send the form data

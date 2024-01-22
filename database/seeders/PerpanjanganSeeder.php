@@ -26,7 +26,7 @@ class PerpanjanganSeeder extends Seeder
         }
         foreach($masyarakatData as $user){
             Perpanjangan::insert([
-                'nik'=>Crypt::encrypt(base64_encode(mt_rand(1000000000000000,9999999999999999))),
+                'nik'=>Crypt::encrypt(mt_rand(1000000000000000,9999999999999999)),
                 'ktp_seniman'=>Str::random(30),
                 'pass_foto'=>Str::random(30),
                 'surat_keterangan'=>Str::random(30),

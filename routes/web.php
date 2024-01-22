@@ -42,7 +42,7 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     //perpanjangan route
     Route::group(['prefix'=>'/perpanjangan'],function(){
         Route::get('/', [ShowSenimanController::class,'showPerpanjangan']);
-        Route::put('/', [ShowSenimanController::class,'prosesPerpanjangan']);
+        Route::put('/', [SenimanController::class,'prosesPerpanjangan']);
         Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailPerpanjangan']);
     });
     //pentas route
