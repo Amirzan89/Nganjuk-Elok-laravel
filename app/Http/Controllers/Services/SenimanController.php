@@ -5,18 +5,37 @@ use App\Models\HistoriNis;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Models\KategoriSeniman;
 use App\Models\Seniman;
 use App\Models\Perpanjangan;
 use Exception;
 class SenimanController extends Controller
 {
     private static $constID = '411.302';
+    private static $jsonFile = storage_path('app/kategori_seniman/kategori_seniman.json');
     private function generateNIS($data,$desc){
         try{
+            //check if cache have kategori
+            // if(Redis::exists('kategori_seniman')){
+            //     $kategoriData = Redis::get('kategori_seniman');
+            // }else{
+                //get data from database
+                //     Redis::set('kategori_seniman', json_encode($kategoriData));
+                //     Redis::expire('kategori_seniman',604800); // 1 week
+                // }
             if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
                 throw new Exception('ID Kategori harus di isi');
             }
-            $kategoriData = json_decode(Storage::disk('kategori_seniman')->get('kategori_seniman.json'), true);
+            //if file is deleted will make new json file
+            if (!file_exists(self::$jsonFile)) {
+                $kategoriData = json_decode(KategoriSeniman::get(),true);
+                $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
+                if (!file_put_contents(self::$jsonFile, $jsonData)) {
+                    throw new Exception('Gagal menyimpan file sistem');
+                }
+            }else{
+                $kategoriData = json_decode(Storage::disk('kategori_seniman')->get('kategori_seniman.json'), true);
+            }
             foreach($kategoriData as $kategori){
                 if($kategori['id_kategori_seniman'] === $data['id_kategori']){
                     $kategoriData = $kategori;

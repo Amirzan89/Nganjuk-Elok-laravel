@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Mobile\Services;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
@@ -11,31 +12,58 @@ use App\Models\Seniman;
 use Carbon\Carbon;
 class SenimanController extends Controller
 {
+    private static $jsonFile = storage_path('app/kategori_seniman/kategori_seniman.json');
     private function kategori($data = null, $con){
-        //check if cache have kategori
-        // if(Redis::exists('kategori_seniman')){
-        //     $kategoriData = Redis::get('kategori_seniman');
-        // }else{
-            //get data from database
-            //     Redis::set('kategori_seniman', json_encode($kategoriData));
-            //     Redis::expire('kategori_seniman',604800); // 1 week
-            // }
-        $kategoriData = json_decode(KategoriSeniman::get(),true);
-        if($con == 'validation'){
-            $formattedKategoriData = [];
-            foreach ($kategoriData as $kategori) {
-                unset($kategori['id_kategori_seniman']);
-                unset($kategori['nama_kategori']);
-                $formattedKategoriData[] = implode(', ', $kategori);
+        try{
+            //check if cache have kategori
+            // if(Redis::exists('kategori_seniman')){
+            //     $kategoriData = Redis::get('kategori_seniman');
+            // }else{
+                //get data from database
+                //     Redis::set('kategori_seniman', json_encode($kategoriData));
+                //     Redis::expire('kategori_seniman',604800); // 1 week
+                // }
+            //if file is deleted will make new json file
+            if (!file_exists(self::$jsonFile)) {
+                $kategoriData = json_decode(KategoriSeniman::get(),true);
+                $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
+                if (!file_put_contents(self::$jsonFile, $jsonData)) {
+                    throw new Exception('Gagal menyimpan file sistem');
+                }
+            }else{
+                $kategoriData = json_decode(Storage::disk('kategori_seniman')->get('kategori_seniman.json'), true);
             }
-            return implode(', ', $formattedKategoriData);
-        }
-        if($con == 'singkatan'){
-            foreach($kategoriData as $key => $value){
-                if(isset($value['singkatan_kategori']) && $value['singkatan_kategori'] ==  $data){
-                    return $kategoriData[$key]['id_kategori_seniman'];
+            if($con == 'validation'){
+                $formattedKategoriData = [];
+                foreach ($kategoriData as $kategori) {
+                    unset($kategori['id_kategori_seniman']);
+                    unset($kategori['nama_kategori']);
+                    $formattedKategoriData[] = implode(', ', $kategori);
+                }
+                return implode(', ', $formattedKategoriData);
+            }
+            if($con == 'singkatan'){
+                foreach($kategoriData as $key => $value){
+                    if(isset($value['singkatan_kategori']) && $value['singkatan_kategori'] ==  $data){
+                        return $kategoriData[$key]['id_kategori_seniman'];
+                    }
                 }
             }
+        }catch(Exception $e){
+            $error = $e->getMessage();
+            $errorJson = json_decode($error, true);
+            if ($errorJson === null) {
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $error,
+                );
+            }else{
+                $responseData = array(
+                    'status' => 'error',
+                    'message' => $errorJson->message,
+                );
+            }
+            return response()->json($responseData,isset($errorJson['code']) ? $errorJson['code'] : 400);
         }
     }
     public function tambahSeniman(Request $request){
