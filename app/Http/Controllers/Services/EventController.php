@@ -47,6 +47,9 @@ class EventController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
+            if($ketInput == 'ditolak' && (empty($catatanInput) && is_null($catatanInput))){
+                return response()->json(['status' => 'error', 'message' => 'Catatan harus di isi !'], 400);
+            }
 
             // Update the event using a raw query
             $updateQuery = Events::whereRaw("BINARY id_event = ?", [$request->input('id_event')])

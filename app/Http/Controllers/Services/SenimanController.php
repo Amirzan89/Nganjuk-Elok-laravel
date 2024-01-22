@@ -100,6 +100,10 @@ class SenimanController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
+            if($ketInput == 'ditolak' && (empty($catatanInput) && is_null($catatanInput))){
+                return response()->json(['status' => 'error', 'message' => 'Catatan harus di isi !'], 400);
+            }
+
             // Update  seniman using a raw query
             $updateQuery = Seniman::whereRaw("BINARY id_seniman = ?", [$request->input('id_seniman')])
             ->update([
@@ -180,7 +184,18 @@ class SenimanController extends Controller
                     return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
                 }
                 return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
-            }else{
+            }else if($ketInput == 'ditolak'){
+                // Update perpanjangan status
+                $updateQuery = Perpanjangan::whereRaw("BINARY id_perpanjangan = ?", [$request->input('id_perpanjangan')])
+                ->update([
+                    'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
+                ]);
+                if ($updateQuery <= 0) {
+                    return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
+                }
+                return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
+                //
+            }else if($ketInput == 'diterima'){
                 $seniman = Seniman::select('nomor_induk','id_kategori_seniman')->whereRaw("BINARY id_seniman = ?",[$perpanjangan->id_seniman])->first();
                 //add histori
                 $ins = HistoriNis::insert([

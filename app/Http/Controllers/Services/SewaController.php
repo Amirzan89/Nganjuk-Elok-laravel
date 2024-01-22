@@ -47,6 +47,9 @@ class SewaController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
+            if($ketInput == 'ditolak' && (empty($catatanInput) && is_null($catatanInput))){
+                return response()->json(['status' => 'error', 'message' => 'Catatan harus di isi !'], 400);
+            }
 
             // Update the sewa using a raw query
             $updateQuery = SewaTempat::whereRaw("BINARY id_sewa = ?", [$request->input('id_sewa')])

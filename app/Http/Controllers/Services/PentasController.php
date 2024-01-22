@@ -47,6 +47,9 @@ class PentasController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
+            if($ketInput == 'ditolak' && (empty($catatanInput) && is_null($catatanInput))){
+                return response()->json(['status' => 'error', 'message' => 'Catatan harus di isi !'], 400);
+            }
 
             // Update the event using a raw query
             $updateQuery = SuratAdvis::whereRaw("BINARY id_advis = ?", [$request->input('id_pentas')])
