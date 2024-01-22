@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('kategori_seniman', function (Blueprint $table) {
             $table->id('id_kategori_seniman');
-            $table->string('nama_kategori');
-            $table->string('singkatan_kategori');
+            $table->string('nama_kategori',45);
+            $table->string('singkatan_kategori',6);
         });
     }
 

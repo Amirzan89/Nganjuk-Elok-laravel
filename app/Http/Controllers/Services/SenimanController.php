@@ -79,6 +79,108 @@ class SenimanController extends Controller
             return response()->json($responseData,isset($errorJson['code']) ? $errorJson['code'] : 400);
         }
     }
+    public function tambahKategoriSeniman(Request $request){
+        $validator = Validator::make($request->only('nama_tempat', 'alamat'), [
+            'nama_tempat' => 'required|max:50',
+            'alamat' => 'required|min:6|max:50',
+        ], [
+            'nama_tempat.required' => 'Nama kategori wajib di isi',
+            'alamat.required' => 'Alamat kategori wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        //get last id
+        $id = KategoriSeniman::select('id_kategori_seniman')->orderBy('id_kategori_seniman','DESC')->limit(1)->get()[0]['id_kategori_seniman'];
+        if (!$request->hasFile('foto')) {
+            return response()->json(['status'=>'error','message'=>'Foto kategori wajib di isi'], 400);
+        }
+        if(app()->environment('local')){
+            $destinationPath = public_path('img/kategori');
+        }else{
+            $destinationPath = base_path('../public_html/public/img/kategori/');
+        }
+        $foto = $request->file('foto');
+        $filename = $id . '.' . $foto->getClientOriginalExtension();
+        $foto->move($destinationPath, $filename);
+        $ins = KategoriSeniman::insert([
+            'nama_tempat'=>$request->input('nama_tempat'),
+            'alamat_tempat'=>$request->input('alamat'),
+            'deskripsi_tempat'=>$request->input('deskripsi'),
+            'pengelola'=>$request->input('nama_pengelola'),
+            'contact_person'=>$request->input('phone'),
+            'foto_tempat'=>'/'.$filename,
+        ]);
+        if(!$ins){
+            return response()->json(['status'=>'error','message'=>'Gagal menambahkan data Kategori Seniman'], 500);
+        }
+        return response()->json(['status'=>'success','message'=>'Data Kategori Seniman berhasil diperbarui']);
+    }
+    public function editTempat(Request $request){
+        $validator = Validator::make($request->only('id_kategori','nama_tempat', 'alamat', 'deskripsi', 'nama_pengelola', 'phone', 'foto'), [
+            'id_kategori' => 'required',
+            'nama_tempat' => 'required|min:6|max:50',
+        ], [
+            'id_kategori.required' => 'ID kategori seniman wajib di isi',
+            'nama_tempat.required' => 'Nama kategori wajib di isi',
+            'alamat.required' => 'Alamat kategori wajib di isi',
+            'deskripsi.required' => 'Deskripsi kategori wajib di isi',
+            'nama_pengelola.required' => 'Pengelola wajib di isi',
+            'phone.required' => 'Contact person wajib di isi',
+            'phone.digits_between' => 'Contact person tidak boleh lebih dari 13 karakter',
+            'phone.integer' => 'Contact person harus berupa angka',
+            'foto.required' => 'Foto kategori wajib di isi',
+            'foto.image' => 'Foto kategori harus berupa gambar',
+            'foto.mimes' => 'Format foto tidak valid. Gunakan format jpeg, png, jpg, atau gif',
+            'foto.max' => 'Ukuran foto tidak boleh lebih dari 5MB',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        $kategori = KategoriSeniman::find(['id_kategori' => $request->input('id_kategori_seniman')]);
+        if ($kategori) {
+            return response()->json(['status' =>'error','message'=>'Data Kategori Seniman tidak ditemukan'], 400);
+        }
+        $edit = $kategori->update([
+            'singkatan_kategori'=>strtoupper($request->input('singkatan')),
+            'nama_kategori_seniman'=>$request->input('singkatan'),
+        ]);
+        if(!$edit){
+            return response()->json(['status' =>'error','message'=>'Gagal memperbarui data Kategori Seniman'], 500);
+        }
+        return response()->json(['status' =>'success','message'=>'Data Kategori Seniman berhasil di perbarui']);
+    }
+    public function deleteTempat(Request $request){
+        $validator = Validator::make($request->only('id_kategori'), [
+            'id_kategori' => 'required',
+        ], [
+            'id_kategori.required' => 'ID kategori seniman wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        $kategori = KategoriSeniman::find(['id_kategori' => $request->input('id_kategori')]);
+        if (!$kategori) {
+            return response()->json(['status' => 'error', 'message' => 'Data Kategori Seniman tidak ditemukan'], 400);
+        }
+        $kategori->delete();
+        return response()->json(['status' => 'success', 'message' => 'Data Kategori Seniman berhasil dihapus']);
+    }
     public function prosesSeniman(Request $request){
         try{
             $validator = Validator::make($request->only('id_seniman','keterangan','catatan'), [
@@ -229,7 +331,7 @@ class SenimanController extends Controller
                 }
                 //delete perpanjangan
                 if (!Perpanjangan::where('id_perpanjangan',$request->input('id_perpanjangan'))->delete()) {
-                    return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Sewa Tempat'], 500);
+                    return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Sewa Kategori Seniman'], 500);
                 }
                 return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
             }
