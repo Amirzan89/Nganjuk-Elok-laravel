@@ -152,6 +152,7 @@ class SenimanController extends Controller
                 return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
             }
             $ketInput = $request->input('keterangan');
+            $catatanInput = $request->input('catatan');
 
             //check perpanjangan
             $perpanjangan = Perpanjangan::select('id_seniman','status')->whereRaw("BINARY id_perpanjangan = ?",[$request->input('id_perpanjangan')])->first();
@@ -172,30 +173,23 @@ class SenimanController extends Controller
             if($ketInput ==  'diterima' && $statusDB == 'ditolak'){
                 return response()->json(['status' => 'error', 'message' => 'Data sudah diverifikasi'], 400);
             }
+            if($ketInput == 'ditolak' && (empty($catatanInput) && is_null($catatanInput))){
+                return response()->json(['status' => 'error', 'message' => 'Catatan harus di isi !'], 400);
+            }
 
-            //get nomor_induk, id_kategori
-            if($ketInput == 'proses'){
+            if($ketInput == 'proses' || $ketInput == 'ditolak'){
                 // Update perpanjangan status
                 $updateQuery = Perpanjangan::whereRaw("BINARY id_perpanjangan = ?", [$request->input('id_perpanjangan')])
                 ->update([
                     'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
+                    'catatan' => ($ketInput == 'proses' || $ketInput == 'diterima') ? '' : $catatanInput
                 ]);
                 if ($updateQuery <= 0) {
                     return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
                 }
                 return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
-            }else if($ketInput == 'ditolak'){
-                // Update perpanjangan status
-                $updateQuery = Perpanjangan::whereRaw("BINARY id_perpanjangan = ?", [$request->input('id_perpanjangan')])
-                ->update([
-                    'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
-                ]);
-                if ($updateQuery <= 0) {
-                    return response()->json(['status' => 'error', 'message' => 'Status gagal diubah'], 500);
-                }
-                return response()->json(['status' => 'success', 'message' => 'Status berhasil diubah']);
-                //
             }else if($ketInput == 'diterima'){
+                //get nomor_induk, id_kategori
                 $seniman = Seniman::select('nomor_induk','id_kategori_seniman')->whereRaw("BINARY id_seniman = ?",[$perpanjangan->id_seniman])->first();
                 //add histori
                 $ins = HistoriNis::insert([
