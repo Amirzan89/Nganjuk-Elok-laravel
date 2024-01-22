@@ -10,14 +10,14 @@ return new class extends Migration
     {
         Schema::create('perpanjangan', function (Blueprint $table) {
             $table->id('id_perpanjangan');
-            $table->string('nik',50);
+            $table->string('nik',500);
             $table->text('ktp_seniman');
             $table->text('pass_foto');
             $table->text('surat_keterangan');
-            $table->date('tgl_pembuatan');
             $table->string('kode_verifikasi',45)->nullable();
             $table->enum('status',['diajukan','proses','diterima','ditolak']);
             $table->text('catatan')->nullable();
+            $table->timestamps();
             $table->unsignedBigInteger('id_seniman');
             $table->foreign('id_seniman')->references('id_seniman')->on('seniman')->onDelete('cascade');
             $table->unsignedBigInteger('id_user');

@@ -124,7 +124,7 @@ class SenimanController extends Controller
                     'message' => $errorJson->message,
                 );
             }
-            return response()->json($responseData,isset($errorJson['code']) ? $errorJson['code'] : 400); 
+            return response()->json($responseData,isset($errorJson['code']) ? $errorJson['code'] : 400);
         }
     }
     public function prosesPerpanjangan(Request $request){

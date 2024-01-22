@@ -33,6 +33,11 @@ Route::group(['prefix'=>'/mobile','middleware'=>'authorized'],function(){
         Route::post('/edit', [MobileSenimanController::class,'editSeniman']);
         Route::delete('/delete', [MobileSenimanController::class,'hapusSeniman']);
     });
+    Route::group(['prefix'=>'/perpanjangan'],function(){
+        Route::post('/tambah', [MobileSenimanController::class,'tambahPerpanjangan']);
+        Route::post('/edit', [MobileSenimanController::class,'editPerpanjangan']);
+        Route::delete('/delete', [MobileSenimanController::class,'hapusPerpanjangan']);
+    });
     Route::group(['prefix'=>'/pentas'],function(){
         Route::post('/tambah', [MobilePentasController::class,'tambahPentas']);
         Route::post('/edit', [MobilePentasController::class,'editPentas']);
