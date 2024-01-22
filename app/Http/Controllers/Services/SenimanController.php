@@ -12,7 +12,214 @@ use Exception;
 class SenimanController extends Controller
 {
     private static $constID = '411.302';
-    private static $jsonFile = storage_path('app/kategori_seniman/kategori_seniman.json');
+    private static $jsonFile;
+    public function __construct(){
+        self::$jsonFile = storage_path('app/kategori_seniman/kategori_seniman.json');
+    }
+    // private function kategoriCache($data, $con){
+    //     $fileExist = Redis::exists('kategori_seniman');
+    //     if($con == 'get'){
+    //         //get kategori seniman
+    //         $jsonData = json_decode(file_get_contents(self::$jsonFile), true);
+    //         $result = null;
+    //         foreach($jsonData as $key => $item){
+    //             if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+    //                 $result = $jsonData[$key];
+    //             }
+    //         }
+    //         if($result === null){
+    //             throw new Exception('Data kategori tidak ditemukan');
+    //         }
+    //         return $result;
+    //     }else if($con == 'tambah'){
+    //         //check if cache exist
+    //         if (!$fileExist) {
+    //             //if cache is delete will make new json cache
+    //             $kategoriData = json_decode(KategoriSeniman::get(),true);
+    //             Redis::set('kategori_seniman', json_encode($kategoriData, JSON_PRETTY_PRINT));
+    //             Redis::expire('kategori_seniman',604800);
+    //         }else{
+    //             //tambah kategori seniman
+    //             $jsonData = json_decode(Redis::get('kategori_seniman'),true);
+    //             $new[$data['id_kategori_seniman']] = $data;
+    //             $jsonData = array_merge($jsonData, $new);
+    //             Redis::set('kategori_seniman', json_encode($jsonData, JSON_PRETTY_PRINT));
+    //             Redis::expire('kategori_seniman',604800);
+    //         }
+    //     }else if($con == 'update'){
+    //         //update kategori seniman
+    //         $jsonData = json_decode(Redis::get('kategori_seniman'),true);
+    //         foreach($jsonData as $key => $item){
+    //             if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+    //                 $jsonData[$key] = $data;
+    //             }
+    //         }
+    //         $jsonData = array_values($jsonData);
+    //         Redis::set('kategori_seniman', json_encode($jsonData, JSON_PRETTY_PRINT));
+    //         Redis::expire('kategori_seniman',604800);
+    //     }else if($con == 'hapus'){
+    //         //hapus kategori seniman
+    //         $jsonData = json_decode(Redis::get('kategori_seniman'),true);
+    //         foreach($jsonData as $key => $item){
+    //             if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+    //                 unset($jsonData[$key]);
+    //             }
+    //         }
+    //         $jsonData = array_values($jsonData);
+    //         Redis::set('kategori_seniman', json_encode($jsonData, JSON_PRETTY_PRINT));
+    //         Redis::expire('kategori_seniman',604800);
+    //     }
+    // }
+    private function kategoriFile($data, $con){
+        $fileExist = file_exists(self::$jsonFile);
+        //check if file exist
+        if (!$fileExist) {
+            //if file is delete will make new json file
+            $kategoriData = json_decode(KategoriSeniman::get(),true);
+            if (!file_put_contents(self::$jsonFile,json_encode($kategoriData, JSON_PRETTY_PRINT))) {
+                throw new Exception('Gagal menyimpan file sistem');
+            }
+        }
+        if($con == 'get'){
+            //get kategori seniman
+            $jsonData = json_decode(file_get_contents(self::$jsonFile), true);
+            $result = null;
+            foreach($jsonData as $key => $item){
+                if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                    $result = $jsonData[$key];
+                }
+            }
+            if($result === null){
+                throw new Exception('Data kategori tidak ditemukan');
+            }
+            return $result;
+        }else if($con == 'tambah'){
+            //tambah kategori seniman
+            $jsonData = json_decode(file_get_contents(self::$jsonFile),true);
+            $new[$data['id_kategori_seniman']] = $data;
+            $jsonData = array_merge($jsonData, $new);
+            file_put_contents(self::$jsonFile,json_encode($jsonData, JSON_PRETTY_PRINT));
+        }else if($con == 'update'){
+            //update kategori seniman
+            $jsonData = json_decode(file_get_contents(self::$jsonFile),true);
+            foreach($jsonData as $key => $item){
+                if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                    $newData = [
+                        'id_kategori_seniman' => $data['id_kategori'],
+                        'nama_kategori' => $data['nama_kategori_seniman'],
+                        'singkatan_kategori' => $data['singkatan_kategori']
+                    ];
+                    $jsonData[$key] = $newData;
+                    break;
+                }
+            }
+            $jsonData = array_values($jsonData);
+            file_put_contents(self::$jsonFile,json_encode($jsonData, JSON_PRETTY_PRINT));
+        }else if($con == 'hapus'){
+            //hapus kategori seniman
+            $jsonData = json_decode(file_get_contents(self::$jsonFile),true);
+            foreach($jsonData as $key => $item){
+                if (isset($item['id_kategori_seniman']) && $item['id_kategori_seniman'] == $data['id_kategori']) {
+                    unset($jsonData[$key]);
+                }
+            }
+            $jsonData = array_values($jsonData);
+            file_put_contents(self::$jsonFile,json_encode($jsonData, JSON_PRETTY_PRINT));
+        }
+    }
+    public function tambahKategoriSeniman(Request $request){
+        $validator = Validator::make($request->only('nama', 'singkatan'), [
+            'nama' => 'required|max:45',
+            'singkatan' => 'required|max:6',
+        ], [
+            'nama.required' => 'Nama kategori wajib di isi',
+            'nama.max' => 'Nama kategori maksimal 45 karakter',
+            'singkatan.required' => 'Singkatan kategori wajib di isi',
+            'singkatan.max' => 'Singkatan kategori maksimal 6 karakter',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        $ins = KategoriSeniman::insertGetId([
+            'nama_kategori'=>$request->input('nama'),
+            'singkatan_kategori'=>strtoupper($request->input('singkatan')),
+        ]);
+        if(!$ins){
+            return response()->json(['status'=>'error','message'=>'Gagal menambahkan data Kategori Seniman'], 500);
+        }
+        $this->kategoriFile([
+            'id_kategori' => $ins,
+            'nama_kategori_seniman'=>$request->input('nama'),
+            'singkatan_kategori'=>strtoupper($request->input('singkatan'))
+        ],'tambah');
+        return response()->json(['status'=>'success','message'=>'Data Kategori Seniman berhasil diperbarui']);
+    }
+    public function editKategoriSeniman(Request $request){
+        $validator = Validator::make($request->only('id_kategori','nama', 'singkatan'), [
+            'id_kategori' => 'required',
+            'nama' => 'required|max:45',
+            'singkatan' => 'required|max:6',
+        ], [
+            'nama.required' => 'Nama kategori wajib di isi',
+            'nama.max' => 'Nama kategori maksimal 45 karakter',
+            'singkatan.required' => 'Singkatan kategori wajib di isi',
+            'singkatan.max' => 'Singkatan kategori maksimal 6 karakter',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        $kategori = KategoriSeniman::find(['id_kategori_seniman' => $request->input('id_kategori')]);
+        if (!$kategori) {
+            return response()->json(['status' =>'error','message'=>'Data Kategori Seniman tidak ditemukan'], 400);
+        }
+        $edit = KategoriSeniman::where('id_kategori_seniman',$request->input('id_kategori'))->update([
+            'nama_kategori'=>$request->input('nama'),
+            'singkatan_kategori'=>strtoupper($request->input('singkatan')),
+        ]);
+        if(!$edit){
+            return response()->json(['status' =>'error','message'=>'Gagal memperbarui data Kategori Seniman'], 500);
+        }
+        $this->kategoriFile([
+            'id_kategori' => $request->input('id_kategori'),
+            'nama_kategori_seniman' => $request->input('nama'),
+            'singkatan_kategori' => strtoupper($request->input('singkatan'))
+        ],'update');
+        return response()->json(['status' =>'success','message'=>'Data Kategori Seniman berhasil di perbarui']);
+    }
+    public function deleteKategoriSeniman(Request $request){
+        $validator = Validator::make($request->only('id_kategori'), [
+            'id_kategori' => 'required',
+        ], [
+            'id_kategori.required' => 'ID kategori seniman wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        $kategori = KategoriSeniman::find(['id_kategori_seniman' => $request->input('id_kategori')]);
+        if (!$kategori) {
+            return response()->json(['status' => 'error', 'message' => 'Data Kategori Seniman tidak ditemukan'], 400);
+        }
+        if (!KategoriSeniman::where('id_kategori_seniman',$request->input('id_kategori'))->delete()) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data kategori seniman'], 500);
+        }
+        $this->kategoriFile(['id_kategori' => $request->input('id_kategori')],'hapus');
+        return response()->json(['status' => 'success', 'message' => 'Data Kategori Seniman berhasil dihapus']);
+    }
     private function generateNIS($data,$desc){
         try{
             //check if cache have kategori
@@ -23,24 +230,7 @@ class SenimanController extends Controller
                 //     Redis::set('kategori_seniman', json_encode($kategoriData));
                 //     Redis::expire('kategori_seniman',604800); // 1 week
                 // }
-            if(!isset($data['id_kategori']) || empty($data['id_kategori'])){
-                throw new Exception('ID Kategori harus di isi');
-            }
-            //if file is deleted will make new json file
-            if (!file_exists(self::$jsonFile)) {
-                $kategoriData = json_decode(KategoriSeniman::get(),true);
-                $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
-                if (!file_put_contents(self::$jsonFile, $jsonData)) {
-                    throw new Exception('Gagal menyimpan file sistem');
-                }
-            }else{
-                $kategoriData = json_decode(Storage::disk('kategori_seniman')->get('kategori_seniman.json'), true);
-            }
-            foreach($kategoriData as $kategori){
-                if($kategori['id_kategori_seniman'] === $data['id_kategori']){
-                    $kategoriData = $kategori;
-                }
-            }
+            $kategoriData = $this->kategoriFile(['id_kategori'=>$data['id_kategori']],'get');
             //get last NIS
             date_default_timezone_set('Asia/Jakarta');
             if ($desc == 'diterima') {
@@ -78,108 +268,6 @@ class SenimanController extends Controller
             }
             return response()->json($responseData,isset($errorJson['code']) ? $errorJson['code'] : 400);
         }
-    }
-    public function tambahKategoriSeniman(Request $request){
-        $validator = Validator::make($request->only('nama_tempat', 'alamat'), [
-            'nama_tempat' => 'required|max:50',
-            'alamat' => 'required|min:6|max:50',
-        ], [
-            'nama_tempat.required' => 'Nama kategori wajib di isi',
-            'alamat.required' => 'Alamat kategori wajib di isi',
-        ]);
-        if ($validator->fails()) {
-            $errors = [];
-            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                $errors[$field] = $errorMessages[0];
-                break;
-            }
-            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
-        }
-        //get last id
-        $id = KategoriSeniman::select('id_kategori_seniman')->orderBy('id_kategori_seniman','DESC')->limit(1)->get()[0]['id_kategori_seniman'];
-        if (!$request->hasFile('foto')) {
-            return response()->json(['status'=>'error','message'=>'Foto kategori wajib di isi'], 400);
-        }
-        if(app()->environment('local')){
-            $destinationPath = public_path('img/kategori');
-        }else{
-            $destinationPath = base_path('../public_html/public/img/kategori/');
-        }
-        $foto = $request->file('foto');
-        $filename = $id . '.' . $foto->getClientOriginalExtension();
-        $foto->move($destinationPath, $filename);
-        $ins = KategoriSeniman::insert([
-            'nama_tempat'=>$request->input('nama_tempat'),
-            'alamat_tempat'=>$request->input('alamat'),
-            'deskripsi_tempat'=>$request->input('deskripsi'),
-            'pengelola'=>$request->input('nama_pengelola'),
-            'contact_person'=>$request->input('phone'),
-            'foto_tempat'=>'/'.$filename,
-        ]);
-        if(!$ins){
-            return response()->json(['status'=>'error','message'=>'Gagal menambahkan data Kategori Seniman'], 500);
-        }
-        return response()->json(['status'=>'success','message'=>'Data Kategori Seniman berhasil diperbarui']);
-    }
-    public function editTempat(Request $request){
-        $validator = Validator::make($request->only('id_kategori','nama_tempat', 'alamat', 'deskripsi', 'nama_pengelola', 'phone', 'foto'), [
-            'id_kategori' => 'required',
-            'nama_tempat' => 'required|min:6|max:50',
-        ], [
-            'id_kategori.required' => 'ID kategori seniman wajib di isi',
-            'nama_tempat.required' => 'Nama kategori wajib di isi',
-            'alamat.required' => 'Alamat kategori wajib di isi',
-            'deskripsi.required' => 'Deskripsi kategori wajib di isi',
-            'nama_pengelola.required' => 'Pengelola wajib di isi',
-            'phone.required' => 'Contact person wajib di isi',
-            'phone.digits_between' => 'Contact person tidak boleh lebih dari 13 karakter',
-            'phone.integer' => 'Contact person harus berupa angka',
-            'foto.required' => 'Foto kategori wajib di isi',
-            'foto.image' => 'Foto kategori harus berupa gambar',
-            'foto.mimes' => 'Format foto tidak valid. Gunakan format jpeg, png, jpg, atau gif',
-            'foto.max' => 'Ukuran foto tidak boleh lebih dari 5MB',
-        ]);
-        if ($validator->fails()) {
-            $errors = [];
-            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                $errors[$field] = $errorMessages[0];
-                break;
-            }
-            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
-        }
-        $kategori = KategoriSeniman::find(['id_kategori' => $request->input('id_kategori_seniman')]);
-        if ($kategori) {
-            return response()->json(['status' =>'error','message'=>'Data Kategori Seniman tidak ditemukan'], 400);
-        }
-        $edit = $kategori->update([
-            'singkatan_kategori'=>strtoupper($request->input('singkatan')),
-            'nama_kategori_seniman'=>$request->input('singkatan'),
-        ]);
-        if(!$edit){
-            return response()->json(['status' =>'error','message'=>'Gagal memperbarui data Kategori Seniman'], 500);
-        }
-        return response()->json(['status' =>'success','message'=>'Data Kategori Seniman berhasil di perbarui']);
-    }
-    public function deleteTempat(Request $request){
-        $validator = Validator::make($request->only('id_kategori'), [
-            'id_kategori' => 'required',
-        ], [
-            'id_kategori.required' => 'ID kategori seniman wajib di isi',
-        ]);
-        if ($validator->fails()) {
-            $errors = [];
-            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                $errors[$field] = $errorMessages[0];
-                break;
-            }
-            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
-        }
-        $kategori = KategoriSeniman::find(['id_kategori' => $request->input('id_kategori')]);
-        if (!$kategori) {
-            return response()->json(['status' => 'error', 'message' => 'Data Kategori Seniman tidak ditemukan'], 400);
-        }
-        $kategori->delete();
-        return response()->json(['status' => 'success', 'message' => 'Data Kategori Seniman berhasil dihapus']);
     }
     public function prosesSeniman(Request $request){
         try{
@@ -228,7 +316,7 @@ class SenimanController extends Controller
             // Update  seniman using a raw query
             $updateQuery = Seniman::whereRaw("BINARY id_seniman = ?", [$request->input('id_seniman')])
             ->update([
-                'nomor_induk' => $ketInput == 'diterima' ? $this->generateNIS(['id_kategori'=>$seniman->id_kategori_seniman],'diterima') : '',
+                'nomor_induk' => $ketInput == 'diterima' ? $this->generateNIS(['id_kategori' => $seniman->id_kategori_seniman],'diterima') : '',
                 'status' => $ketInput == 'proses' ? 'proses' : ($ketInput == 'diterima' ? 'diterima' : 'ditolak'),
                 'catatan' => ($ketInput == 'proses' || $ketInput == 'diterima') ? '' : $catatanInput,
             ]);

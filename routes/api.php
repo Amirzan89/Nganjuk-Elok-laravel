@@ -7,18 +7,10 @@ use App\Http\Controllers\Mobile\Services\SewaController AS MobileSewaController;
 use App\Http\Controllers\Mobile\Services\TempatController AS MobileTempatController;
 use App\Http\Controllers\Mobile\Services\SenimanController AS MobileSenimanController;
 use App\Http\Controllers\Mobile\Services\PerpanjanganController AS MobilePerpanjanganController;
+
 use App\Http\Controllers\Mobile\Auth\LoginController AS MobileLoginController;
 use App\Http\Controllers\Mobile\Auth\RegisterController AS MobileRegisterController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+
 Route::group(['prefix'=>'/mobile','middleware'=>'authorized'],function(){
     Route::group(['prefix'=>'/users'],function(){
         Route::post('/login', [MobileLoginController::class,'Login']);

@@ -104,7 +104,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                                     <br>
                                     <div class="col-md-12">
                                         <label for="nik" class="form-label">Nomor Induk Kependudukan</label>
-                                        <input type="text" class="form-control" id="nik" readonly value="{{ base64_decode($senimanData['nik']) }}">
+                                        <input type="text" class="form-control" id="nik" readonly value="{{ $senimanData['nik'] }}">
                                     </div>
                                     <br>
                                     <div class="col-md-12">

@@ -80,6 +80,11 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     Route::group(['prefix'=>'/admin'],function(){
         Route::post('/login',[LoginController::class,'Login']);
         Route::post('/logout',[AdminController::class,'logout']);
+        Route::group(['prefix'=>'/kategori_seniman'],function(){
+            Route::post('/tambah', [SenimanController::class,'tambahKategoriSeniman']);
+            Route::put('/edit', [SenimanController::class,'editKategoriSeniman']);
+            Route::delete('/delete', [SenimanController::class,'deleteKategoriSeniman']);
+        });
         Route::group(['prefix'=>'/update'],function(){
             Route::put('/profile', [AdminController::class, 'updateProfile']);
             Route::put('/password', [AdminController::class, 'updatePassword']);

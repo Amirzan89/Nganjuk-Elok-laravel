@@ -12,7 +12,10 @@ use App\Models\Seniman;
 use Carbon\Carbon;
 class SenimanController extends Controller
 {
-    private static $jsonFile = storage_path('app/kategori_seniman/kategori_seniman.json');
+    private static $jsonFile;
+    public function __construct(){
+        self::$jsonFile = storage_path('app/kategori_seniman/kategori_seniman.json');
+    }
     private function kategori($data = null, $con){
         try{
             //check if cache have kategori
@@ -26,8 +29,7 @@ class SenimanController extends Controller
             //if file is deleted will make new json file
             if (!file_exists(self::$jsonFile)) {
                 $kategoriData = json_decode(KategoriSeniman::get(),true);
-                $jsonData = json_encode($kategoriData, JSON_PRETTY_PRINT);
-                if (!file_put_contents(self::$jsonFile, $jsonData)) {
+                if (!file_put_contents(self::$jsonFile,json_encode($kategoriData, JSON_PRETTY_PRINT))) {
                     throw new Exception('Gagal menyimpan file sistem');
                 }
             }else{
