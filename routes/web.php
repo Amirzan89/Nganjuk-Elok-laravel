@@ -68,11 +68,11 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     //tempat route
     Route::group(['prefix'=>'/tempat'],function(){
         Route::get('/', [ShowTempatController::class,'showTempat']);
-        Route::get('/{id}', [ShowTempatController::class,'showDetailHome']);
         Route::get('/data', [ShowTempatController::class,'showData']);
         Route::get('/detail/{id}', [ShowTempatController::class,'showDetail']);
         Route::get('/tambah', [ShowTempatController::class,'showTambahTempat']);
         Route::get('/edit/{id}', [ShowTempatController::class,'showEditTempat']);
+        Route::get('/{id}', [ShowTempatController::class,'showDetailHome']);
         Route::post('/tambah', [TempatController::class,'tambahTempat']);
         Route::put('/edit',[TempatController::class,'editTempat']);
     });
