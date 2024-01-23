@@ -142,7 +142,6 @@ class JwtController extends Controller
                 //check email is exist on database
                 if(User::select("email")->whereRaw("BINARY email = ?",[$email])->limit(1)->exists()){
                     //check total login on website
-                    // return $this->checkTotalLoginWebsite(['email'=>$email]);
                     $number = $this->checkTotalLoginWebsite(['email'=>$email]);
                     $dataDb = User::select()->whereRaw("BINARY email = ?",[$email])->limit(1)->get();
                     $data = json_decode($dataDb,true)[0];
@@ -150,15 +149,16 @@ class JwtController extends Controller
                     if($number['data'] >= 3){
                         $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
                         $expRefresh = time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED'));
-                        $payloadRefresh = [ 'data'=>$data, 'exp'=>$expRefresh];
                         $secretKey = env('JWT_SECRET');
                         $secretRefreshKey = env('JWT_SECRET_REFRESH_TOKEN');
-                        $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
                         if(DB::table('refresh_token')->whereRaw("BINARY email = ? AND device = 'website' AND number = 1",[$email])->delete()){
                             for($i = 1; $i <= 3; $i++){
                                 DB::table('refresh_token')->whereRaw("BINARY email = ? AND device = 'website' AND number = $i",[$email])->update(['number'=>$i-1]);
                             }
-                            $payload = ['data'=>$data, 'number'=> 3, 'exp'=>$exp];
+                            $data['number'] = 3;
+                            $payloadRefresh = ['data' => $data, 'exp' => $expRefresh];
+                            $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
+                            $payload = ['data' => $data, 'exp' => $exp];
                             $token = JWT::encode($payload, $secretKey,'HS512');
                             $refreshToken->email = $email;
                             $refreshToken->token = $Rtoken;
@@ -184,18 +184,19 @@ class JwtController extends Controller
                     }else{
                         $exp = time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED'));
                         $expRefresh = time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED'));
-                        $payloadRefresh = [ 'data'=>$data, 'exp'=>$expRefresh];
                         $secretKey = env('JWT_SECRET');
                         $secretRefreshKey = env('JWT_SECRET_REFRESH_TOKEN');
-                        $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
                         $refreshToken->email = $email;
-                        $refreshToken->token = $Rtoken;
                         $refreshToken->device = 'website';
                         $refreshToken->id_user = $data['id_user'];
                         $number = $this->checkTotalLoginWebsite(['email'=>$email]);
                         if($number['status'] == 'error'){
+                            $data['number'] = 1;
+                            $payloadRefresh = ['data' => $data, 'exp' => $expRefresh];
+                            $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
                             $refreshToken->number = 1;
-                            $payload = [ 'data'=>$data, 'number'=> 1,'exp'=>$exp];
+                            $refreshToken->token = $Rtoken;
+                            $payload = [ 'data' => $data,'exp' => $exp];
                             $token = JWT::encode($payload, $secretKey,'HS512');
                             $json = [
                                 'status'=>'success',
@@ -206,7 +207,11 @@ class JwtController extends Controller
                                 ],
                                 'number' => 1];
                             }else{
-                                $payload = [ 'data'=>$data, 'number'=> $number['data']+1,'exp'=>$exp];
+                                $data['number'] = $number['data'] + 1;
+                                $payloadRefresh = [ 'data' => $data, 'exp' => $expRefresh];
+                                $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
+                                $refreshToken->token = $Rtoken;
+                                $payload = [ 'data' => $data, 'exp' => $exp];
                                 $token = JWT::encode($payload, $secretKey,'HS512');
                                 $refreshToken->number = $number['data']+1;
                                 $json = [
