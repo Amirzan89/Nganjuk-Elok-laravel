@@ -78,6 +78,14 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     });
     //admin route
     Route::group(['prefix'=>'/admin'],function(){
+        //page
+        Route::get('/',[ShowAdminController::class,'showAdmin']);
+        Route::get('/tambah',[ShowAdminController::class,'showAdminTambah']);
+        Route::get('/edit/{id}',[ShowAdminController::class,'showAdminEdit']);
+        // api
+        Route::post('/tambah',[AdminController::class,'tambahAdmin']);
+        Route::post('/edit',[AdminController::class,'editAdmin']);
+        Route::delete('/delete',[AdminController::class,'hapusAdmin']);
         Route::post('/login',[LoginController::class,'Login']);
         Route::post('/logout',[AdminController::class,'logout']);
         Route::group(['prefix'=>'/kategori_seniman'],function(){
@@ -93,7 +101,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     //download only for admin
     Route::group(['prefix'=>'/public'],function(){
         Route::group(['prefix'=>'/download'],function(){
-            Route::get('/foto',[AdminController::class,'getFotoAdmin'])->name('download.foto');
+            Route::get('/foto',[AdminController::class,'getFotoProfile'])->name('download.foto');
+            Route::get('/foto/{id}',[AdminController::class,'getFotoAdmin']);
         });
     });
     Route::get('/auth/redirect', 'Auth\LoginController@redirectToProvider');

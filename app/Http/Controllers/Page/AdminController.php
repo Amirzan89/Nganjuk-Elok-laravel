@@ -109,4 +109,30 @@ class AdminController extends Controller
         ];
         return view('page.profile',$dataShow);
     }
+    //only admin
+    public function showAdmin(Request $request){
+        $userAuth = $request->input('user_auth');
+        $adminData = User::select('id_user','nama_lengkap', 'no_telpon', 'jenis_kelamin', DB::raw('DATE(tanggal_lahir) AS tanggal_lahir'), 'tempat_lahir' ,'role', 'email')->whereNotIn('role', ['masyarakat', 'super admin'])->get();
+        $dataShow = [
+            'userAuth' => $userAuth,
+            'adminData' => $adminData ?? '',
+        ];
+        return view('page.admin.admin',$dataShow);
+    }
+    public function showAdminTambah(Request $request){
+        $userAuth = $request->input('user_auth');
+        $dataShow = [
+            'userAuth' => $userAuth,
+        ];
+        return view('page.admin.tambah',$dataShow);
+    }
+    public function showAdminEdit(Request $request, $idUser){
+        $userAuth = $request->input('user_auth');
+        $adminData = User::select('id_user','nama_lengkap', 'no_telpon', 'jenis_kelamin', DB::raw('DATE(tanggal_lahir) AS tanggal_lahir'), 'tempat_lahir' ,'role', 'email')->whereNotIn('role', ['masyarakat', 'super admin'])->whereRaw("BINARY id_user = ?",[$idUser])->limit(1)->get()[0];
+        $dataShow = [
+            'userAuth' => $userAuth,
+            'adminData' => $adminData ?? '',
+        ];
+        return view('page.admin.edit',$dataShow);
+    }
 }

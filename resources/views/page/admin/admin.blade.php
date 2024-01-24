@@ -1,6 +1,6 @@
-<?php
+@php
 $tPath = app()->environment('local') ? '' : '/public/';
-?>
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,34 +26,38 @@ $tPath = app()->environment('local') ? '' : '/public/';
 
   <!-- Template Main CSS File -->
   <link href="{{ asset($tPath.'assets/css/style.css') }}" rel="stylesheet">
-
+  <link href="{{ asset($tPath.'css/popup.css') }}" rel="stylesheet">
 </head>
 
 <body>
+  @if(app()->environment('local'))
   <script>
-    var csrfToken = "<?php echo $csrf ?>";
-    var email = "<?php echo $userAuth['email'] ?>";
-    var idUser = "<?php echo $userAuth['id_user'] ?>";
-    var number = "<?php echo $userAuth['number'] ?>";
-    var role = "<?php echo $userAuth['role'] ?>";
-    var dataUsers = <?php echo json_encode($users); ?>;
+    var tPath = '';
+    </script>
+  @else
+  <script>
+    var tPath = '/public/';
+    </script>
+  @endif
+  <script>
+    const domain = window.location.protocol + '//' + window.location.hostname + ":" + window.location.port;
+    var csrfToken = "{{ csrf_token() }}";
+    var email = "{{ $userAuth['email'] }}";
+    var number = "{{ $userAuth['number'] }}";
+    var dataUsers = {!! json_encode($adminData) !!};
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-
-    <?php
-    include(__DIR__ . '/header.php');
-    ?>
-
+    @include('component.header')
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-      <?php
-      $nav = 'admin';
-      include(__DIR__ . '/sidebar.php');
-      ?>
+      @php
+        $nav = 'admin';
+      @endphp
+      @include('component.sidebar')
     </ul>
 
   </aside><!-- End Sidebar-->
@@ -64,7 +68,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       <h1>Kelola Admin</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/dashboard.php">Beranda</a></li>
+          <li class="breadcrumb-item"><a href="/dashboard">Beranda</a></li>
           <li class="breadcrumb-item active">Kelola Admin</li>
         </ol>
       </nav>
@@ -75,7 +79,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Daftar Admin</h5>
-              <a href="/admin/tambah.php" class="btn btn-primary">
+              <a href="/admin/tambah" class="btn btn-primary">
                 <i class="bi bi-person-plus-fill"></i> Tambah Admin
               </a>
               <div class="col-lg-12">
@@ -91,25 +95,21 @@ $tPath = app()->environment('local') ? '' : '/public/';
                     </tr>
                   </thead>
                   <tbody>
-                    <?php
-                    // $query = mysqli_query($conn, "SELECT id_user, nama_lengkap, no_telpon, jenis_kelamin, DATE_FORMAT(tanggal_lahir, '%d %M %Y') AS tanggal_lahir, tempat_lahir, role, email  FROM users WHERE role = 'masyarakat'");
-                    $no = 1;
-                    foreach ($users as $user) {
-                    ?>
+                    @php $no = 1; @endphp
+                    @foreach ($adminData as $admin)
                       <tr>
-                        <td><?php echo $no ?></td>
-                        <td><?php echo $user['nama_lengkap'] ?></td>
-                        <td><?php echo $user['no_telpon'] ?></td>
-                        <td><?php echo $user['role'] ?></td>
-                        <td><?php echo $user['email'] ?></td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $admin['nama_lengkap'] }}</td>
+                        <td>{{ $admin['no_telpon'] }}</td>
+                        <td>{{ $admin['role'] }}</td>
+                        <td>{{ $admin['email'] }}</td>
                         <td>
-                          <button type="button" class="btn btn-lihat" onclick="openDetail(<?php echo $user['id_user'] ?>)"> <i class="bi bi-eye-fill"></i> Lihat</button>
-                          <a href="/admin/edit.php?id_user=<?= $user['id_user'] ?>" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
-                          <button type="button" class="btn btn-danger" onclick="openDelete(<?php echo $user['id_user'] ?>)"> <i class="bi bi-trash-fill"></i> Hapus</button>
+                          <button type="button" class="btn btn-lihat" onclick="openDetail({{ $admin['id_user'] }})"> <i class="bi bi-eye-fill"></i> Lihat</button>
+                          <a href="/admin/edit/{{ $admin['id_user'] }}" class="btn btn-edit"><i class="bi bi-pencil-fill"></i> Edit</a>
+                          <button type="button" class="btn btn-danger" onclick="openDelete({{ $admin['id_user'] }})"> <i class="bi bi-trash-fill"></i> Hapus</button>
                         </td>
                       </tr>
-                    <?php $no++;
-                    } ?>
+                    @endforeach
                   </tbody>
                 </table>
               </div>
@@ -129,8 +129,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <form method="" action="" enctype="" style="padding: 4px; padding-left: 4;">
-            <!-- <input type="hidden" name="csrf_token" value="<?php // echo $csrf
-                                                                ?>"> -->
             <div class="row mb-4">
               <label for="inputText" class="col-sm-2 col-form-label">Nama Lengkap</label>
               <div class="col-sm-10">
@@ -175,69 +173,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
       </div>
     </div>
     <!-- end modal detail -->
-        <!-- start modal edit -->
-        <div class="modal fade bd-example-modal-sm-12" id="editModal" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title"><strong>Edit Data Admin</strong></h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-              <form method="" action="" enctype="" style="padding: 4px; padding-left: 4;">
-                  <input type="hidden" name="_method" value="PUT">
-                  <input type="hidden" name="id_admin" value="<?php echo $userAuth['id_user']; ?>">
-                  <input type="hidden" name="id_user" value="<?php echo $users['id_user']; ?>">
-                  <input type="hidden" name="csrf_token" value="<?php echo $csrf?>">
-                    <div class="row mb-4">
-                      <label for="inputText" class="col-sm-2 col-form-label">Nama Lengkap</label>
-                      <div class="col-sm-10">
-                      <input type="text" class="form-control" name="nama" placeholder="Nama Lengkap" readonly>
-                      </div>
-                    </div>
-                    <div class="row mb-4">
-                      <label for="inputText" class="col-sm-2 col-form-label">No Handphone</label>
-                      <div class="col-sm-10">
-                      <input type="text" class="form-control" name="phone" placeholder="No Handphone" readonly>
-                      </div>
-                    </div>
-                    <div class="row mb-4">
-                      <label for="inputText" class="col-sm-2 col-form-label">Jenis Kelamin</label>
-                      <div class="col-sm-10">
-                      <input type="text" class="form-control" name="phone" placeholder="Jenis Kelamin" readonly>
-                      </div>
-                    </div>
-                    <div class="row mb-4">
-                      <label for="inputText" class="col-sm-2 col-form-label">Tempat / Tanggal Lahir</label>
-                      <div class="col-sm-10">
-                      <input type="text" class="form-control" name="phone" placeholder="Tempat / Tanggal Lahir" readonly>
-                      </div>
-                    </div>
-                    <div class="row mb-4">
-                      <label for="inputText" class="col-sm-2 col-form-label">Role</label>
-                      <div class="col-sm-10">
-                      <input type="text" class="form-control" name="phone" placeholder="Role" readonly>
-                      </div>
-                    </div>
-                    <div class="row mb-4">
-                      <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
-                      <div class="col-sm-10">
-                        <input type="email" class="form-control" name='email' placeholder="Email" readonly>
-                      </div>
-                    </div>
-                    <div class="row mb-4">
-                      <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-                      <div class="col-sm-10">
-                        <input type="password" class="form-control" name='pass' placeholder="Password" readonly>
-                      </div>
-                    </div>
-              </form>
-          <div class="modal-footer">
-            <button type="cancel" class="btn btn-tambah" data-bs-dismiss="modal">Kembali</button>
-          </div>
-        </div>
-      </div>
-    </div>
-     <!-- end modal edit -->
     <!-- start modal delete -->
     <div class="modal fade" id="modalDelete" tabindex="-1">
       <div class="modal-dialog">
@@ -251,9 +186,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <form action="/web/User.php" id="deleteForm" method="POST">
-              <input type="hidden" name="_method" value="DELETE">
-              <input type="hidden" name="id_admin" value="<?php echo $userAuth['id_user'] ?>">
+            <form onsubmit="proses(event)">
               <input type="hidden" name="id_user" id="inpUserDelete">
               <button type="submit" class="btn btn-tolak" name="hapusAdmin">Hapus</button>
             </form>
@@ -271,9 +204,13 @@ $tPath = app()->environment('local') ? '' : '/public/';
       &copy; Copyright <strong><span>Huffle Puff</span></strong>. All Rights Reserved
     </div>
   </footer>
+  <div id="preloader" style="display: none;"></div>
+  <div id="greenPopup" style="display:none"></div>
+    <div id="redPopup" style="display:none"></div>
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
     <i class="bi bi-arrow-up-short"></i>
   </a>
+  <script src="{{ asset($tPath.'/js/popup.js') }}"></script>
   <script>
     var modalDetail = document.getElementById('modalDetail');
     var inpNamaDetail = document.getElementById('inpNamaDetail');
@@ -284,7 +221,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
     var inpEmailDetail = document.getElementById('inpEmailDetail');
     var modalDelete = document.getElementById('modalDelete');
     var inpUserDelete = document.getElementById('inpUserDelete');
-
+    function showLoading(){
+      document.querySelector('div#preloader').style.display = 'block';
+    }
+    function closeLoading(){
+      document.querySelector('div#preloader').style.display = 'none';
+    }
     function openDetail(dataU) {
       dataUsers.forEach((dataUser) => {
         if (dataUser.id_user == dataU) {
@@ -305,6 +247,34 @@ $tPath = app()->environment('local') ? '' : '/public/';
       var myModal = new bootstrap.Modal(modalDelete);
       myModal.show();
     }
+    function proses(event) {
+      event.preventDefault();
+      var modals = '';
+      var inpUser = event.target.querySelector('[name="id_user"]').value;
+      var catatan = '';
+      showLoading();
+      var xhr = new XMLHttpRequest();
+      var requestBody = {
+        emailID: inpUser,
+      };
+      xhr.open('DELETE', domain + "/admin/delete")
+      xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.send(JSON.stringify(requestBody));
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            closeLoading();
+            var response = JSON.parse(xhr.responseText);
+            showGreenPopup(response);
+          } else {
+            closeLoading();
+            var response = JSON.parse(xhr.responseText);
+            showRedPopup(response);
+          }
+        }
+      }
+    }
   </script>
   <!-- Vendor JS Files -->
   <script src="{{ asset($tPath.'assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
@@ -313,7 +283,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
   <script src="{{ asset($tPath.'assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
 
   <!-- Template Main JS File -->
-  <script src="{{ asset($tPath.'assets/js/admin/main.js"></script>
+  <script src="{{ asset($tPath.'assets/js/admin/main.js') }}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var currentPageURL = window.location.href;

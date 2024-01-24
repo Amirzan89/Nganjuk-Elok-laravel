@@ -58,7 +58,7 @@ class TempatController extends Controller
         if(!$ins){
             return response()->json(['status'=>'error','message'=>'Gagal menambahkan data Tempat'], 500);
         }
-        return response()->json(['status'=>'success','message'=>'Data Tempat berhasil diperbarui']);
+        return response()->json(['status'=>'success','message'=>'Data Tempat berhasil ditambahkan']);
     }
     public function editTempat(Request $request){
         $validator = Validator::make($request->only('id_tempat','nama_tempat', 'alamat', 'deskripsi', 'nama_pengelola', 'phone', 'foto'), [

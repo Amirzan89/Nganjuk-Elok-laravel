@@ -471,7 +471,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
         imgText.innerText = 'Jatuhkan file';
         divImg.classList.add('drag');
       }else if(con == 'leave'){
-        imgText.innerText = 'Pilih atau jatuhkan file gambar tempat';
+        imgText.innerText = 'Pilih atau jatuhkan file Foto';
         divImg.classList.remove('drag');
       }
     }
