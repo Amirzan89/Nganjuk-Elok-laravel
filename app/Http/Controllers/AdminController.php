@@ -1,14 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 use App\Http\Controllers\Auth\JwtController;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\RefreshToken;
 use Carbon\Carbon;
+use Closure;
 class AdminController extends Controller
 {
     public function getFotoProfile(Request $request){
@@ -21,7 +23,11 @@ class AdminController extends Controller
             $defaultPhotoPath = $userAuth['jenis_kelamin'] == 'laki-laki' ? 'admin/default_boy.jpg' : 'admin/default_girl.png';
             return response()->download(storage_path('app/' . $defaultPhotoPath), 'foto.' . pathinfo($defaultPhotoPath, PATHINFO_EXTENSION));
         } else {
-            return response(Crypt::decrypt(file_get_contents(storage_path('app/admin/foto/' . $userAuth['foto']))));
+            $filePath = storage_path('app/admin/foto/' . $userAuth['foto']);
+            if (file_exists($filePath)) {
+                return response(Crypt::decrypt(file_get_contents($filePath)));
+            }
+            abort(404);
         }
     }
     public function getFotoAdmin(Request $request, $userID){
@@ -37,7 +43,11 @@ class AdminController extends Controller
             $defaultPhotoPath = $admin->jenis_kelamin == 'laki-laki' ? 'admin/default_boy.jpg' : 'admin/default_girl.png';
             return response()->download(storage_path('app/' . $defaultPhotoPath), 'foto.' . pathinfo($defaultPhotoPath, PATHINFO_EXTENSION));
         } else {
-            return response(Crypt::decrypt(file_get_contents(storage_path('app/admin/foto/' . $admin['foto']))));
+            $filePath = storage_path('app/admin/foto/' . $admin['foto']);
+            if (file_exists($filePath)) {
+                return response(Crypt::decrypt(file_get_contents($filePath)));
+            }
+            abort(404);
         }
     }
     public function tambahAdmin(Request $request){
@@ -179,7 +189,7 @@ class AdminController extends Controller
         if (!$admin) {
             return response()->json(['status' => 'error', 'message' => 'Data Admin tidak ditemukan'], 404);
         }
-        //process file pass foto
+        //process file foto
         if ($request->hasFile('foto')) {
             $file = $request->file('foto');
             if(!($file->isValid() && in_array($file->extension(), ['jpeg', 'png', 'jpg']))){
@@ -216,49 +226,49 @@ class AdminController extends Controller
     }
     public function updateProfile(Request $request){
         $userAuth = $request->input('user_auth');
-        $rules = [
-            'email_new'=>'required|email',
-            'nama_lengkap' => 'required|max:50',
-            'jenis_kelamin' => 'required|in:laki-laki,perempuan',
-            'no_telpon' => 'required|digits_between:13|integer',
-            'tempat_lahir' => 'required|max:45',
-            'tanggal_lahir' => ['required', 'date', 'before_or_equal:' . now()->toDateString()],
-            'foto' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-        ];
-        $messages = [
-            'email_new.required'=>'Email dvdsvsvwajib di isi',
-            'email_new.email'=>'Email yang anda masukkan invalid',
-            'nama_lengkap.required' => 'Nama admin wajib di isi',
-            'nama_lengkap.max' => 'Nama admin maksimal 50 karakter',
-            'jenis_kelamin.required' => 'Jenis kelamin wajib di isi',
-            'jenis_kelamin.in' => 'Jenis kelamin harus Laki-laki atau Perempuan',
-            'no_telpon.required' => 'Nomor telepon wajib di isi',
-            'no_telpon.digits_between' => 'Nomor telepon tidak boleh lebih dari 13 karakter',
-            'tempat_lahir.required' => 'Nama admin wajib di isi',
-            'tempat_lahir.max' => 'Nama admin maksimal 45 karakter',
-            'tanggal_lahir.required' => 'Tanggal lahir wajib di isi',
-            'tanggal_lahir.date' => 'Format tanggal lahir tidak valid',
-            'tanggal_lahir.before_or_equal' => 'Tanggal Lahir harus Sebelum dari tanggal sekarang',
-            'foto.required' => 'Foto Admin wajib di isi',
-            'foto.image' => 'Foto Admin harus berupa gambar',
-            'foto.mimes' => 'Format foto admin tidak valid. Gunakan format jpeg, png, jpg',
-            'foto.max' => 'Ukuran foto admin tidak boleh lebih dari 5MB',
-        ];
-        if($userAuth['role'] !== 'super admin'){
-            $rules = array_merge($rules, [
-                'role' => 'required|in:admin event, admin seniman, admin tempat',
-            ]);
-            $messages = array_merge($messages, [
-                'role.required' => 'Role wajib di isi',
-                'role.in' => 'Role tidak valid',
-            ]);
-        }
-        $validator = Validator::make(
-            $request->only('email_new', 'nama_lengkap', 'jenis_kelamin', 'no_telpon', 'tempat_lahir', 'tanggal_lahir', $userAuth['role'] !== 'super admin' ? 'role' : '', 'foto'),
-            $rules,
-            $messages
+        $validator = Validator::make($request->only('email_new', 'nama_lengkap', 'jenis_kelamin', 'no_telpon', 'tempat_lahir', 'tanggal_lahir', $userAuth['role'] !== 'super admin' ? 'role' : null, 'foto'),
+            [
+                'email_new'=>'nullable|email',
+                'nama_lengkap' => 'required|max:50',
+                'jenis_kelamin' => 'required|in:laki-laki,perempuan',
+                'no_telpon' => 'required|digits_between:11,13',
+                'tempat_lahir' => 'required|max:45',
+                'tanggal_lahir' => ['required', 'date', 'before_or_equal:' . now()->toDateString()],
+                function($attribute, $value, $parameters, $validator) use ($userAuth){
+                    if($userAuth['role'] !== 'super admin'){
+                        return ['role' => 'required|in:admin event, admin seniman, admin tempat'];
+                    }
+                    return [];
+                },
+                'foto' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+            ],[
+                'email_new.email'=>'Email yang anda masukkan invalid',
+                'nama_lengkap.required' => 'Nama admin wajib di isi',
+                'nama_lengkap.max' => 'Nama admin maksimal 50 karakter',
+                'jenis_kelamin.required' => 'Jenis kelamin wajib di isi',
+                'jenis_kelamin.in' => 'Jenis kelamin harus Laki-laki atau Perempuan',
+                'no_telpon.required' => 'Nomor telepon wajib di isi',
+                'no_telpon.digits_between' => 'Nomor telepon tidak boleh lebih dari 13 karakter',
+                'tempat_lahir.required' => 'Nama admin wajib di isi',
+                'tempat_lahir.max' => 'Nama admin maksimal 45 karakter',
+                'tanggal_lahir.required' => 'Tanggal lahir wajib di isi',
+                'tanggal_lahir.date' => 'Format tanggal lahir tidak valid',
+                'tanggal_lahir.before_or_equal' => 'Tanggal Lahir harus Sebelum dari tanggal sekarang',
+                function($attribute, $value, $parameters, $validator) use ($userAuth){
+                    if($userAuth['role'] !== 'super admin'){
+                        return [
+                            'role.required' => 'Role wajib di isi',
+                            'role.in' => 'Role tidak valid'
+                        ];
+                    }
+                    return [];
+                },
+                'foto.required' => 'Foto Admin wajib di isi',
+                'foto.image' => 'Foto Admin harus berupa gambar',
+                'foto.mimes' => 'Format foto admin tidak valid. Gunakan format jpeg, png, jpg',
+                'foto.max' => 'Ukuran foto admin tidak boleh lebih dari 5MB',
+            ],
         );
-        // $validator = Validator::make($request->only('email_new', 'nama_lengkap', 'jenis_kelamin', 'no_telpon', 'tempat_lahir', 'tanggal_lahir', 'foto'), $rules, $messages);
         if ($validator->fails()) {
             $errors = [];
             foreach ($validator->errors()->toArray() as $field => $errorMessages) {
@@ -268,59 +278,58 @@ class AdminController extends Controller
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         //check email
-        $user = User::select('email')->whereRaw("BINARY email = ?",[$request->input('user_auth')['email']])->first();
+        $user = User::select('email','foto')->whereRaw("BINARY email = ?",[$request->input('user_auth')['email']])->first();
         if (!$user) {
             return response()->json(['status' => 'error', 'message' => 'Admin tidak ditemukan'], 400);
         }
+        //process file foto
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            if(!($file->isValid() && in_array($file->extension(), ['jpeg', 'png', 'jpg']))){
+                return response()->json(['status'=>'error','message'=>'Format Foto tidak valid. Gunakan format jpeg, png, jpg'], 400);
+            }
+            $destinationPath = storage_path('app/admin/');
+            $fileToDelete = $destinationPath . $user['foto'];
+            if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
+                unlink($fileToDelete);
+            }
+            Storage::disk('admin')->delete('foto/'.$user['foto']);
+            $fotoName = $file->hashName();
+            $fileData = Crypt::encrypt(file_get_contents($file));
+            Storage::disk('admin')->put('foto/' . $fotoName, $fileData);
+        }
         //update profile
-        $updateProfile = $user->update([
-            'email' => $request->input('email_new'),
+        $updateProfile = User::whereRaw("BINARY email = ?",[$request->input('user_auth')['email']])->update([
+            'email'=> (empty($request->input('email_new')) || is_null($request->input('email_new'))) ? $request->input('user_auth')['email'] : $request->input('email_new'),
             'nama_lengkap' => $request->input('nama_lengkap'),
             'jenis_kelamin' => $request->input('jenis_kelamin'),
             'no_telpon' => $request->input('no_telpon'),
             'tempat_lahir' => $request->input('tempat_lahir'),
             'tanggal_lahir' => $request->input('tanggal_lahir'),
-            'role' => $request->input('role'),
-            'foto' => $request->input('foto'),
+            'role' => $userAuth['role'] !== 'super admin' ? $request->input('role') : $userAuth['role'],
+            'foto' => $request->hasFile('foto') ? $fotoName : $user['foto'],
             'updated_at'=> Carbon::now()
         ]);
         if (!$updateProfile) {
             return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui Profile'], 500);
         }
         //update cookie
-        return response()->json(['status' =>'success','message'=>'Profile berhasil di perbarui']);
-    }
-    public function hapusAdmin(Request $request){
-        $validator = Validator::make($request->only('emailID'), [
-            'emailID' => 'required',
-        ], [
-            'emailID.required' => 'Email ID wajib di isi',
-        ]);
-        if ($validator->fails()) {
-            $errors = [];
-            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                $errors[$field] = $errorMessages[0];
-                break;
+        $jwtController = new JWTController();
+        $data = $jwtController->createJWTWebsite($request->input('email_new'),new RefreshToken());
+        if(is_null($data)){
+            return response()->json(['status'=>'error','message'=>'create token error'],500);
+        }else{
+            if($data['status'] == 'error'){
+                return response()->json(['status'=>'error','message'=>$data['message']],400);
+            }else{
+                $data1 = ['email'=>$request->input('email_new'),'number'=>$data['number']];
+                $encoded = base64_encode(json_encode($data1));
+                return response()->json(['status'=>'success','message'=>'Profile Anda berhasil di perbarui'])
+                ->cookie('token1',$encoded,time()+intval(env('JWT_ACCESS_TOKEN_EXPIRED')))
+                ->cookie('token2',$data['data']['token'],time() + intval(env('JWT_ACCESS_TOKEN_EXPIRED')))
+                ->cookie('token3',$data['data']['refresh'],time() + intval(env('JWT_REFRESH_TOKEN_EXPIRED')));
             }
-            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
-        //check data Admin
-        $admin = User::select('foto')->find($request->input('emailID'));
-        if (!$admin) {
-            return response()->json(['status' => 'error', 'message' => 'Data Admin tidak ditemukan'], 404);
-        }
-        //delete foto
-        $destinationPath = storage_path('app/admin/');
-        $fileToDelete = $destinationPath . $admin->foto;
-        if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
-            unlink($fileToDelete);
-        }
-        Storage::disk('admin')->delete('foto/'.$admin->foto);
-
-        if (!User::where('id_user',$request->input('emailID'))->delete()) {
-            return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Admin'], 500);
-        }
-        return response()->json(['status' => 'success', 'message' => 'Data Admin berhasil dihapus']);
     }
     //update from profile
     public function updatePassword(Request $request){
@@ -388,6 +397,38 @@ class AdminController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui password admin'], 500);
         }
         return response()->json(['status' =>'success','message'=>'Password Admin berhasil di perbarui']);
+    }
+    public function hapusAdmin(Request $request){
+        $validator = Validator::make($request->only('emailID'), [
+            'emailID' => 'required',
+        ], [
+            'emailID.required' => 'Email ID wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        //check data Admin
+        $admin = User::select('foto')->find($request->input('emailID'));
+        if (!$admin) {
+            return response()->json(['status' => 'error', 'message' => 'Data Admin tidak ditemukan'], 404);
+        }
+        //delete foto
+        $destinationPath = storage_path('app/admin/');
+        $fileToDelete = $destinationPath . $admin->foto;
+        if (file_exists($fileToDelete) && !is_dir($fileToDelete)) {
+            unlink($fileToDelete);
+        }
+        Storage::disk('admin')->delete('foto/'.$admin->foto);
+
+        if (!User::where('id_user',$request->input('emailID'))->delete()) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal menghapus data Admin'], 500);
+        }
+        return response()->json(['status' => 'success', 'message' => 'Data Admin berhasil dihapus']);
     }
     public function logout(Request $request, JWTController $jwtController){
         $email = $request->input('email');

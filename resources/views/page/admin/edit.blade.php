@@ -257,6 +257,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
       }
       uploadStat = true;
       const formData = new FormData();
+      formData.append('_method', 'PUT');
       formData.append('email',email);
       formData.append('email_admin', inpEmail);
       formData.append('nama_lengkap', document.querySelector('input[name="nama"]').value);

@@ -84,7 +84,7 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/edit/{id}',[ShowAdminController::class,'showAdminEdit']);
         // api
         Route::post('/tambah',[AdminController::class,'tambahAdmin']);
-        Route::post('/edit',[AdminController::class,'editAdmin']);
+        Route::put('/edit',[AdminController::class,'editAdmin']);
         Route::delete('/delete',[AdminController::class,'hapusAdmin']);
         Route::post('/login',[LoginController::class,'Login']);
         Route::post('/logout',[AdminController::class,'logout']);

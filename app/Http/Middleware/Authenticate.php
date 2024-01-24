@@ -79,7 +79,7 @@ class Authenticate
                                 if($decodedRefresh['message'] == 'Expired token'){
                                     return redirect('/login')->withCookies([Cookie::forget('token1'),Cookie::forget('token2'),Cookie::forget('token3')]);
                                 }else if($decodedRefresh['message'] == 'invalid email'){
-                                    return redirect('/login')->withCookies([Cookie::forget('token1'),   Cookie::forget('token2'),Cookie::forget('token3')]);
+                                    return redirect('/login')->withCookies([Cookie::forget('token1'), Cookie::forget('token2'),Cookie::forget('token3')]);
                                 }
                             //if token refresh success decoded and not expired
                             }else{
@@ -158,7 +158,7 @@ class Authenticate
             }
         //if cookie gone
         }else{
-            $page = ['/dashboard','pengguna','/admin/tempat'];
+            $page = ['/dashboard','/profile','/pengguna','/admin/tempat'];
             $pagePrefix = ['/tempat',];
             if(Str::startsWith($currentPath, $pagePrefix) || in_array($currentPath,$page)){
                 if($request->hasCookie("token1")){

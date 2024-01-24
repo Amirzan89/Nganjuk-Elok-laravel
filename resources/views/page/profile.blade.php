@@ -86,7 +86,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
     var csrfToken = "{{ csrf_token() }}";
     var email = "{{ $userAuth['email'] }}";
     var number = "{{ $userAuth['number'] }}";
-    var users = "{{ json_encode($userAuth) }}";
+    var users = {!! json_encode($userAuth) !!};
   </script>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
@@ -363,9 +363,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
     }
     function uploadEdit(event){
       event.preventDefault();
-      if(uploadStat){
-        return;
-      }
       var inpNama = document.querySelector("input[name='nama']").value;
       var inpTLP = document.querySelector("input[name='phone']").value;
       var inpJenis = document.querySelector("input[name='jenisK']").value;
@@ -378,14 +375,12 @@ $tPath = app()->environment('local') ? '' : '/public/';
         //check data if edit or not
         if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpEmail === users.email){
           showRedPopup('Data belum diubah');
+          return;
         }
-        //check data if edit or not
-          if((fileImg === null || fileImg === '') && inpNama === users.nama_lengkap && inpTLP === users.no_telpon && inpJenis === users.jenis_kelamin && inpTempat === users.tempat_lahir && inpTanggal === users.tanggal_lahir && inpRole === users.role && inpEmail === users.email){
-            showRedPopup('Data belum diubah');
-          }
       uploadStat = true;
       showLoading();
       const formData = new FormData();
+      formData.append('_method', 'PUT');
       formData.append('email',email);
       formData.append('email_new', document.querySelector('input[name="email"]').value);
       formData.append('nama_lengkap', document.querySelector('input[name="nama"]').value);
@@ -400,13 +395,16 @@ $tPath = app()->environment('local') ? '' : '/public/';
         formData.append('foto', fileImg, fileImg.name);
       }
       const xhr = new XMLHttpRequest();
-      xhr.open('PUT', '/admin/update/profile', true);
+      xhr.open('POST', '/admin/update/profile', true);
       xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
       xhr.onload = function () {
         if (xhr.status === 200) {
           closeLoading();
           uploadStat = false;
           showGreenPopup(JSON.parse(xhr.responseText));
+          setTimeout(() => {
+              window.location.href = '/profile';
+            }, 1000);
           return;
         } else {
           closeLoading();
