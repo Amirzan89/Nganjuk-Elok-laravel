@@ -82,10 +82,10 @@ class MailController extends Controller
             }
             $data = ['name'=>$user->nama_lengkap,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink)];
             Mail::to($email)->send(new VerifyEmail($data));
-            return ['status'=>'Success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','code'=>200,'data'=>['waktu'=>Carbon::now()->addMinutes($userController->conditionOTP[0])]];
+            return ['status'=>'Success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','code'=>200,'data'=>['waktu'=>Carbon::now()->addMinutes(MasyarakatController::getConditionOTP()[0])]];
         }
         //checking if user have create verify email
-        $expTime = $userController->conditionOTP[($verify->send - 1)];
+        $expTime = MasyarakatController::getConditionOTP()[($verify->send - 1)];
         if (!Carbon::parse($verify->updated_at)->diffInMinutes(Carbon::now()) <= $expTime) {
             return ['status'=>'error','message'=>'Kami sudah mengirim email verifikasi ','data'=>true];
         }
@@ -139,13 +139,13 @@ class MailController extends Controller
             if($verify->save()){
                 $data = ['name'=>$user->nama_lengkap,'email'=>$email,'code'=>$verificationCode,'link'=>$verificationLink];
                 Mail::to($email)->send(new ForgotPassword($data));
-                return response()->json(['status'=>'success','message'=>'kami akan kirim kode ke anda silahkan cek email','data'=>['waktu'=>Carbon::now()->addMinutes($userController->conditionOTP[0])]]);
+                return response()->json(['status'=>'success','message'=>'kami akan kirim kode ke anda silahkan cek email','data'=>['waktu'=>Carbon::now()->addMinutes(MasyarakatController::getConditionOTP()[0])]]);
             }else{
                 return response()->json(['status'=>'error','message'=>'fail create forgot password'],500);
             }
         }
         //checking if user have create verify email
-        $expTime = $userController->conditionOTP[($verify->send - 1)];
+        $expTime = MasyarakatController::getConditionOTP()[($verify->send - 1)];
         if (!Carbon::parse($verify->updated_at)->diffInMinutes(Carbon::now()) <= $expTime) {
             return response()->json(['status'=>'error','message'=>'Kami sudah mengirim Otp silahkan cek mail anda ','data'=>true]);
         }
