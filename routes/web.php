@@ -17,6 +17,7 @@ use App\Http\Controllers\Page\SewaController AS ShowSewaController;
 use App\Http\Controllers\Page\TempatController AS ShowTempatController;
 use App\Http\Controllers\Page\AdminController AS ShowAdminController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Services\PreviewController;
 
 Route::group(['middleware'=>['auth','authorized']],function(){
     //event route
@@ -98,6 +99,13 @@ Route::group(['middleware'=>['auth','authorized']],function(){
             Route::put('/profile', [AdminController::class, 'updateProfile']);
             Route::put('/password', [AdminController::class, 'updatePassword']);
         });
+    });
+    //preview only for admin
+    Route::group(['prefix'=>'/prefiew'],function(){
+        Route::post('/event',[PreviewController::class,'previewEvent']);
+        Route::post('/sewa',[PreviewController::class,'previewSewaTempat']);
+        Route::post('/seniman',[PreviewController::class,'previewSeniman']);
+        Route::post('/perpanjangan',[PreviewController::class,'previewPerpanjangan']);
     });
     //download only for admin
     Route::group(['prefix'=>'/public'],function(){
