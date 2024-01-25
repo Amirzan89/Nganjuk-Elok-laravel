@@ -388,7 +388,6 @@ $tPath = app()->environment('local') ? '' : '/public/';
             var requestBody = {
                 email: email,
                 id_seniman: idSeniman,
-                item: 'seniman',
                 deskripsi: desc
             };
             //open the request

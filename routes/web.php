@@ -7,6 +7,7 @@ use App\Http\Controllers\Services\PentasController;
 use App\Http\Controllers\Services\SenimanController;
 use App\Http\Controllers\Services\SewaController;
 use App\Http\Controllers\Services\TempatController;
+use App\Http\Controllers\Services\DownloadController;
 
 use App\Http\Controllers\Page\HomeController AS ShowHomeController;
 use App\Http\Controllers\Page\EventController AS ShowEventController;
@@ -103,6 +104,10 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::group(['prefix'=>'/download'],function(){
             Route::get('/foto',[AdminController::class,'getFotoProfile'])->name('download.foto');
             Route::get('/foto/{id}',[AdminController::class,'getFotoAdmin']);
+            Route::post('/event',[DownloadController::class,'downloadEvent']);
+            Route::post('/sewa',[DownloadController::class,'downloadSewaTempat']);
+            Route::post('/seniman',[DownloadController::class,'downloadSeniman']);
+            Route::post('/perpanjangan',[DownloadController::class,'downloadPerpanjangan']);
         });
     });
     Route::get('/auth/redirect', 'Auth\LoginController@redirectToProvider');

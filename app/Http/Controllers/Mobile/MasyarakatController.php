@@ -3,24 +3,17 @@ namespace App\Http\Controllers\Mobile;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Auth\JwtController;
 use App\http\controllers\Mobile\Services\MailController;
-use App\Http\Controllers\Website\ChangePasswordController;
-use App\Http\Controllers\Website\NotificationPageController;
 use App\Models\User;
 use App\Models\Verifikasi;
 use App\Models\RefreshToken;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cookie;
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
-use Exception;
 class MasyarakatController extends Controller
 {
     private static $conditionOTP = [ 5, 15, 30, 60];
