@@ -1,18 +1,18 @@
 <?php
 namespace App\Http\Controllers\Mobile\Auth;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Mail\MailController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Mobile\MasyarakatController;
+use App\Http\Controllers\Mobile\Services\MailController;
 use App\Models\User;
-use App\Models\Verify;
+use App\Models\Verifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 class RegisterController extends Controller
 {
-    public function Register(Request $request, User $user, UserController $userController,MailController $mailController, Verify $verify){
-        $validator = Validator::make($request->all(), [
+    public function Register(Request $request, User $user, MasyarakatController $userController,MailController $mailController, Verifikasi $verify){
+        $validator = Validator::make($request->only('email','password','password_confirm'), [
             'email'=>'required | email',
             'password' => [
                 'required',
@@ -45,9 +45,10 @@ class RegisterController extends Controller
         if ($validator->fails()) {
             $errors = [];
             foreach ($validator->errors()->toArray() as $field => $errorMessages) {
-                $errors = $errorMessages[0];
+                $errors[$field] = $errorMessages[0];
+                break;
             }
-            return response()->json(['status' => 'error', 'message' => $errors], 400);
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
         $email = $request->input("email");
         $pass = $request->input("password");
@@ -57,7 +58,7 @@ class RegisterController extends Controller
         }else if($pass !== $pass1){
             return response()->json(['status'=>'error','message'=>'Password Harus Sama'],400);
         }else{
-            $result = $userController->createUser($request, $mailController,$user, $verify);
+            $result = $userController->createUser($request, $mailController, $verify);
             if($result['status'] == 'error'){
                 return response()->json(['status'=>'error','message'=>$result['message']],400);
             }else{

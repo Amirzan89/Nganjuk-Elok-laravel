@@ -126,7 +126,9 @@ class AdminController extends Controller
             'email'=>$request->input('email'),
             'password'=>Hash::make($request->input('password')),
             'foto'=>$fotoName,
-            'verifikasi'=>true
+            'verifikasi'=>true,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ]);
         if(!$ins){
             return response()->json(['status'=>'error','message'=>'Gagal menambahkan data Admin'], 500);
@@ -217,10 +219,11 @@ class AdminController extends Controller
             'role'=>$request->input('role'),
             'password'=> (empty($request->input('password')) || is_null($request->input('password'))) ? $admin['password']: Hash::make($request->input('password')),
             'foto' => $request->hasFile('foto') ? $fotoName : $admin['foto'],
-            'verifikasi'=>true
+            'verifikasi'=>true,
+            'updated_at' => Carbon::now(),
         ]);
         if (!$updatedAdmin) {
-            return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui data Seniman'], 500);
+            return response()->json(['status' => 'error', 'message' => 'Gagal memperbarui data Admin'], 500);
         }
         return response()->json(['status'=>'success','message'=>'Data Admin berhasil diperbarui']);
     }

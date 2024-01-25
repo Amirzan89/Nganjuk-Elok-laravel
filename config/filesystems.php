@@ -60,6 +60,11 @@ return [
             'root' => storage_path('app/admin'),
             'throw' => false,
         ],
+        'masyarakat' => [
+            'driver' => 'local',
+            'root' => storage_path('app/masyarakat'),
+            'throw' => false,
+        ],
 
         'public' => [
             'driver' => 'local',
