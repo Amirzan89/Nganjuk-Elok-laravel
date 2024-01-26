@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
+use App\Jobs\SendResetPassword;
+use App\Jobs\SendVerifyEmail;
 use App\Mail\ForgotPassword;
 use App\Mail\VerifyEmail;
 use Carbon\Carbon;
@@ -81,7 +83,8 @@ class MailController extends Controller
                 return ['status'=>'error','message'=>'fail create verify email','code'=>400];
             }
             $data = ['name'=>$user->nama_lengkap,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink)];
-            Mail::to($email)->send(new VerifyEmail($data));
+            dispatch(new SendVerifyEmail($data));
+            // Mail::to($email)->send(new VerifyEmail($data));
             return ['status'=>'Success','message'=>'Akun Berhasil Dibuat Silahkan verifikasi email','code'=>200,'data'=>['waktu'=>Carbon::now()->addMinutes(MasyarakatController::getConditionOTP()[0])]];
         }
         //checking if user have create verify email
@@ -98,7 +101,8 @@ class MailController extends Controller
         }
         $data = ['name'=>$user->nama_lengkap,'email'=>$email,'code'=>$verificationCode,'link'=>urldecode($verificationLink)];
         //resend email
-        Mail::to($email)->send(new VerifyEmail($data));
+        dispatch(new SendVerifyEmail($data));
+        // Mail::to($email)->send(new VerifyEmail($data));
         return ['status'=>'success','message'=>'success send verify email','data'=>['waktu'=>Carbon::now()->addMinutes($expTime)]];
     }
     //send email forgot password
@@ -138,7 +142,8 @@ class MailController extends Controller
             $verify->send = 1;
             if($verify->save()){
                 $data = ['name'=>$user->nama_lengkap,'email'=>$email,'code'=>$verificationCode,'link'=>$verificationLink];
-                Mail::to($email)->send(new ForgotPassword($data));
+                dispatch(new SendResetPassword($data));
+                // Mail::to($email)->send(new ForgotPassword($data));
                 return response()->json(['status'=>'success','message'=>'kami akan kirim kode ke anda silahkan cek email','data'=>['waktu'=>Carbon::now()->addMinutes(MasyarakatController::getConditionOTP()[0])]]);
             }else{
                 return response()->json(['status'=>'error','message'=>'fail create forgot password'],500);
@@ -157,7 +162,8 @@ class MailController extends Controller
             return response()->json(['status'=>'error','message'=>'fail create forgot password'],500);
         }else{
             $data = ['name'=>$user->nama_lengkap,'email'=>$email,'code'=>$verificationCode,'link'=>$verificationLink];
-            Mail::to($email)->send(new ForgotPassword($data));
+            dispatch(new SendResetPassword($data));
+            // Mail::to($email)->send(new ForgotPassword($data));
             return response()->json(['status'=>'success','message'=>'email benar kami kirim kode ke anda silahkan cek email','data'=>['waktu'=>Carbon::now()->addMinutes($expTime)]]);
         }
     }

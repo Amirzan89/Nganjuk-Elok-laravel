@@ -101,7 +101,7 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         });
     });
     //preview only for admin
-    Route::group(['prefix'=>'/prefiew'],function(){
+    Route::group(['prefix'=>'/preview'],function(){
         Route::post('/event',[PreviewController::class,'previewEvent']);
         Route::post('/sewa',[PreviewController::class,'previewSewaTempat']);
         Route::post('/seniman',[PreviewController::class,'previewSeniman']);
