@@ -1,8 +1,10 @@
 <?php
 namespace App\Http\Controllers\Services;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Seniman;
 use App\Models\Perpanjangan;
@@ -27,7 +29,7 @@ class DownloadController extends Controller
             }
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
-        $event = Events::select('ktp_seniman')->where('id_event',$request->input('id_event'))->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->limit(1)->get()[0];
+        $event = Events::select('nama_event','poster_event')->where('id_event',$request->input('id_event'))->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->limit(1)->get()[0];
         if (!$event) {
             return response()->json(['status' => 'error', 'message' => 'Data Event tidak ditemukan'], 404);
         }
@@ -35,7 +37,9 @@ class DownloadController extends Controller
         if (!file_exists($filePath)) {
             return response()->json(['status' => 'error', 'message' =>'Poster Event tidak ditemukan'], 404);
         }
-        return response(Crypt::decrypt(file_get_contents($filePath)));
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'decrypted_file');
+        file_put_contents($tempFilePath, Crypt::decrypt(Storage::disk('event')->get("poster_event/{$event->poster_event}")));
+        return Response::download($tempFilePath, $event->nama_event. '.' .pathinfo($event->poster_event, PATHINFO_EXTENSION));
     }
     public function downloadSewaTempat(Request $request){
         $validator = Validator::make($request->only('id_sewa','deskripsi'), [
@@ -54,7 +58,7 @@ class DownloadController extends Controller
             }
             return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
         }
-        $sewa = SewaTempat::select('surat_keterangan')->where('id_sewa',$request->input('id_sewa'))->limit(1)->get()[0];
+        $sewa = SewaTempat::select('nama_peminjam', 'surat_keterangan')->where('id_sewa',$request->input('id_sewa'))->limit(1)->get()[0];
         if (!$sewa) {
             return response()->json(['status' => 'error', 'message' => 'Data Sewa Tempat tidak ditemukan'], 404);
         }
@@ -62,7 +66,9 @@ class DownloadController extends Controller
         if (!file_exists($filePath)) {
             return response()->json(['status' => 'error', 'message' => 'Surat Keterangan tidak ditemukan'], 404);
         }
-        return response(Crypt::decrypt(file_get_contents($filePath)));
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'decrypted_file');
+        file_put_contents($tempFilePath, Crypt::decrypt(Storage::disk('sewa')->get("surat_keterangan/{$sewa->surat_keterangan}")));
+        return Response::download($tempFilePath, $sewa->nama_peminjam. '.' .pathinfo($sewa->surat_keterangan, PATHINFO_EXTENSION));
     }
     public function downloadSeniman(Request $request){
         $validator = Validator::make($request->only('id_seniman','deskripsi'), [
@@ -90,7 +96,7 @@ class DownloadController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Deskripsi invalid'], 400);
         }
         $field = $deskripsi[$request->input('deskripsi')];
-        $seniman = Seniman::select($field)->where('id_seniman',$request->input('id_seniman'))->limit(1)->get()[0];
+        $seniman = Seniman::select('nama_seniman', $field)->where('id_seniman',$request->input('id_seniman'))->limit(1)->get()[0];
         if (!$seniman) {
             return response()->json(['status' => 'error', 'message' => 'Data Seniman tidak ditemukan'], 404);
         }
@@ -98,7 +104,9 @@ class DownloadController extends Controller
         if (!file_exists($filePath)) {
             return response()->json(['status' => 'error', 'message' => ucfirst($field) . ' tidak ditemukan'], 404);
         }
-        return response(Crypt::decrypt(file_get_contents($filePath)));
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'decrypted_file');
+        file_put_contents($tempFilePath, Crypt::decrypt(Storage::disk('seniman')->get("{$field}/{$seniman->$field}")));
+        return Response::download($tempFilePath, $seniman->nama_seniman. '.' .pathinfo($seniman->$field, PATHINFO_EXTENSION));
     }
     public function downloadPerpanjangan(Request $request){
         $validator = Validator::make($request->only('id_perpanjangan','deskripsi'), [
@@ -126,7 +134,7 @@ class DownloadController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Deskripsi invalid'], 400);
         }
         $field = $deskripsi[$request->input('deskripsi')];
-        $perpanjangan = Perpanjangan::select($field)->where('id_perpanjangan',$request->input('id_perpanjangan'))->limit(1)->get()[0];
+        $perpanjangan = Perpanjangan::select('nama_seniman', $field)->where('id_perpanjangan',$request->input('id_perpanjangan'))->join('seniman', 'perpanjangan.id_seniman', '=', 'seniman.id_seniman')->limit(1)->get()[0];
         if (!$perpanjangan) {
             return response()->json(['status' => 'error', 'message' => 'Data Perpanjangan tidak ditemukan'], 404);
         }
@@ -134,6 +142,8 @@ class DownloadController extends Controller
         if (!file_exists($filePath)) {
             return response()->json(['status' => 'error', 'message' => ucfirst($field) . ' tidak ditemukan'], 404);
         }
-        return response(Crypt::decrypt(file_get_contents($filePath)));
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'decrypted_file');
+        file_put_contents($tempFilePath, Crypt::decrypt(Storage::disk('perpanjangan')->get("{$field}/{$perpanjangan->$field}")));
+        return Response::download($tempFilePath,'perpanjangan ' . $perpanjangan->nama_seniman. '.' .pathinfo($perpanjangan->$field, PATHINFO_EXTENSION));
     }
 }
