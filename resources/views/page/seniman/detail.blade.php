@@ -362,7 +362,7 @@ $tPath = app()->environment('local') ? '' : '/public/';
                 deskripsi: desc
             };
             //open the request
-            xhr.open('POST', domain + "/preview")
+            xhr.open('POST', domain + "/preview/seniman")
             xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
             xhr.setRequestHeader('Content-Type', 'application/json');
             //send the form data
