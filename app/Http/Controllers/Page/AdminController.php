@@ -59,6 +59,22 @@ class AdminController extends Controller
         }
         return $inpDate;
     }
+    public function showPengguna(Request $request){
+        $dataUser = User::select(
+            'id_user',
+            'nama_lengkap',
+            'no_telpon',
+            'jenis_kelamin',
+            DB::raw('DATE(tanggal_lahir) AS tanggal_lahir'),
+            'email',
+        )->where('role', 'masyarakat')->get();
+        unset($request->input('user_auth')['foto']);
+        $dataShow = [
+            'userAuth' => $request->input('user_auth'),
+            'dataUser' => $dataUser,
+        ];
+        return view('page.pengguna.pengguna',$dataShow);
+    }
     public function showDashboard(Request $request){
         $totalAdmin = User::whereNotIn('role', ['super admin', 'masyarakat'])->count();
         $totalPengguna = User::where('role','masyarakat')->count();
@@ -69,15 +85,15 @@ class AdminController extends Controller
             'nama_kegiatan_sewa',
             DB::raw('DATE(tgl_awal_peminjaman) AS start_date'),
             DB::raw('DATE(tgl_akhir_peminjaman) AS end_date')
-            )->where('status', 'diajukan')->get();
-            foreach($dataKalenderQuery as $data){
-                $sewa = array(
-                'id' => $data['id_sewa'],
-                'title' => $data['nama_kegiatan_sewa'],
-                'peminjam' => $data['nama_peminjam'],
-                'nama_tempat' => $data['nama_tempat'],
-                'start' => $data['start_date'],
-                'end' => $data['end_date'],
+        )->where('status', 'diajukan')->get();
+        foreach($dataKalenderQuery as $data){
+            $sewa = array(
+            'id' => $data['id_sewa'],
+            'title' => $data['nama_kegiatan_sewa'],
+            'peminjam' => $data['nama_peminjam'],
+            'nama_tempat' => $data['nama_tempat'],
+            'start' => $data['start_date'],
+            'end' => $data['end_date'],
             );
             $dataKalender[] = $sewa;
         }

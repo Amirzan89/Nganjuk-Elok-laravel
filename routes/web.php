@@ -123,6 +123,7 @@ Route::group(['middleware'=>['auth','authorized']],function(){
     Route::get('/login', function () {
         return view('page.login');
     })->withoutMiddleware('authorized');
+    Route::get('/pengguna',[ShowAdminController::class,'showPengguna']);
     Route::get('/dashboard',[ShowAdminController::class,'showDashboard']);
     Route::get('/profile',[ShowAdminController::class,'showProfile']);
     Route::get('/event/semua',[ShowHomeController::class,'showHome1'])->withoutMiddleware('authorized');
