@@ -56,6 +56,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowPentasController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowPentasController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowPentasController::class,'showDetail']);
+        Route::post('/pengajuan', [PentasController::class,'getPentasPengajuan']);
+        Route::post('/riwayat', [PentasController::class,'getPentasRiwayat']);
         Route::put('/pengajuan', [PentasController::class,'prosesPentas']);
         Route::put('/riwayat', [PentasController::class,'prosesPentas']);
     });
