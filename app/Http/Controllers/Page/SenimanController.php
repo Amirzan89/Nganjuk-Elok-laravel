@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
@@ -57,6 +58,93 @@ class SenimanController extends Controller
             $inpDate = $processedData;
         }
         return $inpDate;
+    }
+    public function getSenimanPengajuan(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $seniman = Seniman::select('id_seniman', 'nama_seniman', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'diajukan')->orWhere('status', 'proses');
+            })->orderBy('id_seniman','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal')); 
+            $seniman = Seniman::select('id_seniman', 'nama_seniman', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'diajukan')->orWhere('status', 'proses');
+            })->whereRaw('MONTH(updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(updated_at) = ?',[$tanggal[1]])->orderBy('id_seniman','DESC')->get();
+        }
+        if (!$seniman) {
+            return response()->json(['status' => 'error', 'message' => 'Data surat advis tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($seniman)]);
+    }
+    public function getSenimanRiwayat(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $seniman = Seniman::select('id_seniman', 'nama_seniman', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'ditolak')->orWhere('status', 'diterima');
+            })->orderBy('id_seniman','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal'));
+            $seniman = Seniman::select('id_seniman', 'nama_seniman', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'ditolak')->orWhere('status', 'diterima');
+            })->whereRaw('MONTH(updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(updated_at) = ?',[$tanggal[1]])->orderBy('id_seniman','DESC')->get();
+        }
+        if (!$seniman) {
+            return response()->json(['status' => 'error', 'message' => 'Data surat advis tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($seniman)]);
+    }
+    public function getPerpanjangan(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $perpanjangan = Perpanjangan::select('seniman.id_seniman AS id_seniman', 'id_perpanjangan', 'nama_seniman', DB::raw('DATE(perpanjangan.created_at) AS tanggal'), 'perpanjangan.status')->where(function ($query) {
+                $query->where('perpanjangan.status', 'diajukan')->orWhere('perpanjangan.status', 'proses');
+            })->join('seniman', 'seniman.id_seniman', '=', 'perpanjangan.id_seniman')->orderBy('id_perpanjangan','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal'));
+            $perpanjangan = Perpanjangan::select('seniman.id_seniman AS id_seniman', 'id_perpanjangan', 'nama_seniman', DB::raw('DATE(perpanjangan.created_at) AS tanggal'), 'perpanjangan.status')->where(function ($query) {
+                $query->where('perpanjangan.status', 'diajukan')->orWhere('perpanjangan.status', 'proses');
+            })->whereRaw('MONTH(perpanjangan.updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(perpanjangan.updated_at) = ?',[$tanggal[1]])->join('seniman', 'seniman.id_seniman', '=', 'perpanjangan.id_seniman')->orderBy('id_perpanjangan','DESC')->get();
+        }
+        if (!$perpanjangan) {
+            return response()->json(['status' => 'error', 'message' => 'Data surat advis tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($perpanjangan)]);
     }
     public function showSeniman(Request $request){
         $totalPengajuan = Seniman::where('status', 'diajukan')->orWhere('status', 'proses')->count();

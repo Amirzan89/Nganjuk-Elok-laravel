@@ -40,12 +40,15 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/riwayat', [ShowSenimanController::class,'showRiwayat']);
         Route::get('/data',[ShowSenimanController::class,'showData']);
         Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailSeniman']);
+        Route::post('/pengajuan', [ShowSenimanController::class,'getSenimanPengajuan']);
+        Route::post('/riwayat', [ShowSenimanController::class,'getSenimanRiwayat']);
         Route::put('/pengajuan', [SenimanController::class,'prosesSeniman']);
         Route::put('/riwayat', [SenimanController::class,'prosesSeniman']);
     });
     //perpanjangan route
     Route::group(['prefix'=>'/perpanjangan'],function(){
         Route::get('/', [ShowSenimanController::class,'showPerpanjangan']);
+        Route::post('/', [ShowSenimanController::class,'getPerpanjangan']);
         Route::put('/', [SenimanController::class,'prosesPerpanjangan']);
         Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailPerpanjangan']);
     });
