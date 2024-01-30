@@ -27,8 +27,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowEventController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowEventController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowEventController::class,'showDetail']);
-        Route::post('/pengajuan', [EventController::class,'getEventPengajuan']);
-        Route::post('/riwayat', [EventController::class,'getEventRiwayat']);
+        Route::post('/pengajuan', [ShowEventController::class,'getEventPengajuan']);
+        Route::post('/riwayat', [ShowEventController::class,'getEventRiwayat']);
         Route::put('/pengajuan', [EventController::class,'prosesEvent']);
         Route::put('/riwayat', [EventController::class,'prosesEvent']);
     });
@@ -59,8 +59,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowPentasController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowPentasController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowPentasController::class,'showDetail']);
-        Route::post('/pengajuan', [PentasController::class,'getPentasPengajuan']);
-        Route::post('/riwayat', [PentasController::class,'getPentasRiwayat']);
+        Route::post('/pengajuan', [ShowPentasController::class,'getPentasPengajuan']);
+        Route::post('/riwayat', [ShowPentasController::class,'getPentasRiwayat']);
         Route::put('/pengajuan', [PentasController::class,'prosesPentas']);
         Route::put('/riwayat', [PentasController::class,'prosesPentas']);
     });
@@ -71,8 +71,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowSewaController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowSewaController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowSewaController::class,'showDetail']);
-        Route::post('/pengajuan', [SewaController::class,'getSewaPengajuan']);
-        Route::post('/riwayat', [SewaController::class,'getSewaRiwayat']);
+        Route::post('/pengajuan', [ShowSewaController::class,'getSewaPengajuan']);
+        Route::post('/riwayat', [ShowSewaController::class,'getSewaRiwayat']);
         Route::put('/pengajuan', [SewaController::class,'prosesSewa']);
         Route::put('/riwayat', [SewaController::class,'prosesSewa']);
     });

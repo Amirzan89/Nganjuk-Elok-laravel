@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Http\Request;
@@ -56,6 +57,64 @@ class SewaController extends Controller
             $inpDate = $processedData;
         }
         return $inpDate;
+    }
+    public function getSewaPengajuan(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $sewa = SewaTempat::select('id_sewa', 'nama_peminjam', 'nama_tempat', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'diajukan')->orWhere('status', 'proses');
+            })->orderBy('id_sewa','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal')); 
+            $sewa = SewaTempat::select('id_sewa', 'nama_peminjam', 'nama_tempat', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'diajukan')->orWhere('status', 'proses');
+            })->whereRaw('MONTH(updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(updated_at) = ?',[$tanggal[1]])->orderBy('id_sewa','DESC')->get();
+        }
+        if (!$sewa) {
+            return response()->json(['status' => 'error', 'message' => 'Data sewa tempat tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($sewa)]);
+    }
+    public function getSewaRiwayat(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $sewa = SewaTempat::select('id_sewa', 'nama_peminjam', 'nama_tempat', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'ditolak')->orWhere('status', 'diterima');
+            })->orderBy('id_sewa','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal'));
+            $sewa = SewaTempat::select('id_sewa', 'nama_peminjam', 'nama_tempat', DB::raw('DATE(created_at) AS tanggal'), 'status')->where(function ($query) {
+                $query->where('status', 'ditolak')->orWhere('status', 'diterima');
+            })->whereRaw('MONTH(updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(updated_at) = ?',[$tanggal[1]])->orderBy('id_sewa','DESC')->get();
+        }
+        if (!$sewa) {
+            return response()->json(['status' => 'error', 'message' => 'Data sewa tempat tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($sewa)]);
     }
     public function showSewa(Request $request){
         $totalTempat = ListTempat::count();

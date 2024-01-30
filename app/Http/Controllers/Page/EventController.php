@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Page;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Events;
@@ -54,6 +55,64 @@ class EventController extends Controller
             $inpDate = $processedData;
         }
         return $inpDate;
+    }
+    public function getEventPengajuan(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $event = Events::select('events.id_event', 'nama_pengirim', 'nama_event', DB::raw('DATE(events.created_at) AS tanggal'),'status')->where(function ($query) {
+                $query->where('status', 'diajukan')->orWhere('status', 'proses');
+            })->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->orderBy('events.id_event','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal')); 
+            $event = Events::select('events.id_event', 'nama_pengirim', 'nama_event', DB::raw('DATE(events.created_at) AS tanggal'),'status')->where(function ($query) {
+                $query->where('status', 'diajukan')->orWhere('status', 'proses');
+            })->whereRaw('MONTH(updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(updated_at) = ?',[$tanggal[1]])->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->orderBy('events.id_event','DESC')->get();
+        }
+        if (!$event) {
+            return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($event)]);
+    }
+    public function getEventRiwayat(Request $request){
+        $validator = Validator::make($request->only('tanggal'), [
+            'tanggal'=>'required',
+        ], [
+            'tanggal.required' => 'Tanggal wajib di isi',
+        ]);
+        if ($validator->fails()) {
+            $errors = [];
+            foreach ($validator->errors()->toArray() as $field => $errorMessages) {
+                $errors[$field] = $errorMessages[0];
+                break;
+            }
+            return response()->json(['status' => 'error', 'message' => implode(', ', $errors)], 400);
+        }
+        if($request->input('tanggal') === 'semua'){
+            $event = Events::select('events.id_event', 'nama_pengirim', 'nama_event', DB::raw('DATE(events.created_at) AS tanggal'),'status')->where(function ($query) {
+                $query->where('status', 'ditolak')->orWhere('status', 'diterima');
+            })->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->orderBy('events.id_event','DESC')->get();
+        }else{
+            $tanggal = explode('-', $request->input('tanggal'));
+            $event = Events::select('events.id_event', 'nama_pengirim', 'nama_event', DB::raw('DATE(events.created_at) AS tanggal'),'status')->where(function ($query) {
+                $query->where('status', 'ditolak')->orWhere('status', 'diterima');
+            })->whereRaw('MONTH(updated_at) = ?',[$tanggal[0]])->whereRaw('YEAR(updated_at) = ?',[$tanggal[1]])->join('detail_events', 'events.id_detail', '=', 'detail_events.id_detail')->orderBy('events.id_event','DESC')->get();
+        }
+        if (!$event) {
+            return response()->json(['status' => 'error', 'message' => 'Data event tidak ditemukan'], 400);
+        }
+        return response()->json(['status'=>'success','data'=>$this->changeMonth($event)]);
     }
     public function showEvent(Request $request){
         $totalPengajuan = Events::where('status', 'diajukan')->orWhere('status', 'proses')->count();
