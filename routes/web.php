@@ -27,6 +27,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowEventController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowEventController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowEventController::class,'showDetail']);
+        Route::post('/pengajuan', [EventController::class,'getEventPengajuan']);
+        Route::post('/riwayat', [EventController::class,'getEventRiwayat']);
         Route::put('/pengajuan', [EventController::class,'prosesEvent']);
         Route::put('/riwayat', [EventController::class,'prosesEvent']);
     });
@@ -64,6 +66,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowSewaController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowSewaController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowSewaController::class,'showDetail']);
+        Route::post('/pengajuan', [SewaController::class,'getSewaPengajuan']);
+        Route::post('/riwayat', [SewaController::class,'getSewaRiwayat']);
         Route::put('/pengajuan', [SewaController::class,'prosesSewa']);
         Route::put('/riwayat', [SewaController::class,'prosesSewa']);
     });
