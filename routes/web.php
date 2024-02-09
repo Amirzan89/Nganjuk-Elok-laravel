@@ -27,6 +27,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowEventController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowEventController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowEventController::class,'showDetail']);
+        Route::post('/pengajuan', [ShowEventController::class,'getEventPengajuan']);
+        Route::post('/riwayat', [ShowEventController::class,'getEventRiwayat']);
         Route::put('/pengajuan', [EventController::class,'prosesEvent']);
         Route::put('/riwayat', [EventController::class,'prosesEvent']);
     });
@@ -38,12 +40,15 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/riwayat', [ShowSenimanController::class,'showRiwayat']);
         Route::get('/data',[ShowSenimanController::class,'showData']);
         Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailSeniman']);
+        Route::post('/pengajuan', [ShowSenimanController::class,'getSenimanPengajuan']);
+        Route::post('/riwayat', [ShowSenimanController::class,'getSenimanRiwayat']);
         Route::put('/pengajuan', [SenimanController::class,'prosesSeniman']);
         Route::put('/riwayat', [SenimanController::class,'prosesSeniman']);
     });
     //perpanjangan route
     Route::group(['prefix'=>'/perpanjangan'],function(){
         Route::get('/', [ShowSenimanController::class,'showPerpanjangan']);
+        Route::post('/', [ShowSenimanController::class,'getPerpanjangan']);
         Route::put('/', [SenimanController::class,'prosesPerpanjangan']);
         Route::get('/detail/{id}',[ShowSenimanController::class,'showDetailPerpanjangan']);
     });
@@ -54,6 +59,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowPentasController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowPentasController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowPentasController::class,'showDetail']);
+        Route::post('/pengajuan', [ShowPentasController::class,'getPentasPengajuan']);
+        Route::post('/riwayat', [ShowPentasController::class,'getPentasRiwayat']);
         Route::put('/pengajuan', [PentasController::class,'prosesPentas']);
         Route::put('/riwayat', [PentasController::class,'prosesPentas']);
     });
@@ -64,6 +71,8 @@ Route::group(['middleware'=>['auth','authorized']],function(){
         Route::get('/pengajuan', [ShowSewaController::class,'showPengajuan']);
         Route::get('/riwayat', [ShowSewaController::class,'showRiwayat']);
         Route::get('/detail/{id}',[ShowSewaController::class,'showDetail']);
+        Route::post('/pengajuan', [ShowSewaController::class,'getSewaPengajuan']);
+        Route::post('/riwayat', [ShowSewaController::class,'getSewaRiwayat']);
         Route::put('/pengajuan', [SewaController::class,'prosesSewa']);
         Route::put('/riwayat', [SewaController::class,'prosesSewa']);
     });
