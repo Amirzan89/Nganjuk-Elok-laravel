@@ -57,7 +57,7 @@ class ListTempatSeeder extends Seeder
                 'pengelola'=>'random',
                 'contact_person'=>'0888111111116',
                 'foto_tempat'=>'/6.png',
-            ],
+            ],  
         ];
     }
     public function run(): void

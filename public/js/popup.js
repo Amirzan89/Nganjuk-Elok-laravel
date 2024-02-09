@@ -47,10 +47,10 @@ function showRedPopup(data, div){
         redPopup.style.display = 'block';
         showDiv(div);
         isPopupVisible = true;
-        setTimeout(() => {
-            closePopup('red');
-            isPopupVisible = false;
-        }, 1000);
+        // setTimeout(() => {
+        //     closePopup('red');
+        //     isPopupVisible = false;
+        // }, 1000);
     }else if(!isPopupVisible){
         if(data.message){
             redPopup.innerHTML = `
@@ -64,10 +64,10 @@ function showRedPopup(data, div){
             `;
             redPopup.style.display = 'block';
             isPopupVisible = true; 
-            setTimeout(() => {
-                closePopup('red');
-                isPopupVisible = false; 
-            }, 1000);
+            // setTimeout(() => {
+            //     closePopup('red');
+            //     isPopupVisible = false; 
+            // }, 1000);
         }else{
             redPopup.innerHTML = `
                 <div class="bg" onclick="closePopup('red',true)"></div>
@@ -80,10 +80,10 @@ function showRedPopup(data, div){
             `;
             redPopup.style.display = 'block';
             isPopupVisible = true; 
-            setTimeout(() => {
-                closePopup('red');
-                isPopupVisible = false; 
-            }, 1000);
+            // setTimeout(() => {
+            //     closePopup('red');
+            //     isPopupVisible = false; 
+            // }, 1000);
         }
     }
 }

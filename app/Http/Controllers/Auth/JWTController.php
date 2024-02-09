@@ -205,24 +205,25 @@ class JwtController extends Controller
                                     'token'=>json_decode(json_encode($token),true),
                                     'refresh'=>json_decode(json_encode($Rtoken),true)
                                 ],
-                                'number' => 1];
-                            }else{
-                                $data['number'] = $number['data'] + 1;
-                                $payloadRefresh = [ 'data' => $data, 'exp' => $expRefresh];
-                                $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
-                                $refreshToken->token = $Rtoken;
-                                $payload = [ 'data' => $data, 'exp' => $exp];
-                                $token = JWT::encode($payload, $secretKey,'HS512');
-                                $refreshToken->number = $number['data']+1;
-                                $json = [
-                                    'status'=>'success',
-                                    'data'=>
-                                    [
-                                        'token'=>json_decode(json_encode($token),true),
-                                        'refresh'=>json_decode(json_encode($Rtoken),true)
-                                    ],
-                                    'number' => $number['data']+1];
-                            // $json = ['status'=>'success','data'=>json_decode(json_encode($token),true),'number'=>$number['data']+1];
+                                'number' => 1
+                            ];
+                        }else{
+                            $data['number'] = $number['data'] + 1;
+                            $payloadRefresh = [ 'data' => $data, 'exp' => $expRefresh];
+                            $Rtoken = JWT::encode($payloadRefresh, $secretRefreshKey, 'HS512');
+                            $refreshToken->token = $Rtoken;
+                            $payload = [ 'data' => $data, 'exp' => $exp];
+                            $token = JWT::encode($payload, $secretKey,'HS512');
+                            $refreshToken->number = $number['data']+1;
+                            $json = [
+                                'status'=>'success',
+                                'data'=>
+                                [
+                                    'token'=>json_decode(json_encode($token),true),
+                                    'refresh'=>json_decode(json_encode($Rtoken),true)
+                                ],
+                                'number' => $number['data']+1
+                            ];
                         }
                         if($refreshToken->save()){
                             return $json;
